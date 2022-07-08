@@ -41,6 +41,7 @@ struct RowndHubInteropMessage: Decodable {
 
 enum MessageType: String, Codable {
     case authentication
+    case signOut = "sign_out"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -60,6 +61,7 @@ enum MessageType: String, Codable {
 
 enum MessagePayload: Decodable {
     case authentication(AuthenticationMessage)
+    case signOut
     case unknown
     
     enum CodingKeys: String, CodingKey {
@@ -81,12 +83,15 @@ enum MessagePayload: Decodable {
             let payload = try objectContainer.decode(AuthenticationMessage.self)
             self = .authentication(payload)
             
+        case .signOut:
+            self = .signOut
+            
         case .unknown:
             self = .unknown
         }
     }
-    
-    struct AuthenticationMessage: Codable {
+
+    public struct AuthenticationMessage: Codable {
         var accessToken: String
         var refreshToken: String
         

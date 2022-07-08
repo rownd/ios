@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol APIResource {
     associatedtype ModelType: Decodable
@@ -23,7 +24,17 @@ extension APIResource {
     
     // Default implementation so implementers can provide extra headers or not
     var headers: Dictionary<String, String> {
-        get { return [:] }
+        get {
+            let bundle = Bundle(for: Rownd.self)
+            
+            var bundleVersion = "unknown"
+            if let _bundleVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String {
+                bundleVersion = _bundleVersion
+            }
+
+            return ["User-Agent": "Rownd SDK for iOS/\(bundleVersion) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"]
+            
+        }
         set {}
     }
     

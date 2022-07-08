@@ -9,34 +9,29 @@ import Foundation
 import SwiftUI
 import WebKit
 
-public enum RowndHubPage {
-    case signIn
-    case signOut
-}
-
-public struct RowndHubView: UIViewControllerRepresentable {
-    public typealias UIViewControllerType = RowndHubViewController
-    var currentPage: RowndHubPage?
+public struct HubWebView: UIViewControllerRepresentable {
+    public typealias UIViewControllerType = HubWebViewController
+    var currentPage: HubPageSelector?
     
-    public init(page: RowndHubPage) {
+    public init(page: HubPageSelector) {
         self.currentPage = page
     }
     
-    public func makeUIViewController(context: Context) -> RowndHubViewController {
+    public func makeUIViewController(context: Context) -> HubWebViewController {
         let base64EncodedConfig = RowndConfig.inst.toJson()
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
 
         let hubLoaderUrl = URL(string: "\(RowndConfig.inst.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
         
-        let webView = RowndHubViewController()
+        let webView = HubWebViewController()
         
         webView.setUrl(url: hubLoaderUrl!)
 
         return webView
     }
     
-    public func updateUIViewController(_ uiViewController: RowndHubViewController, context: Context) {
+    public func updateUIViewController(_ uiViewController: HubWebViewController, context: Context) {
         
     }
 }

@@ -11,9 +11,10 @@ public struct RowndConfig: Hashable, Codable {
     static let inst = RowndConfig();
     private init(){}
 
-    var apiUrl = "https://api.us-east-2.dev.rownd.io"
-    var baseUrl = "http://localhost:8787"
-    var appKey = "82f7fa9a-8110-416c-8cc8-e3c0506fbf93"
+    public var apiUrl = "https://api.rownd.io"
+    public var baseUrl = "https://hub.rownd.io"
+    public var appKey = ""
+    public var forceDarkMode = false
     
     func toJson() -> String {
         let encoder = JSONEncoder()

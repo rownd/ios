@@ -13,11 +13,17 @@ import OSLog
 
 let logger = Logger(subsystem: "io.rownd.sdk", category: "HubView")
 
-public class RowndHubViewController: UIViewController, WKUIDelegate {
+public enum HubPageSelector {
+    case signIn
+    case signOut
+    case unknown
+}
+
+public class HubWebViewController: UIViewController, WKUIDelegate {
     
     var webView: WKWebView!
-    var activityIndicator: UIActivityIndicatorView!
-    var url: URL!
+    var url = URL(string: "https://api.rownd.io/mobile_app")!
+    var hubViewController: HubViewProtocol?
     
     func setUrl(url: URL) {
         self.url = url
@@ -50,54 +56,53 @@ public class RowndHubViewController: UIViewController, WKUIDelegate {
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.scrollView.isScrollEnabled = false
+        webView.isOpaque = false
+        webView.backgroundColor = .systemGray6
         self.modalPresentationStyle = .pageSheet
         view = webView
-        
-        // Activity indicator
-        activityIndicator = UIActivityIndicatorView()
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = UIActivityIndicatorView.Style.medium
-
-        view.addSubview(activityIndicator)
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let myRequest = URLRequest(url: url!)
-        webView.load(myRequest)
-    }
-    
-    func showActivityIndicator(show: Bool) {
-        if show {
-            activityIndicator.startAnimating()
-        } else {
-            activityIndicator.stopAnimating()
-        }
+        let hubRequest = URLRequest(url: url)
+        webView.load(hubRequest)
     }
 }
 
-extension RowndHubViewController: WKScriptMessageHandler, WKNavigationDelegate {
+extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        showActivityIndicator(show: true)
+        hubViewController?.setLoading(true)
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
         
-        showActivityIndicator(show: false)
+        hubViewController?.setLoading(false)
         
-        webView.evaluateJavaScript("rownd.requestSignIn()") { (result, error) in
-            if error != nil {
-                print(error)
+        switch (hubViewController?.targetPage) {
+        case .signOut:
+            webView.evaluateJavaScript("rownd.signOut()") { (result, error) in
+                if error != nil {
+                    print(error)
+                }
             }
+            
+        case .signIn, .unknown:
+            let idfv = UIDevice.current.identifierForVendor
+            webView.evaluateJavaScript("rownd.requestSignIn({ fingerprint: '\(idfv?.uuidString ?? "")' })") { (result, error) in
+                if error != nil {
+                    print(error)
+                }
+            }
+        case .none:
+            return
         }
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        showActivityIndicator(show: false)
+        hubViewController?.setLoading(false)
     }
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -105,12 +110,31 @@ extension RowndHubViewController: WKScriptMessageHandler, WKNavigationDelegate {
         //We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
         
+        print("hubMessage raw", response)
+        
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)
-            switch hubMessage.payload {
-            case .authentication(let authMessage):
+            
+            print("hubMessage type:", hubMessage.type)
+            
+            switch hubMessage.type {
+            case .authentication:
+                guard case .authentication(let authMessage) = hubMessage.payload else { return }
+                if store.state.auth.isAuthenticated {
+                    // The Hub is open for something else, so just chill...
+                    return
+                }
                 store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
-            default:
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
+                    self?.hubViewController?.hide()
+                }
+                
+            case .signOut:
+                store.dispatch(SetAuthState(payload: AuthState()))
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
+                    self?.hubViewController?.hide()
+                }
+            case .unknown:
                 break
             }
         } catch {

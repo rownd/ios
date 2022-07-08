@@ -9,10 +9,11 @@ import Foundation
 import SwiftUI
 import UIKit
 import ReSwift
+import WebKit
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
-    static var config: RowndConfig = RowndConfig.inst
+    public static var config: RowndConfig = RowndConfig.inst
     
     private override init() {}
     
@@ -32,6 +33,7 @@ public class Rownd: NSObject {
         }
         
         if (launchUrl?.host?.hasSuffix("rownd.link")) != nil {
+            print("launch_url:", launchUrl)
             // TODO: Ask Rownd to handle this link (probably signing the user in)
         }
     }
@@ -40,17 +42,27 @@ public class Rownd: NSObject {
         return inst
     }
     
-    public static func requestSignIn() -> RowndHubView {
-        return RowndHubView(page: RowndHubPage.signIn)
+    public static func requestSignIn() {
+        let _ = inst.displayHub(.signIn)
+    }
+    
+    public static func signOut() {
+        let _ = inst.displayHub(.signOut)
+        store.dispatch(SetAuthState(payload: AuthState()))
     }
     
     public func state() -> Store<RowndState> {
         return store
     }
     
-    public func signOut() {
-        store.dispatch(SetAuthState())
-    }
+//    public func state(type: RowndStateType) -> StateObject<AnyObject> {
+//        switch(type) {
+//        case .auth:
+//            return state().subscribe { $0.auth }
+//        case .none
+//            return nil
+//        }
+//    }
     
     // MARK: Internal methods
     private func loadAppConfig() {
@@ -61,5 +73,23 @@ public class Rownd: NSObject {
         RowndState.load()
     }
     
+    private func displayHub(_ page: HubPageSelector) -> HubViewController {
+        let rootViewController = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .compactMap({$0 as? UIWindowScene})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first?.rootViewController
+        
+        let hubController = HubViewController()
+        hubController.targetPage = page
+        
+        rootViewController?.present(hubController, animated: true)
+        
+        return hubController
+    }
     
+}
+
+public enum RowndStateType {
+    case auth, user, app, none
 }
