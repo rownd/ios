@@ -22,8 +22,10 @@
 		B302E2CD2866C75A005FD927 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CC2866C75A005FD927 /* Auth.swift */; };
 		B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */; };
 		B302E2D1286A4530005FD927 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2D0286A452F005FD927 /* Exporter.swift */; };
+		B347C24F2877DAB600935115 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C24E2877DAB600935115 /* Encryption.swift */; };
+		B347C25428786C5C00935115 /* Rownd.podspec in Resources */ = {isa = PBXBuildFile; fileRef = B347C25328786C5C00935115 /* Rownd.podspec */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
-		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift */; };
+		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B374E56428545A3800955719 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E56328545A3800955719 /* SignIn.swift */; };
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
@@ -43,8 +45,12 @@
 		B302E2CC2866C75A005FD927 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSwiftObserver.swift; sourceTree = "<group>"; };
 		B302E2D0286A452F005FD927 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
+		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
+		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; };
+		B347C25528786D8B00935115 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		B35E1ED02874C9C9007E989F /* HubViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewController.swift; sourceTree = "<group>"; };
-		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
+		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpinnerViewController.swift.bak; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B374E55B28545A1C00955719 /* framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framework.h; sourceTree = "<group>"; };
 		B374E56328545A3800955719 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
@@ -95,15 +101,34 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
-		B374E54E28545A1C00955719 = {
+		B347C25228786AE300935115 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				B3F08945286FD85300057DC2 /* README.md */,
+				B347C2562878989F00935115 /* Rownd */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		B347C2562878989F00935115 /* Rownd */ = {
+			isa = PBXGroup;
+			children = (
 				B302E2C128642329005FD927 /* Rownd.swift */,
 				B302E2B52863BCA3005FD927 /* Resources */,
 				B302E28B2863A8E5005FD927 /* Models */,
 				B374E56228545A2900955719 /* Views */,
 				B374E55A28545A1C00955719 /* framework */,
+			);
+			path = Rownd;
+			sourceTree = "<group>";
+		};
+		B374E54E28545A1C00955719 = {
+			isa = PBXGroup;
+			children = (
+				B347C25528786D8B00935115 /* LICENSE.txt */,
+				B347C25328786C5C00935115 /* Rownd.podspec */,
+				B347C25228786AE300935115 /* Sources */,
+				B347C25028786A8800935115 /* Package.swift */,
+				B3F08945286FD85300057DC2 /* README.md */,
 				B374E55928545A1C00955719 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -123,6 +148,7 @@
 				B374E55B28545A1C00955719 /* framework.h */,
 				B302E2C828650C1D005FD927 /* APIClient.swift */,
 				B302E2CA28662748005FD927 /* APIResource.swift */,
+				B347C24E2877DAB600935115 /* Encryption.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -134,7 +160,7 @@
 				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
 				B374E56328545A3800955719 /* SignIn.swift */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
-				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift */,
+				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,9 +179,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		B374E55728545A1C00955719 /* framework */ = {
+		B374E55728545A1C00955719 /* RowndSDK */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "framework" */;
+			buildConfigurationList = B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "RowndSDK" */;
 			buildPhases = (
 				B374E55328545A1C00955719 /* Headers */,
 				B374E55428545A1C00955719 /* Sources */,
@@ -166,7 +192,7 @@
 			);
 			dependencies = (
 			);
-			name = framework;
+			name = RowndSDK;
 			packageProductDependencies = (
 				B302E2BA28641A7A005FD927 /* ReSwift */,
 				B302E2C62865012F005FD927 /* ReSwiftThunk */,
@@ -207,7 +233,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B374E55728545A1C00955719 /* framework */,
+				B374E55728545A1C00955719 /* RowndSDK */,
 			);
 		};
 /* End PBXProject section */
@@ -217,6 +243,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B347C25428786C5C00935115 /* Rownd.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,12 +260,13 @@
 				B374E56428545A3800955719 /* SignIn.swift in Sources */,
 				B302E2C228642329005FD927 /* Rownd.swift in Sources */,
 				B302E2872863A8D0005FD927 /* HubWebView.swift in Sources */,
-				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift in Sources */,
+				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
+				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
 				B374E5662855873100955719 /* Color.swift in Sources */,
 				B302E2BD28641AA9005FD927 /* Context.swift in Sources */,
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
@@ -389,7 +417,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -419,7 +447,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -441,7 +469,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "framework" */ = {
+		B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "RowndSDK" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B374E56028545A1C00955719 /* Debug */,

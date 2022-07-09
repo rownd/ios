@@ -25,8 +25,6 @@ public class HubViewController: UIViewController, HubViewProtocol {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        
-        
         if let presentation = sheetPresentationController {
             presentation.detents = [.medium(), .large()]
             presentation.prefersGrabberVisible = true
