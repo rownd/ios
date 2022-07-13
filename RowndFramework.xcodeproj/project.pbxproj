@@ -58,7 +58,6 @@
 		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpinnerViewController.swift.bak; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B374E55B28545A1C00955719 /* framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framework.h; sourceTree = "<group>"; };
-		B374E56328545A3800955719 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
 		B374E5652855872F00955719 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = SOURCE_ROOT; };
 		B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingExcluded.swift; sourceTree = "<group>"; };
 		B38A4086287E720E00FD0813 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -170,7 +169,6 @@
 			children = (
 				B302E2822863A8D0005FD927 /* HubWebView.swift */,
 				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
-				B374E56328545A3800955719 /* SignIn.swift */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
 				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
 			);
