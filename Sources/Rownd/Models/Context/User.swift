@@ -15,7 +15,7 @@ public struct UserState: Hashable {
     public var isLoading: Bool = false
     public var isErrored: Bool = false
     public var errorMessage: String?
-    public var data: Dictionary<String, AnyCodable>? = [:]
+    public var data: Dictionary<String, AnyCodable> = [:]
 }
 
 extension UserState: Codable {
@@ -100,10 +100,16 @@ class UserData {
         }
     }
     
-    func save() -> Thunk<RowndState> {
+    static func save() -> Thunk<RowndState> {
+        return save(store.state.user.data)
+    }
+    
+    static func save(_ data: Dictionary<String, AnyCodable>) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
             guard !state.user.isLoading else { return }
+            
+            dispatch(SetUserData(payload: data))
             
             Task.init {
                 guard let accessToken = await Rownd.getAccessToken() else {

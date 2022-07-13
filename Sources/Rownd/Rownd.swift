@@ -10,10 +10,12 @@ import SwiftUI
 import UIKit
 import ReSwift
 import WebKit
+import AnyCodable
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig.inst
+    public static let user = UserPropAccess()
     
     private override init() {}
     
@@ -100,6 +102,38 @@ public class Rownd: NSObject {
     
 }
 
+public class UserPropAccess {
+    public func get() -> UserState {
+        return store.state.user
+    }
+    
+    public func get(field: String) -> Any {
+        return store.state.user.data[field] ?? nil
+    }
+    
+    public func get<T>(field: String) throws -> T? {
+        guard let value = store.state.user.data[field] else {
+            return nil
+        }
+        
+        return value as? T
+    }
+    
+    public func set(data: Dictionary<String, AnyCodable>) -> Void {
+        store.dispatch(UserData.save(data))
+    }
+    
+    public func set(field: String, value: AnyCodable) -> Void {
+        var userData = store.state.user.data
+        userData[field] = value
+        store.dispatch(UserData.save(userData))
+    }
+}
+
 public enum RowndStateType {
     case auth, user, app, none
+}
+
+public enum UserFieldAccessType {
+    case string, int, float, dictionary, array
 }

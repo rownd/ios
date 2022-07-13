@@ -15,12 +15,29 @@ public struct AppConfigState: Hashable {
     public var id: String?
     public var icon: String?
     public var userVerificationFields: [String]?
+    public var schema: Dictionary<String, AppSchemaField>?
 }
 
 extension AppConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case id, icon
         case userVerificationFields = "user_verification_fields"
+    }
+}
+
+public struct AppSchemaField: Hashable {
+    public var displayName: String?
+    public var type: String?
+    public var required: Bool?
+    public var ownedBy: String?
+    
+}
+
+extension AppSchemaField: Codable {
+    enum CodingKeys: String, CodingKey {
+        case type, required
+        case displayName = "display_name"
+        case ownedBy = "owned_by"
     }
 }
 
