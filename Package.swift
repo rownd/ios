@@ -34,7 +34,7 @@ let package = Package(
             .upToNextMajor(from: "6.1.0")
         ),
         .package(
-            name: "ReSwift-Thunk",
+            name: "ReSwiftThunk",
             url: "https://github.com/ReSwift/ReSwift-Thunk",
             .upToNextMajor(from: "2.0.0")
         ),
@@ -48,7 +48,7 @@ let package = Package(
     targets: [
         .target(
             name: "Rownd",
-            dependencies: ["AnyCodable", "ReSwift", "ReSwift-Thunk", "JWTDecode"]
+            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode"]
         )
     ],
     
