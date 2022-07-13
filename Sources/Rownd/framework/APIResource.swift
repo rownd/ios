@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import UIKit
 
 protocol APIResource {
     associatedtype ModelType: Decodable
     var methodPath: String { get }
-    var headers: Dictionary<String, String> { get set }
+    var headers: Dictionary<String, String>? { get set }
 }
 
 extension APIResource {
@@ -22,26 +21,16 @@ extension APIResource {
         return components.url!
     }
     
-    // Default implementation so implementers can provide extra headers or not
-    var headers: Dictionary<String, String> {
-        get {
-            let bundle = Bundle(for: Rownd.self)
-            
-            var bundleVersion = "unknown"
-            if let _bundleVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String {
-                bundleVersion = _bundleVersion
-            }
-
-            return ["User-Agent": "Rownd SDK for iOS/\(bundleVersion) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"]
-            
-        }
-        set {}
-    }
-    
     var combinedHeaders: Dictionary<String, String> {
         
-        return headers.merging([
-            "X-Rownd-App-Key": Rownd.config.appKey
+        var localHeaders = Dictionary<String, String>()
+        if let _resourceHeaders = headers {
+            localHeaders = _resourceHeaders
+        }
+        
+        return localHeaders.merging([
+            "X-Rownd-App-Key": Rownd.config.appKey,
+            "User-Agent": DEFAULT_API_USER_AGENT
         ]) { (current, _) in current }
     }
 }

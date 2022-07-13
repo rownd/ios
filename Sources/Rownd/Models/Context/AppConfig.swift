@@ -38,6 +38,8 @@ func appConfigReducer(action: Action, state: AppConfigState?) -> AppConfigState 
     switch action {
     case let action as SetAppConfig:
         state = action.payload
+    case let action as SetAppLoading:
+        state.isLoading = action.isLoading
     default:
         break
     }
@@ -53,6 +55,8 @@ struct AppConfigResponse: Decodable {
 }
 
 struct AppConfigResource: APIResource {
+    var headers: Dictionary<String, String>?
+    
     typealias ModelType = AppConfigResponse
     
     var methodPath: String {
@@ -75,7 +79,7 @@ class AppConfig {
                 // This guard ensures that the resource allocator doesn't clean up the request object before
                 // the parsing closure in request.execute() is finished with it.
                 guard request.decode != nil else { return }
-                print(appConfig)
+                logger.trace("app_config \(String(describing: appConfig))")
 //                print(self.req?.decode)
                 dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
                 dispatch(SetAppLoading(isLoading: false))

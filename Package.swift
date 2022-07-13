@@ -22,7 +22,20 @@ let package = Package(
         )
     ],
     
-    dependencies: [],
+    dependencies: [
+        .package(
+            url: "https://github.com/Flight-School/AnyCodable",
+            from: "0.6.0"
+        ),
+        .package(
+            url: "https://github.com/ReSwift/ReSwift",
+            from: "6.1.0"
+        ),
+        .package(
+            url: "https://github.com/auth0/JWTDecode.swift",
+            from: "2.6.3"
+        )
+    ],
     
     targets: [
         .target(

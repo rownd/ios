@@ -24,11 +24,16 @@
 		B302E2D1286A4530005FD927 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2D0286A452F005FD927 /* Exporter.swift */; };
 		B347C24F2877DAB600935115 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C24E2877DAB600935115 /* Encryption.swift */; };
 		B347C25428786C5C00935115 /* Rownd.podspec in Resources */ = {isa = PBXBuildFile; fileRef = B347C25328786C5C00935115 /* Rownd.podspec */; };
+		B347C27528792AD900935115 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C27428792AD900935115 /* User.swift */; };
+		B347C2782879358200935115 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = B347C2772879358200935115 /* AnyCodable */; };
+		B347C27B287CB46A00935115 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = B347C27A287CB46A00935115 /* JWTDecode */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
 		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B374E56428545A3800955719 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E56328545A3800955719 /* SignIn.swift */; };
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
+		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
+		B38A4087287E720E00FD0813 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4086287E720E00FD0813 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,12 +54,15 @@
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; };
 		B347C25528786D8B00935115 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		B347C27428792AD900935115 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B35E1ED02874C9C9007E989F /* HubViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewController.swift; sourceTree = "<group>"; };
 		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpinnerViewController.swift.bak; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B374E55B28545A1C00955719 /* framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framework.h; sourceTree = "<group>"; };
 		B374E56328545A3800955719 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
 		B374E5652855872F00955719 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = SOURCE_ROOT; };
+		B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingExcluded.swift; sourceTree = "<group>"; };
+		B38A4086287E720E00FD0813 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,6 +72,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
+				B347C2782879358200935115 /* AnyCodable in Frameworks */,
+				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,6 +107,7 @@
 				B302E2CC2866C75A005FD927 /* Auth.swift */,
 				B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */,
 				B302E2D0286A452F005FD927 /* Exporter.swift */,
+				B347C27428792AD900935115 /* User.swift */,
 			);
 			path = Context;
 			sourceTree = "<group>";
@@ -149,6 +160,8 @@
 				B302E2C828650C1D005FD927 /* APIClient.swift */,
 				B302E2CA28662748005FD927 /* APIResource.swift */,
 				B347C24E2877DAB600935115 /* Encryption.swift */,
+				B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */,
+				B38A4086287E720E00FD0813 /* Constants.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -196,6 +209,8 @@
 			packageProductDependencies = (
 				B302E2BA28641A7A005FD927 /* ReSwift */,
 				B302E2C62865012F005FD927 /* ReSwiftThunk */,
+				B347C2772879358200935115 /* AnyCodable */,
+				B347C27A287CB46A00935115 /* JWTDecode */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -228,6 +243,8 @@
 			packageReferences = (
 				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
 				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
+				B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */,
+				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -255,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */,
+				B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */,
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
 				B374E56428545A3800955719 /* SignIn.swift in Sources */,
@@ -264,6 +282,7 @@
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
+				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
@@ -272,6 +291,7 @@
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
 				B302E2CB28662749005FD927 /* APIResource.swift in Sources */,
 				B302E2972863A95A005FD927 /* RowndConfig.swift in Sources */,
+				B347C27528792AD900935115 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,6 +517,22 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Flight-School/AnyCodable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.5;
+			};
+		};
+		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -509,6 +545,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
 			productName = ReSwiftThunk;
+		};
+		B347C2772879358200935115 /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
+		};
+		B347C27A287CB46A00935115 /* JWTDecode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
+			productName = JWTDecode;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -17,13 +17,18 @@ public class Rownd: NSObject {
     
     private override init() {}
     
-    public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) {
+    public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
         if let _appKey = appKey {
             config.appKey = _appKey
         }
         
         inst.inflateStoreCache()
         inst.loadAppConfig()
+        
+        if await Rownd.getAccessToken() != nil {
+            store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
+            store.dispatch(UserData.fetch())
+        }
         
         var launchUrl: URL?
         if let _launchUrl = launchOptions?[.url] as? URL {
@@ -33,7 +38,8 @@ public class Rownd: NSObject {
         }
         
         if (launchUrl?.host?.hasSuffix("rownd.link")) != nil {
-            print("launch_url:", launchUrl)
+            logger.trace("launch_url: \(String(describing: launchUrl?.absoluteString))")
+            
             // TODO: Ask Rownd to handle this link (probably signing the user in)
         }
     }
@@ -49,6 +55,10 @@ public class Rownd: NSObject {
     public static func signOut() {
         let _ = inst.displayHub(.signOut)
         store.dispatch(SetAuthState(payload: AuthState()))
+    }
+    
+    public static func getAccessToken() async -> String? {
+        return await store.state.auth.getAccessToken()
     }
     
     public func state() -> Store<RowndState> {

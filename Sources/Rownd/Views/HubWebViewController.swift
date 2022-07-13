@@ -53,6 +53,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         
         // Init WebView
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        webView.customUserAgent = DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.scrollView.isScrollEnabled = false
@@ -115,7 +116,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)
             
-            print("hubMessage type:", hubMessage.type)
+            logger.debug("Received message from hub with type: \(String(describing: hubMessage.type))")
             
             switch hubMessage.type {
             case .authentication:
@@ -125,21 +126,22 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     return
                 }
                 store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
+                store.dispatch(UserData.fetch())
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
                     self?.hubViewController?.hide()
                 }
                 
             case .signOut:
                 store.dispatch(SetAuthState(payload: AuthState()))
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
+                store.dispatch(SetUserData(payload: [:]))
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // Change `2.0` to the desired number of seconds.
                     self?.hubViewController?.hide()
                 }
             case .unknown:
                 break
             }
         } catch {
-            logger.error("Failed to decode incoming interop message:")
-            print(error)
+            logger.error("Failed to decode incoming interop message: \(String(describing: error))")
         }
     }
 }

@@ -14,20 +14,21 @@ fileprivate let STORAGE_STATE_KEY = "RowndState"
 public struct RowndState: Codable, Hashable {
     public var appConfig = AppConfigState()
     public var auth = AuthState()
+    public var user = UserState()
 }
 
 extension RowndState {
     static func save(state: RowndState) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(state) {
-            print("storing:", String(data: encoded, encoding: .utf8))
+            logger.trace("storing: \(String(data: encoded, encoding: .utf8) ?? "{}")")
             Storage.store?.set(String(data: encoded, encoding: .utf8), forKey: STORAGE_STATE_KEY)
         }
     }
     
     static func load() {
         let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String ?? String("{}")
-        print("initial store state:", existingStateStr)
+        logger.trace("initial store state: \(existingStateStr)")
         
         let decoder = JSONDecoder()
         if let decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
@@ -48,7 +49,8 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     default:
         newState = RowndState(
             appConfig: appConfigReducer(action: action, state: state?.appConfig),
-            auth: authReducer(action: action, state: state?.auth)
+            auth: authReducer(action: action, state: state?.auth),
+            user: userReducer(action: action, state: state?.user)
         )
         
         RowndState.save(state: newState)
