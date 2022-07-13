@@ -30,7 +30,6 @@
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
 		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B374E56428545A3800955719 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E56328545A3800955719 /* SignIn.swift */; };
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
 		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
 		B38A4087287E720E00FD0813 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4086287E720E00FD0813 /* Constants.swift */; };
@@ -275,7 +274,6 @@
 				B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */,
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
-				B374E56428545A3800955719 /* SignIn.swift in Sources */,
 				B302E2C228642329005FD927 /* Rownd.swift in Sources */,
 				B302E2872863A8D0005FD927 /* HubWebView.swift in Sources */,
 				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
