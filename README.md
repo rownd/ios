@@ -57,7 +57,6 @@ struct MyView: View {
                     if authState.current.isAuthenticated {
                         Rownd.signOut()
                     } else {
-                        self.showWebView = true
                         Rownd.requestSignIn()
                     }
                 },
