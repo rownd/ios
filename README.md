@@ -26,7 +26,9 @@ In your `AppDelegate` file, call the `Rownd.configure()` method during applicati
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     
-    Rownd.configure(launchOptions: launchOptions, appKey: "82f7fa9a-8110-416c-8cc8-e3c0506fbf93")
+    Task.init {
+        await Rownd.configure(launchOptions: launchOptions, appKey: "82f7fa9a-8110-416c-8cc8-e3c0506fbf93")
+    }
     
     return true
 }
@@ -45,20 +47,33 @@ import SwiftUI
 import Rownd
 
 struct MyView: View {
-    @StateObject var authState = Rownd.getInstance().state(type: .auth)
+    @StateObject var authState = Rownd.getInstance().state().subscribe { $0.auth }
+    @StateObject var user = Rownd.getInstance().state().subscribe { $0.user.data }
     
     var body: some View {
         VStack {
-            Button(action: {
+            HStack {
+                Button(action: {
+                    if authState.current.isAuthenticated {
+                        Rownd.signOut()
+                    } else {
+                        self.showWebView = true
+                        Rownd.requestSignIn()
+                    }
+                },
+                       label: {
+                    Text(!authState.current.isAuthenticated ? "Sign in" : "Sign out")
+                })
+                Spacer()
                 if authState.current.isAuthenticated {
-                    Rownd.signOut()
-                } else {
-                    Rownd.requestSignIn()
+                    Button(action: {
+                        
+                    }, label: {
+                        Text(user.current?["first_name"]?.value as? String)
+                    })
                 }
-            },
-            label: {
-                Text(!authState.current.isAuthenticated ? "Sign in" : "Sign out")
-            })
+            }
+            .padding(.horizontal)
         }
     }
 }
@@ -83,9 +98,9 @@ public struct AuthState {
 #### .user
 ```
 public struct UserState {
-    public var id: String?                      // The user's ID as known to Rownd
-    public var data: Dictionary<String, Any>    // Contains key/value pairs for the current user
-    public var redacted: [String]               // An array of field keys that the current user has disabled your app from accessing
+    public var id: String?                           // The user's ID as known to Rownd
+    public var data: Dictionary<String, AnyCodable>  // Contains key/value pairs for the current user based on your Rownd's app config
+    public var redacted: [String]                    // An array of field keys that the current user has disabled your app from accessing
 }
 ```
 
@@ -110,7 +125,7 @@ Sets a specific user profile field to the provided value, overwriting if a value
 If something goes wrong during the operation (e.g., schema mismatch, network failure, etc), the method will throw.
 
 
-## Data encryption
+## Data encryption (coming soon)
 As indicated previously, Rownd can automatically assist you in protecting sensitive user data by encrypting it on-device with a user's unique encryption key prior to saving it in Rownd's own platform storage.
 
 When you configure your app within the Rownd platform, you can indicate that it supports on-device encryption. When this flag is set, Rownd will automatically generate a cryptographically secure, unrecoverable encryption key on the user's device after they sign in. The key is stored in the device Keychain and all encryption is handled on the device. The key is never transmitted to Rownd's servers.
