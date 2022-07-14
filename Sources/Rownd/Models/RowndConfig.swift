@@ -15,6 +15,7 @@ public struct RowndConfig: Hashable, Codable {
     public var baseUrl = "https://hub.rownd.io"
     public var appKey = ""
     public var forceDarkMode = false
+    public var postSignInRedirect: String? = nil
     
     func toJson() -> String {
         let encoder = JSONEncoder()

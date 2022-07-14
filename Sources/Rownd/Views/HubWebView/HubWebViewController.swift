@@ -24,6 +24,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     var webView: WKWebView!
     var url = URL(string: "https://api.rownd.io/mobile_app")!
     var hubViewController: HubViewProtocol?
+    var jsFunctionArgsAsJson: String = "{}"
     
     func setUrl(url: URL) {
         self.url = url
@@ -86,15 +87,15 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         case .signOut:
             webView.evaluateJavaScript("rownd.signOut()") { (result, error) in
                 if error != nil {
-                    print(error)
+                    logger.error("Failed to request sign out from Rownd: \(String(describing: error))")
                 }
             }
             
         case .signIn, .unknown:
-            let idfv = UIDevice.current.identifierForVendor
-            webView.evaluateJavaScript("rownd.requestSignIn({ fingerprint: '\(idfv?.uuidString ?? "")' })") { (result, error) in
+            print("rownd.requestSignIn(JSON.parse(\"\(jsFunctionArgsAsJson)\"))")
+            webView.evaluateJavaScript("rownd.requestSignIn(\(jsFunctionArgsAsJson))") { (result, error) in
                 if error != nil {
-                    print(error)
+                    logger.error("Failed to request sign in from Rownd: \(String(describing: error))")
                 }
             }
         case .none:

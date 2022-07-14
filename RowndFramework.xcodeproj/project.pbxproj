@@ -33,6 +33,9 @@
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
 		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
 		B38A4087287E720E00FD0813 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4086287E720E00FD0813 /* Constants.swift */; };
+		B38A4089287F28D000FD0813 /* AccountManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4088287F28D000FD0813 /* AccountManagerView.swift */; };
+		B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A408F287F5B4900FD0813 /* Encodable.swift */; };
+		B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +64,9 @@
 		B374E5652855872F00955719 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = SOURCE_ROOT; };
 		B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingExcluded.swift; sourceTree = "<group>"; };
 		B38A4086287E720E00FD0813 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		B38A4088287F28D000FD0813 /* AccountManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerView.swift; sourceTree = "<group>"; };
+		B38A408F287F5B4900FD0813 /* Encodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encodable.swift; sourceTree = "<group>"; };
+		B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerViewController.swift; sourceTree = "<group>"; };
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -160,6 +166,7 @@
 				B347C24E2877DAB600935115 /* Encryption.swift */,
 				B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */,
 				B38A4086287E720E00FD0813 /* Constants.swift */,
+				B38A408F287F5B4900FD0813 /* Encodable.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -167,12 +174,30 @@
 		B374E56228545A2900955719 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B302E2822863A8D0005FD927 /* HubWebView.swift */,
-				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
+				B38A4095287FC0DC00FD0813 /* HubWebView */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
 				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
+				B38A4094287FC0CA00FD0813 /* AccountManager */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B38A4094287FC0CA00FD0813 /* AccountManager */ = {
+			isa = PBXGroup;
+			children = (
+				B38A4088287F28D000FD0813 /* AccountManagerView.swift */,
+				B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */,
+			);
+			path = AccountManager;
+			sourceTree = "<group>";
+		};
+		B38A4095287FC0DC00FD0813 /* HubWebView */ = {
+			isa = PBXGroup;
+			children = (
+				B302E2822863A8D0005FD927 /* HubWebView.swift */,
+				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
+			);
+			path = HubWebView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,6 +267,7 @@
 				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
 				B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
+				B38A408A287F2B5900FD0813 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -268,7 +294,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */,
 				B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */,
+				B38A4089287F28D000FD0813 /* AccountManagerView.swift in Sources */,
 				B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */,
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
@@ -282,6 +310,7 @@
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
+				B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */,
 				B374E5662855873100955719 /* Color.swift in Sources */,
 				B302E2BD28641AA9005FD927 /* Context.swift in Sources */,
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
@@ -419,7 +448,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 34CNMPW6U9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -433,7 +462,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -449,7 +478,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 34CNMPW6U9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -463,7 +492,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -527,6 +556,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
+			};
+		};
+		B38A408A287F2B5900FD0813 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

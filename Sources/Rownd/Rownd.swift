@@ -51,12 +51,20 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn() {
-        let _ = inst.displayHub(.signIn)
+        requestSignIn(nil)
+    }
+    
+    public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {        
+        let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
     public static func signOut() {
         let _ = inst.displayHub(.signOut)
         store.dispatch(SetAuthState(payload: AuthState()))
+    }
+    
+    public static func manageUser() {
+        inst.displayViewControllerOnTop(AccountManagerViewController())
     }
     
     public static func getAccessToken() async -> String? {
@@ -67,14 +75,14 @@ public class Rownd: NSObject {
         return store
     }
     
-//    public func state(type: RowndStateType) -> StateObject<AnyObject> {
-//        switch(type) {
-//        case .auth:
-//            return state().subscribe { $0.auth }
-//        case .none
-//            return nil
-//        }
-//    }
+    //    public func state(type: RowndStateType) -> StateObject<AnyObject> {
+    //        switch(type) {
+    //        case .auth:
+    //            return state().subscribe { $0.auth }
+    //        case .none
+    //            return nil
+    //        }
+    //    }
     
     // MARK: Internal methods
     private func loadAppConfig() {
@@ -86,18 +94,34 @@ public class Rownd: NSObject {
     }
     
     private func displayHub(_ page: HubPageSelector) -> HubViewController {
-        let rootViewController = UIApplication.shared.connectedScenes
-                .filter({$0.activationState == .foregroundActive})
-                .compactMap({$0 as? UIWindowScene})
-                .first?.windows
-                .filter({$0.isKeyWindow}).first?.rootViewController
-        
+        return displayHub(page, jsFnOptions: nil)
+    }
+    
+    private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
         let hubController = HubViewController()
         hubController.targetPage = page
         
-        rootViewController?.present(hubController, animated: true)
+        displayViewControllerOnTop(hubController)
+        
+        if let jsFnOptions = jsFnOptions {
+            do {
+                hubController.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
+            } catch {
+                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+            }
+        }
         
         return hubController
+    }
+    
+    private func displayViewControllerOnTop(_ viewController: UIViewController) {
+        let rootViewController = UIApplication.shared.connectedScenes
+            .filter({$0.activationState == .foregroundActive})
+            .compactMap({$0 as? UIWindowScene})
+            .first?.windows
+            .filter({$0.isKeyWindow}).first?.rootViewController
+        
+        rootViewController?.present(viewController, animated: true)
     }
     
 }
@@ -136,4 +160,16 @@ public enum RowndStateType {
 
 public enum UserFieldAccessType {
     case string, int, float, dictionary, array
+}
+
+public struct RowndSignInOptions: Encodable {
+    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect) {
+        self.postSignInRedirect = postSignInRedirect
+    }
+    
+    public var postSignInRedirect: String? = Rownd.config.postSignInRedirect
+    
+    enum CodingKeys: String, CodingKey {
+        case postSignInRedirect = "post_login_redirect"
+    }
 }

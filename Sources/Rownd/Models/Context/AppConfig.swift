@@ -20,7 +20,7 @@ public struct AppConfigState: Hashable {
 
 extension AppConfigState: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, icon
+        case id, icon, schema
         case userVerificationFields = "user_verification_fields"
     }
 }
