@@ -92,7 +92,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
             
         case .signIn, .unknown:
-            print("rownd.requestSignIn(JSON.parse(\"\(jsFunctionArgsAsJson)\"))")
             webView.evaluateJavaScript("rownd.requestSignIn(\(jsFunctionArgsAsJson))") { (result, error) in
                 if error != nil {
                     logger.error("Failed to request sign in from Rownd: \(String(describing: error))")

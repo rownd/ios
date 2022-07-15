@@ -84,6 +84,12 @@ public class Rownd: NSObject {
 //        }
 //    }
     
+    public static func _refreshToken() {
+        Auth.refreshToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
+            print(authState)
+        }
+    }
+    
     // MARK: Internal methods
     private func loadAppConfig() {
         store.dispatch(AppConfig().fetch())

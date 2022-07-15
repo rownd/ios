@@ -110,12 +110,12 @@ struct TokenResource: APIResource {
 class Auth {
     static func refreshToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         var resource = TokenResource()
-        let request = APIRequest(resource: resource)
-        
         resource.headers = [
             "Content-Type": "application/json"
         ]
-        
+
+        let request = APIRequest(resource: resource)
+
         let encoder = JSONEncoder()
         var body: Data?
         do {
