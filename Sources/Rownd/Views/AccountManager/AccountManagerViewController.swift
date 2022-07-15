@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import UIKit
-import OverlayContainer
 
 public class AccountManagerViewController: UIViewController {
     
