@@ -33,10 +33,10 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let presentation = sheetPresentationController {
-            presentation.detents = [.medium(), .large()]
-            presentation.prefersGrabberVisible = true
-        }
+//        if let presentation = sheetPresentationController {
+//            presentation.detents = [.medium(), .large()]
+//            presentation.prefersGrabberVisible = true
+//        }
     }
     
     public override func loadView() {
@@ -74,7 +74,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        hubViewController?.setLoading(true)
+//        hubViewController?.setLoading(true)
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -112,7 +112,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         //We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
         
-        print("hubMessage raw", response)
+        logger.trace("Received message from hub: \(response)")
         
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)

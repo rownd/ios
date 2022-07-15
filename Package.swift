@@ -13,7 +13,7 @@ import PackageDescription
 let package = Package(
     name: "Rownd",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v14)
     ],
     products: [
         .library(
@@ -43,12 +43,18 @@ let package = Package(
             url: "https://github.com/auth0/JWTDecode.swift",
             .upToNextMajor(from: "2.6.3")
         )
+        .package(
+            name: "LBBottomSheet",
+            url: "https://github.com/LunabeeStudio/LBBottomSheet",
+            .upToNextMajor(from: "1.0.17")
+        )
+
     ],
     
     targets: [
         .target(
             name: "Rownd",
-            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode"]
+            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode", "LBBottomSheet"]
         )
     ],
     

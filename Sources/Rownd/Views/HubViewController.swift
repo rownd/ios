@@ -25,10 +25,10 @@ public class HubViewController: UIViewController, HubViewProtocol {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let presentation = sheetPresentationController {
-            presentation.detents = [.medium(), .large()]
-            presentation.prefersGrabberVisible = true
-        }
+//        if let presentation = sheetPresentationController {
+//            presentation.detents = [.medium(), .large()]
+//            presentation.prefersGrabberVisible = true
+//        }
         
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -60,6 +60,7 @@ public class HubViewController: UIViewController, HubViewProtocol {
         view.backgroundColor = .systemGray6
         addChild(hubWebController)
         view.addSubview(hubWebController.view)
+        setupConstraints()
         
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark
@@ -80,6 +81,14 @@ public class HubViewController: UIViewController, HubViewProtocol {
     
     func show() {
         view.isHidden = false
+    }
+    
+    fileprivate func setupConstraints() {
+        hubWebController.view.translatesAutoresizingMaskIntoConstraints = false
+        hubWebController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        hubWebController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        hubWebController.view.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        hubWebController.view.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
     
 }

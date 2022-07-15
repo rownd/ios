@@ -75,14 +75,14 @@ public class Rownd: NSObject {
         return store
     }
     
-    //    public func state(type: RowndStateType) -> StateObject<AnyObject> {
-    //        switch(type) {
-    //        case .auth:
-    //            return state().subscribe { $0.auth }
-    //        case .none
-    //            return nil
-    //        }
-    //    }
+//    public func state(type: RowndStateType) -> StateObject<AnyObject> {
+//        switch(type) {
+//        case .auth:
+//            return state().subscribe { $0.auth }
+//        case .none
+//            return nil
+//        }
+//    }
     
     // MARK: Internal methods
     private func loadAppConfig() {
@@ -121,7 +121,13 @@ public class Rownd: NSObject {
             .first?.windows
             .filter({$0.isKeyWindow}).first?.rootViewController
         
-        rootViewController?.present(viewController, animated: true)
+        // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
+        // Can't replace it yet (2022) since there are too many devices running iOS 14.
+        let bottomSheetController = BottomSheetController()
+        bottomSheetController.controller = viewController
+
+        rootViewController?.addChild(bottomSheetController)
+        rootViewController?.view.addSubview(bottomSheetController.view)
     }
     
 }

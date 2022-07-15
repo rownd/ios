@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import OverlayContainer
 
 public class AccountManagerViewController: UIViewController {
     
@@ -16,10 +17,10 @@ public class AccountManagerViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let presentation = sheetPresentationController {
-            presentation.detents = [.medium(), .large()]
-            presentation.prefersGrabberVisible = true
-        }
+//        if let presentation = sheetPresentationController {
+//            presentation.detents = [.large()]
+//            presentation.prefersGrabberVisible = true
+//        }
     }
     
     public override func loadView() {

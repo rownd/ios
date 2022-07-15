@@ -19,12 +19,18 @@ extension NetworkRequest {
         request.allHTTPHeaderFields = headers ?? [:]
         request.httpMethod = method
         request.httpBody = body
+        request.timeoutInterval = 10 // seconds
         
         if let body = body {
             logger.trace("API request body: \(String(decoding: body, as: UTF8.self))")
         }
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] (data, resp , error) -> Void in
+            guard error == nil else {
+                logger.error("Network request failed: \(String(describing: error))")
+                return
+            }
+            
             let response = resp as! HTTPURLResponse
             guard (200...299).contains(response.statusCode) else {
                 logger.error("API call failed (\(response.statusCode)): \(String(decoding: data ?? Data(), as: UTF8.self))")

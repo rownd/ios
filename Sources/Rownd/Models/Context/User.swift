@@ -18,9 +18,7 @@ public struct UserState: Hashable {
     public var data: Dictionary<String, AnyCodable> = [:]
 }
 
-extension UserState: Codable {
-    
-}
+extension UserState: Codable {}
 
 struct SetUserLoading: Action {
     var isLoading: Bool
@@ -55,7 +53,7 @@ func userReducer(action: Action, state: UserState?) -> UserState {
 // Easily unwrap the main payload from the `app` key
 struct UserDataPayload: Codable {
     var data: Dictionary<String, AnyCodable>
-    var redacted: [String]
+    var redacted: [String]?
 }
 
 struct UserDataResource: APIResource {
@@ -118,23 +116,27 @@ class UserData {
                 
                 dispatch(SetUserLoading(isLoading: true))
                 var resource = UserDataResource()
-                resource.headers = ["Authorization": "Bearer \(accessToken)"]
+                resource.headers = [
+                    "Authorization": "Bearer \(accessToken)",
+                    "Content-Type": "application/json"
+                ]
                 let request = APIRequest(resource: resource)
                 
                 // TODO: Get current user state as json string for body
                 let encoder = JSONEncoder()
+                let userDataPayload = UserDataPayload(data: data)
                 var body: Data? = nil
                 do {
-                    body = try encoder.encode(state.user.data)
+                    body = try encoder.encode(userDataPayload)
                 } catch {
                     dispatch(SetUserError(errorMessage: "The user profile could not be encoded: \(error)"))
                 }
                 request.execute(method: "PUT", body: body) { userResp in
                     // This guard ensures that the resource allocator doesn't clean up the request object before
                     // the parsing closure in request.execute() is finished with it.
-                    //                guard request.decode != nil else { return }
-                    print(userResp)
-                    //                print(self.req?.decode)
+                    guard request.decode != nil else { return }
+                    logger.debug("Decoded user response: \(String(describing: userResp))")
+
                     dispatch(SetUserData(payload: userResp?.data ?? [:]))
                     dispatch(SetUserLoading(isLoading: false))
                 }

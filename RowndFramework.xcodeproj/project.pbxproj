@@ -36,6 +36,8 @@
 		B38A4089287F28D000FD0813 /* AccountManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4088287F28D000FD0813 /* AccountManagerView.swift */; };
 		B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A408F287F5B4900FD0813 /* Encodable.swift */; };
 		B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */; };
+		B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A409D288111F200FD0813 /* BottomSheetController.swift */; };
+		B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40A02881157D00FD0813 /* LBBottomSheet */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,7 @@
 		B38A4088287F28D000FD0813 /* AccountManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerView.swift; sourceTree = "<group>"; };
 		B38A408F287F5B4900FD0813 /* Encodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encodable.swift; sourceTree = "<group>"; };
 		B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerViewController.swift; sourceTree = "<group>"; };
+		B38A409D288111F200FD0813 /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,6 +80,7 @@
 			files = (
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
 				B347C2782879358200935115 /* AnyCodable in Frameworks */,
+				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
 			);
@@ -178,6 +182,7 @@
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
 				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
 				B38A4094287FC0CA00FD0813 /* AccountManager */,
+				B38A409D288111F200FD0813 /* BottomSheetController.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -233,6 +238,7 @@
 				B302E2C62865012F005FD927 /* ReSwiftThunk */,
 				B347C2772879358200935115 /* AnyCodable */,
 				B347C27A287CB46A00935115 /* JWTDecode */,
+				B38A40A02881157D00FD0813 /* LBBottomSheet */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -267,7 +273,7 @@
 				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
 				B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
-				B38A408A287F2B5900FD0813 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -305,6 +311,7 @@
 				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
+				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
 				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
@@ -374,7 +381,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -431,7 +438,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -558,9 +565,9 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B38A408A287F2B5900FD0813 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
+			repositoryURL = "https://github.com/LunabeeStudio/LBBottomSheet.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
@@ -588,6 +595,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
 			productName = JWTDecode;
+		};
+		B38A40A02881157D00FD0813 /* LBBottomSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */;
+			productName = LBBottomSheet;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -109,11 +109,14 @@ struct TokenResource: APIResource {
 
 class Auth {
     static func refreshToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
-        let resource = TokenResource()
+        var resource = TokenResource()
         let request = APIRequest(resource: resource)
         
-        let encoder = JSONEncoder()
+        resource.headers = [
+            "Content-Type": "application/json"
+        ]
         
+        let encoder = JSONEncoder()
         var body: Data?
         do {
             body = try encoder.encode(TokenRequest(refreshToken: refreshToken))
@@ -125,7 +128,7 @@ class Auth {
             // This guard ensures that the resource allocator doesn't clean up the request object before
             // the parsing closure in request.execute() is finished with it.
             guard request.decode != nil else { return }
-            print(tokenResp)
+            logger.trace("Received tokens: \(String(describing: tokenResp))")
             
             completion(tokenResp)
         }
