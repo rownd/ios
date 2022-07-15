@@ -42,7 +42,7 @@ let package = Package(
             name: "JWTDecode",
             url: "https://github.com/auth0/JWTDecode.swift",
             .upToNextMajor(from: "2.6.3")
-        )
+        ),
         .package(
             name: "LBBottomSheet",
             url: "https://github.com/LunabeeStudio/LBBottomSheet",
