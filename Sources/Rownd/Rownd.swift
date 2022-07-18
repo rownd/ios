@@ -75,7 +75,7 @@ public class Rownd: NSObject {
     }
     
     public static func getAccessToken() async -> String? {
-        return await store.state.auth.getAccessToken(nil)
+        return await store.state.auth.getAccessToken()
     }
     
     public func state() -> Store<RowndState> {
