@@ -27,7 +27,7 @@ In your `AppDelegate` file, call the `Rownd.configure()` method during applicati
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     
     Task.init {
-        await Rownd.configure(launchOptions: launchOptions, appKey: "82f7fa9a-8110-416c-8cc8-e3c0506fbf93")
+        await Rownd.configure(launchOptions: launchOptions, appKey: "YOUR_API_KEY")
     }
     
     return true
