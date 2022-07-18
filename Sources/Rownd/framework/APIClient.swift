@@ -25,7 +25,7 @@ extension NetworkRequest {
             logger.trace("API request body: \(String(decoding: body, as: UTF8.self))")
         }
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] (data, resp , error) -> Void in
+        let task = URLSession.shared.dataTask(with: request) { [weak self] (data, resp, error) -> Void in
             guard error == nil else {
                 logger.error("Network request failed: \(String(describing: error))")
                 return

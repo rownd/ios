@@ -22,7 +22,7 @@ public enum HubPageSelector {
 public class HubWebViewController: UIViewController, WKUIDelegate {
     
     var webView: WKWebView!
-    var url = URL(string: "https://api.rownd.io/mobile_app")!
+    var url = URL(string: "https://hub.rownd.io/mobile_app")!
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
     
