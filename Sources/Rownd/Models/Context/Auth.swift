@@ -45,7 +45,7 @@ extension AuthState: Codable {
                     }
                     
                     if let refreshToken = store.state.auth.refreshToken {
-                        Auth.refreshToken(refreshToken: refreshToken) { tokenResource in
+                        Auth.refreshToken(refreshToken: refreshToken, id_token: nil) { tokenResource in
                             if let newAuthState = tokenResource {
                                 store.dispatch(SetAuthState(payload: newAuthState))
                                 continuation.resume(returning: newAuthState.accessToken)
@@ -90,10 +90,14 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
 // MARK: Token / auth API calls
 
 struct TokenRequest: Codable {
-    var refreshToken: String
+    var refreshToken: String?
+    var id_token: String?
+    var app_id: String?
     
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
+        case id_token = "id_token"
+        case app_id = "app_id"
     }
 }
 
@@ -108,7 +112,7 @@ struct TokenResource: APIResource {
 }
 
 class Auth {
-    static func refreshToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+    static func refreshToken(refreshToken: String?, id_token: String?, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         var resource = TokenResource()
         resource.headers = [
             "Content-Type": "application/json"
@@ -119,7 +123,14 @@ class Auth {
         let encoder = JSONEncoder()
         var body: Data?
         do {
-            body = try encoder.encode(TokenRequest(refreshToken: refreshToken))
+            if id_token != nil {
+                guard let app_id = store.state.appConfig.id else { return completion(nil) }
+                body = try encoder.encode(TokenRequest(id_token: id_token, app_id: app_id))
+            }
+            else {
+                body = try encoder.encode(TokenRequest(refreshToken: refreshToken))
+            }
+            
         } catch {
             return completion(nil)
         }
