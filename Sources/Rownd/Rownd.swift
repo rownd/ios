@@ -11,13 +11,19 @@ import UIKit
 import ReSwift
 import WebKit
 import AnyCodable
+import AuthenticationServices
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig.inst
     public static let user = UserPropAccess()
+    private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
     
     private override init() {}
+    
+    public static func requestAppleSignIn() {
+        appleSignUpCoordinator?.didTapButton()
+    }
     
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
         if let _appKey = appKey {
@@ -26,6 +32,7 @@ public class Rownd: NSObject {
         
         inst.inflateStoreCache()
         inst.loadAppConfig()
+        inst.loadAppleSignIn()
         
         if await Rownd.getAccessToken() != nil {
             store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
@@ -68,7 +75,7 @@ public class Rownd: NSObject {
     }
     
     public static func getAccessToken() async -> String? {
-        return await store.state.auth.getAccessToken()
+        return await store.state.auth.getAccessToken(nil)
     }
     
     public func state() -> Store<RowndState> {
@@ -85,12 +92,17 @@ public class Rownd: NSObject {
 //    }
     
     public static func _refreshToken() {
-        Auth.refreshToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
+        Auth.refreshToken(refreshToken: store.state.auth.refreshToken ?? "no token", id_token: nil) { authState in
             print(authState)
         }
     }
     
     // MARK: Internal methods
+    private func loadAppleSignIn() {
+        //If we want to check if the AppleId userIdentifier is still valid
+    }
+ 
+    
     private func loadAppConfig() {
         store.dispatch(AppConfig().fetch())
     }
