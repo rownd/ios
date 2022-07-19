@@ -45,7 +45,7 @@ extension AuthState: Codable {
                     }
                     
                     if let refreshToken = store.state.auth.refreshToken {
-                        Auth.refreshToken(refreshToken: refreshToken) { tokenResource in
+                        Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
                             if let newAuthState = tokenResource {
                                 store.dispatch(SetAuthState(payload: newAuthState))
                                 continuation.resume(returning: newAuthState.accessToken)
@@ -90,10 +90,14 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
 // MARK: Token / auth API calls
 
 struct TokenRequest: Codable {
-    var refreshToken: String
+    var refreshToken: String?
+    var idToken: String?
+    var appId: String?
     
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
+        case idToken = "id_token"
+        case appId = "app_id"
     }
 }
 
@@ -108,7 +112,18 @@ struct TokenResource: APIResource {
 }
 
 class Auth {
-    static func refreshToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+    static func fetchToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+        let tokenRequest = TokenRequest(refreshToken: refreshToken)
+        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
+    }
+    
+    static func fetchToken(idToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+        guard let appId = store.state.appConfig.id else { return completion(nil) }
+        let tokenRequest = TokenRequest(idToken: idToken, appId: appId)
+        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
+    }
+    
+    static func fetchToken(tokenRequest: TokenRequest, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         var resource = TokenResource()
         resource.headers = [
             "Content-Type": "application/json"
@@ -118,8 +133,9 @@ class Auth {
 
         let encoder = JSONEncoder()
         var body: Data?
+        
         do {
-            body = try encoder.encode(TokenRequest(refreshToken: refreshToken))
+            body = try encoder.encode(tokenRequest)
         } catch {
             return completion(nil)
         }

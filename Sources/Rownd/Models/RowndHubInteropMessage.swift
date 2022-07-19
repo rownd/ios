@@ -42,6 +42,7 @@ struct RowndHubInteropMessage: Decodable {
 enum MessageType: String, Codable {
     case authentication
     case signOut = "sign_out"
+    case triggerSignInWithApple = "trigger_sign_in_with_apple"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -63,6 +64,7 @@ enum MessagePayload: Decodable {
     case authentication(AuthenticationMessage)
     case signOut
     case unknown
+    case triggerSignInWithApple
     
     enum CodingKeys: String, CodingKey {
         case type
@@ -79,6 +81,9 @@ enum MessagePayload: Decodable {
         let objectContainer = try decoder.singleValueContainer()
         
         switch type {
+        case .triggerSignInWithApple:
+            self = .triggerSignInWithApple
+            
         case .authentication:
             let payload = try objectContainer.decode(AuthenticationMessage.self)
             self = .authentication(payload)

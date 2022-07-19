@@ -11,11 +11,13 @@ import UIKit
 import ReSwift
 import WebKit
 import AnyCodable
+import AuthenticationServices
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig.inst
     public static let user = UserPropAccess()
+    private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
     
     private override init() {}
     
@@ -26,6 +28,7 @@ public class Rownd: NSObject {
         
         inst.inflateStoreCache()
         inst.loadAppConfig()
+        inst.loadAppleSignIn()
         
         if await Rownd.getAccessToken() != nil {
             store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
@@ -52,6 +55,15 @@ public class Rownd: NSObject {
     
     public static func requestSignIn() {
         requestSignIn(nil)
+    }
+    
+    public static func requestSignIn(with: RowndSignInHint) {
+        switch with {
+        case .appleId:
+            appleSignUpCoordinator?.didTapButton()
+        default:
+            requestSignIn()
+        }
     }
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {        
@@ -85,12 +97,17 @@ public class Rownd: NSObject {
 //    }
     
     public static func _refreshToken() {
-        Auth.refreshToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
+        Auth.fetchToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
             print(authState)
         }
     }
     
     // MARK: Internal methods
+    private func loadAppleSignIn() {
+        //If we want to check if the AppleId userIdentifier is still valid
+    }
+ 
+    
     private func loadAppConfig() {
         store.dispatch(AppConfig().fetch())
     }
@@ -172,6 +189,10 @@ public enum RowndStateType {
 
 public enum UserFieldAccessType {
     case string, int, float, dictionary, array
+}
+
+public enum RowndSignInHint {
+      case appleId
 }
 
 public struct RowndSignInOptions: Encodable {
