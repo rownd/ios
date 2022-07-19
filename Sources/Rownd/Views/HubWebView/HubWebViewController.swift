@@ -132,6 +132,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
                 
             case .triggerSignInWithApple:
+                self.hubViewController?.hide()
                 Rownd.requestAppleSignIn()
                 
             case .signOut:
