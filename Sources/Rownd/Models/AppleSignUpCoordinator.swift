@@ -28,7 +28,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         //Make the request
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         
-        //Assingnig the delegates
+        //Assigning the delegates
         authorizationController.presentationContextProvider = self
         authorizationController.delegate = self
         authorizationController.performRequests()
@@ -39,7 +39,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         return (vc?.view.window!)!
     }
     
-    //If authorization is successfull then this method will get triggered
+    //If authorization is successful then this method will get triggered
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
@@ -52,8 +52,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
-                let id_token = urlContent as String
-                Auth.refreshToken(refreshToken: nil, id_token: id_token) { authState in
+                let idToken = urlContent as String
+                Auth.fetchToken(idToken: idToken) { authState in
                     store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
                     var userData = store.state.user.data
                     if let email = email {
@@ -81,7 +81,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         
         //If there is any error will get it here
-        logger.trace("apple sign credential error")
+        logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
     }
 }
 
