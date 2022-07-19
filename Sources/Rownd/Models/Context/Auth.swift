@@ -87,6 +87,15 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
     return state
 }
 
+func receiveAuthTokens() -> Thunk<RowndState> {
+    return Thunk<RowndState> { dispatch, getState in
+        guard let state = getState() else { return }
+
+        store.dispatch(UserData.fetch())
+
+    }
+}
+
 // MARK: Token / auth API calls
 
 struct TokenRequest: Codable {

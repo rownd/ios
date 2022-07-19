@@ -16,11 +16,11 @@ class RowndEncryption {
         return key
     }
 
-    static func storeKey(key: SecretBox.Key, keyId: String?) throws -> Void {
+    static func storeKey(key: SecretBox.Key, keyId: String?) -> Void {
         KeychainWrapper.standard.set(key.asData(), forKey: keyName(keyId))
     }
 
-    static func loadKey(keyId: String?) throws -> SecretBox.Key? {
+    static func loadKey(keyId: String?) -> SecretBox.Key? {
         let keyData = KeychainWrapper.standard.data(forKey: keyName(keyId))
 
         guard let keyData = keyData else {
@@ -40,13 +40,8 @@ class RowndEncryption {
 }
 
 extension RowndEncryption {
-    public static func encrypt(plaintext: String, withKeyId keyId: String) throws -> Data {
-        let key: SecretBox.Key? = try loadKey(keyId: keyId)
-
-        guard let key = key else {
-            throw KeyStoreError("The requested key '\(keyId)' could not be found")
-        }
-
+    // MARK: Encrypt data methods
+    public static func encrypt(plaintext: String, withKey key: SecretBox.Key) throws -> Data {
         let encrypted: Bytes? = sodium.secretBox.seal(message: plaintext.bytes, secretKey: key)
 
         guard let encrypted = encrypted else {
@@ -58,18 +53,31 @@ extension RowndEncryption {
         }
     }
 
+    public static func encrypt(plaintext: String, withKey key: SecretBox.Key) throws -> String {
+        let encrypted: Data = try encrypt(plaintext: plaintext, withKey: key)
+
+        return encrypted.base64EncodedString()
+    }
+
+    public static func encrypt(plaintext: String, withKeyId keyId: String) throws -> Data {
+        let key: SecretBox.Key? = try loadKey(keyId: keyId)
+
+        guard let key = key else {
+            throw KeyStoreError("The requested key '\(keyId)' could not be found")
+        }
+
+        return try encrypt(plaintext: plaintext, withKey: key)
+    }
+
     public static func encrypt(plaintext: String, withKeyId keyId: String) throws -> String {
         let encrypted: Data = try encrypt(plaintext: plaintext, withKeyId: keyId)
 
         return encrypted.base64EncodedString()
     }
 
-    public static func decrypt(ciphertext: String, withKeyId keyId: String) throws -> Data {
-        let key: SecretBox.Key? = try loadKey(keyId: keyId)
+    // MARK: Decrypt data methods
+    public static func decrypt(ciphertext: String, withKey key: SecretBox.Key) throws -> Data {
 
-        guard let key = key else {
-            throw KeyStoreError("The requested key '\(keyId)' could not be found")
-        }
 
         // Decode the string data back to Bytes
         let encrypted = Data(base64Encoded: ciphertext)
@@ -77,7 +85,6 @@ extension RowndEncryption {
         guard let encrypted = encrypted else {
             throw EncryptionError("Failed to read ciphertext. Not encoded as base64.")
         }
-
 
         let decrypted = sodium.secretBox.open(nonceAndAuthenticatedCipherText: Array(encrypted), secretKey: key)
 
@@ -88,6 +95,20 @@ extension RowndEncryption {
         return decrypted.withUnsafeBytes { body in
             Data(body)
         }
+    }
+
+    public static func decrypt(ciphertext: String, withKey key: SecretBox.Key) throws -> String {
+        return String(decoding: try decrypt(ciphertext: ciphertext, withKey: key), as: UTF8.self)
+    }
+
+    public static func decrypt(ciphertext: String, withKeyId keyId: String) throws -> Data {
+        let key: SecretBox.Key? = loadKey(keyId: keyId)
+
+        guard let key = key else {
+            throw KeyStoreError("The requested key '\(keyId)' could not be found")
+        }
+
+        return try decrypt(ciphertext: ciphertext, withKey: key)
     }
 
     public static func decrypt(ciphertext: String, withKeyId keyId: String) throws -> String {

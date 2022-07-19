@@ -18,7 +18,37 @@ public struct UserState: Hashable {
     public var data: Dictionary<String, AnyCodable> = [:]
 }
 
-extension UserState: Codable {}
+extension UserState: Codable {
+    public func get() -> UserState {
+        return self
+    }
+
+    public func get(field: String) -> Any {
+        return self.data[field] ?? nil
+    }
+
+    public func get<T>(field: String) -> T? {
+        guard let value = self.data[field] else {
+            return nil
+        }
+
+        return value.value as? T
+    }
+
+    public func set(data: Dictionary<String, AnyCodable>) -> Void {
+        store.dispatch(UserData.save(data))
+    }
+
+    public func set(field: String, value: AnyCodable) -> Void {
+        var userData = self.data
+        userData[field] = value
+        store.dispatch(UserData.save(userData))
+    }
+}
+
+struct SetUserState: Action {
+    public var payload = UserState()
+}
 
 struct SetUserLoading: Action {
     var isLoading: Bool
@@ -41,6 +71,8 @@ func userReducer(action: Action, state: UserState?) -> UserState {
         state.data = action.payload
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
+    case let action as SetUserState:
+        state = action.payload
     default:
         break
     }
@@ -88,9 +120,31 @@ class UserData {
                 request.execute { userResp in
                     // This guard ensures that the resource allocator doesn't clean up the request object before
                     // the parsing closure in request.execute() is finished with it.
-                    guard request.decode != nil else { return }
-                    print(userResp)
-                    //                print(self.req?.decode)
+                    guard request.decode != nil else {
+                        dispatch(SetUserLoading(isLoading: false))
+                        return
+                    }
+                    logger.debug("Decoded user response: \(String(describing: userResp))")
+
+                    var updatedUserState = UserState()
+                    updatedUserState.data = userResp?.data ?? [:]
+
+                    let encKeyId = Rownd.user.ensureEncryptionKey(user: updatedUserState)
+
+                    if let encKeyId = encKeyId, var userResp = userResp, let userDataDict = userResp.data.dictionary {
+                        // Decrypt user fields
+                        for (key, value) in userDataDict {
+                            if state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value as? String {
+                                do {
+                                    let decrypted: String = try RowndEncryption.decrypt(ciphertext: value, withKeyId: encKeyId)
+                                    userResp.data[key] = AnyCodable.init(decrypted)
+                                } catch {
+                                    logger.trace("Failed to decrypt user data value. Error: \(String(describing: error))")
+                                }
+                            }
+                        }
+                    }
+
                     dispatch(SetUserLoading(isLoading: false))
                     dispatch(SetUserData(payload: userResp?.data ?? [:]))
                 }

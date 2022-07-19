@@ -30,15 +30,23 @@ public struct AppSchemaField: Hashable {
     public var type: String?
     public var required: Bool?
     public var ownedBy: String?
-    
+    public var encryption: AppSchemaFieldEncryption?
 }
 
 extension AppSchemaField: Codable {
     enum CodingKeys: String, CodingKey {
-        case type, required
+        case type, required, encryption
         case displayName = "display_name"
         case ownedBy = "owned_by"
     }
+}
+
+public struct AppSchemaFieldEncryption: Hashable, Codable {
+    public var state: AppSchemaEncryptionState?
+}
+
+public enum AppSchemaEncryptionState: String, Codable {
+    case enabled, disabled
 }
 
 struct SetAppConfig: Action {
