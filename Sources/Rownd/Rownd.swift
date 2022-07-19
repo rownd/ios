@@ -21,10 +21,6 @@ public class Rownd: NSObject {
     
     private override init() {}
     
-    public static func requestAppleSignIn() {
-        appleSignUpCoordinator?.didTapButton()
-    }
-    
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
         if let _appKey = appKey {
             config.appKey = _appKey
@@ -61,6 +57,15 @@ public class Rownd: NSObject {
         requestSignIn(nil)
     }
     
+    public static func requestSignIn(with: RowndSignInHint) {
+        switch with {
+        case .appleId:
+            appleSignUpCoordinator?.didTapButton()
+        default:
+            requestSignIn()
+        }
+    }
+    
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {        
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
@@ -92,7 +97,7 @@ public class Rownd: NSObject {
 //    }
     
     public static func _refreshToken() {
-        Auth.refreshToken(refreshToken: store.state.auth.refreshToken ?? "no token", id_token: nil) { authState in
+        Auth.fetchToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
             print(authState)
         }
     }
@@ -184,6 +189,10 @@ public enum RowndStateType {
 
 public enum UserFieldAccessType {
     case string, int, float, dictionary, array
+}
+
+public enum RowndSignInHint {
+      case appleId
 }
 
 public struct RowndSignInOptions: Encodable {
