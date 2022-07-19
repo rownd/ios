@@ -10,6 +10,20 @@ import AuthenticationServices
 import UIKit
 import AnyCodable
 
+fileprivate let appleSignInDataKey = "userAppleSignInData"
+
+struct AppleSignInData: Codable {
+    var email: String
+    var firstName: String?
+    var lastName: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case email = "email"
+    }
+}
+
 class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     var parent: Rownd?
     
@@ -51,14 +65,15 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             let identityToken = appleIDCredential.identityToken
             
             if let email = email {
-                saveKeychainItem(item: email, key: "email")
+                //Store email and fullName in AppleSignInData struct if available
+                let userAppleSignInData = AppleSignInData(email: email, firstName: fullName?.givenName, lastName: fullName?.familyName)
+                let encoder = JSONEncoder()
+                if let encoded = try? encoder.encode(userAppleSignInData) {
+                    let defaults = UserDefaults.standard
+                    defaults.set(encoded, forKey: appleSignInDataKey)
+                }
             }
-            if let givenName = fullName?.givenName {
-                saveKeychainItem(item: givenName, key: "givenName")
-            }
-            if let familyName = fullName?.familyName {
-                saveKeychainItem(item: familyName, key: "familyName")
-            }
+            
             
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
@@ -66,32 +81,22 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                 Auth.fetchToken(idToken: idToken) { authState in
                     store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
                     var userData = store.state.user.data
-                    let emailKeychain = readKeychainItem(key: "email")
-                    let givenNameKeychain = readKeychainItem(key: "givenName")
-                    let familyNameKeychain = readKeychainItem(key: "familyName")
                     
-                    if let email = email {
-                        userData["email"] = AnyCodable.init(email)
-                    }
-                    if !emailKeychain.isEmpty {
-                        // If Rownd failed on first Apple Sign in, the email will be saved in the keychain
-                        userData["email"] = AnyCodable.init(emailKeychain)
-                    }
-
-                    if let givenName = fullName?.givenName {
-                        userData["first_name"] = AnyCodable.init(givenName)
-                    }
-                    if !givenNameKeychain.isEmpty {
-                        // If Rownd failed on first Apple Sign in, the givenName will be saved in the keychain
-                        userData["first_name"] = AnyCodable.init(givenNameKeychain)
-                    }
-
-                    if let familyName = fullName?.familyName {
-                        userData["last_name"] = AnyCodable.init(familyName)
-                    }
-                    if !familyNameKeychain.isEmpty {
-                        // If Rownd failed on first Apple Sign in, the family name will be saved in the keychain
-                        userData["last_name"] = AnyCodable.init(familyNameKeychain)
+                    let defaults = UserDefaults.standard
+                    //use UserDefault values for Email and fullName if available
+                    if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
+                        let decoder = JSONDecoder()
+                        if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
+                            userData["email"] = AnyCodable.init(loadedAppleSignInData.email)
+                            userData["first_name"] = AnyCodable.init(loadedAppleSignInData.firstName)
+                            userData["last_name"] = AnyCodable.init(loadedAppleSignInData.lastName)
+                        }
+                    } else {
+                        if let email = email {
+                            userData["email"] = AnyCodable.init(email)
+                            userData["first_name"] = AnyCodable.init(fullName?.givenName)
+                            userData["last_name"] = AnyCodable.init(fullName?.familyName)
+                        }
                     }
                     
                     store.dispatch(UserData.save(userData))
