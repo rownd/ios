@@ -50,21 +50,50 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             let email = appleIDCredential.email
             let identityToken = appleIDCredential.identityToken
             
+            if let email = email {
+                saveKeychainItem(item: email, key: "email")
+            }
+            if let givenName = fullName?.givenName {
+                saveKeychainItem(item: givenName, key: "givenName")
+            }
+            if let familyName = fullName?.familyName {
+                saveKeychainItem(item: familyName, key: "familyName")
+            }
+            
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
                 Auth.fetchToken(idToken: idToken) { authState in
                     store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
                     var userData = store.state.user.data
+                    let emailKeychain = readKeychainItem(key: "email")
+                    let givenNameKeychain = readKeychainItem(key: "givenName")
+                    let familyNameKeychain = readKeychainItem(key: "familyName")
+                    
                     if let email = email {
                         userData["email"] = AnyCodable.init(email)
                     }
+                    if !emailKeychain.isEmpty {
+                        // If Rownd failed on first Apple Sign in, the email will be saved in the keychain
+                        userData["email"] = AnyCodable.init(emailKeychain)
+                    }
+
                     if let givenName = fullName?.givenName {
                         userData["first_name"] = AnyCodable.init(givenName)
                     }
+                    if !givenNameKeychain.isEmpty {
+                        // If Rownd failed on first Apple Sign in, the givenName will be saved in the keychain
+                        userData["first_name"] = AnyCodable.init(givenNameKeychain)
+                    }
+
                     if let familyName = fullName?.familyName {
                         userData["last_name"] = AnyCodable.init(familyName)
                     }
+                    if !familyNameKeychain.isEmpty {
+                        // If Rownd failed on first Apple Sign in, the family name will be saved in the keychain
+                        userData["last_name"] = AnyCodable.init(familyNameKeychain)
+                    }
+                    
                     store.dispatch(UserData.save(userData))
                 }
             } else {
