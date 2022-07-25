@@ -105,7 +105,7 @@ public struct UserState {
 
 ## API reference
 
-In addition to the state observable APIs, Rownd provides imperative APIs that you can call to get and retrieve user profile information, retrieve a current access token, or encrypt user data with the user's local key.
+In addition to the state observable APIs, Rownd provides imperative APIs that you can call to request sign in, get and retrieve user profile information, retrieve a current access token, or encrypt user data with the user's local key.
 
 ### Rownd.requestSignIn() -> Void
 Opens the Rownd Sign in Modal for authentication.
