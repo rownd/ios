@@ -108,7 +108,7 @@ public struct UserState {
 In addition to the state observable APIs, Rownd provides imperative APIs that you can call to request sign in, get and retrieve user profile information, retrieve a current access token, or encrypt user data with the user's local key.
 
 ### Rownd.requestSignIn() -> Void
-Opens the Rownd sign-in Modal for authentication.
+Opens the Rownd sign-in dialog for authentication.
 
 ### Rownd.requestSignIn(with: RowndSignInHint) -> Void
 Requests a sign-in, but with a specific authentication provider (e.g., Sign in with Apple). Rownd treats this information as a hint. If the specified authentication provider is enabled within your Rownd app configuration, it will be honored. If not, Rownd will fall back to the default flow.
