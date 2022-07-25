@@ -90,24 +90,35 @@ struct AppConfigResource: APIResource {
 }
 
 class AppConfig {
-//    private var req: APIRequest<AppConfigResource>?
-    
-    func fetch() -> Thunk<RowndState> {
+    static func requestAppState() -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
             guard !state.appConfig.isLoading else { return }
             dispatch(SetAppLoading(isLoading: true))
-            let resource = AppConfigResource()
-            let request = APIRequest(resource: resource)
-//            self.req = request
+
+            Task.init {
+                let appConfig = await AppConfig.fetch()
+                
+                dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
+                dispatch(SetAppLoading(isLoading: false))
+            }
+        }
+    }
+
+    static func fetch() async -> AppConfigResponse? {
+        let resource = AppConfigResource()
+        let request = APIRequest(resource: resource)
+
+        return await withCheckedContinuation { continuation in
             request.execute { appConfig in
                 // This guard ensures that the resource allocator doesn't clean up the request object before
                 // the parsing closure in request.execute() is finished with it.
-                guard request.decode != nil else { return }
-                logger.trace("app_config \(String(describing: appConfig))")
-//                print(self.req?.decode)
-                dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
-                dispatch(SetAppLoading(isLoading: false))
+                guard request.decode != nil else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                logger.trace("fetched app_config \(String(describing: appConfig))")
+                continuation.resume(returning: appConfig)
             }
         }
     }

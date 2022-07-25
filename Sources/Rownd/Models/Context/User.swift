@@ -16,9 +16,14 @@ public struct UserState: Hashable {
     public var isErrored: Bool = false
     public var errorMessage: String?
     public var data: Dictionary<String, AnyCodable> = [:]
+    public var redacted: [String]?
 }
 
 extension UserState: Codable {
+    public enum CodingKeys: String, CodingKey {
+        case data, redacted
+    }
+
     public func get() -> UserState {
         return self
     }
@@ -43,6 +48,50 @@ extension UserState: Codable {
         var userData = self.data
         userData[field] = value
         store.dispatch(UserData.save(userData))
+    }
+
+    internal func dataAsEncrypted() -> Dictionary<String, AnyCodable> {
+        let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
+
+        var data: Dictionary<String, AnyCodable> = [:].merging(self.data) { (current, _) in current }
+
+        if let encKeyId = encKeyId {
+            // Decrypt user fields
+            for (key, value) in data {
+                if store.state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value.value as? String {
+                    do {
+                        let encrypted: String = try RowndEncryption.encrypt(plaintext: value, withKeyId: encKeyId)
+                        data[key] = AnyCodable.init(encrypted)
+                    } catch {
+                        logger.trace("Failed to encrypt user data value. Error: \(String(describing: error))")
+                    }
+                }
+            }
+        }
+
+        return data
+    }
+
+    internal func dataAsDecrypted() -> Dictionary<String, AnyCodable> {
+        let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
+
+        var data: Dictionary<String, AnyCodable> = [:].merging(self.data) { (current, _) in current }
+
+        if let encKeyId = encKeyId {
+            // Decrypt user fields
+            for (key, value) in data {
+                if store.state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value.value as? String {
+                    do {
+                        let decrypted: String = try RowndEncryption.decrypt(ciphertext: value, withKeyId: encKeyId)
+                        data[key] = AnyCodable.init(decrypted)
+                    } catch {
+                        logger.trace("Failed to decrypt user data value. Error: \(String(describing: error))")
+                    }
+                }
+            }
+        }
+
+        return data
     }
 }
 
@@ -89,7 +138,7 @@ struct UserDataPayload: Codable {
 }
 
 struct UserDataResource: APIResource {
-    typealias ModelType = UserDataPayload
+    typealias ModelType = UserState
     
     var methodPath: String {
         guard let appId = store.state.appConfig.id else { return "/me/applications/unknown/data" }
@@ -126,27 +175,8 @@ class UserData {
                     }
                     logger.debug("Decoded user response: \(String(describing: userResp))")
 
-                    var updatedUserState = UserState()
-                    updatedUserState.data = userResp?.data ?? [:]
-
-                    let encKeyId = Rownd.user.ensureEncryptionKey(user: updatedUserState)
-
-                    if let encKeyId = encKeyId, var userResp = userResp, let userDataDict = userResp.data.dictionary {
-                        // Decrypt user fields
-                        for (key, value) in userDataDict {
-                            if state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value as? String {
-                                do {
-                                    let decrypted: String = try RowndEncryption.decrypt(ciphertext: value, withKeyId: encKeyId)
-                                    userResp.data[key] = AnyCodable.init(decrypted)
-                                } catch {
-                                    logger.trace("Failed to decrypt user data value. Error: \(String(describing: error))")
-                                }
-                            }
-                        }
-                    }
-
                     dispatch(SetUserLoading(isLoading: false))
-                    dispatch(SetUserData(payload: userResp?.data ?? [:]))
+                    dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
                 }
             }
         }
@@ -175,10 +205,15 @@ class UserData {
                     "Content-Type": "application/json"
                 ]
                 let request = APIRequest(resource: resource)
+
+                // Handle data that should be encrypted
+                var updatedUserState = UserState()
+                updatedUserState.data = data
                 
-                // TODO: Get current user state as json string for body
+                // TODO: Do we need to current user state as json string for body and merge?
                 let encoder = JSONEncoder()
-                let userDataPayload = UserDataPayload(data: data)
+                let userDataPayload = UserDataPayload(data: updatedUserState.dataAsEncrypted())
+
                 var body: Data? = nil
                 do {
                     body = try encoder.encode(userDataPayload)
@@ -191,7 +226,7 @@ class UserData {
                     guard request.decode != nil else { return }
                     logger.debug("Decoded user response: \(String(describing: userResp))")
 
-                    dispatch(SetUserData(payload: userResp?.data ?? [:]))
+                    dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
                     dispatch(SetUserLoading(isLoading: false))
                 }
             }

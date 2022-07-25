@@ -27,7 +27,7 @@ public class Rownd: NSObject {
         }
         
         inst.inflateStoreCache()
-        inst.loadAppConfig()
+        await inst.loadAppConfig()
         inst.loadAppleSignIn()
         
         if await Rownd.getAccessToken() != nil {
@@ -109,8 +109,16 @@ public class Rownd: NSObject {
     }
  
     
-    private func loadAppConfig() {
-        store.dispatch(AppConfig().fetch())
+    private func loadAppConfig() async {
+        if store.state.appConfig.id == nil {
+            // Await the config if it wasn't already cached
+            let appConfig = await AppConfig.fetch()
+            store.dispatch(SetAppConfig(payload: appConfig?.app ?? store.state.appConfig))
+        } else {
+            // Refresh in background if already present
+            store.dispatch(AppConfig.requestAppState())
+        }
+
     }
     
     private func inflateStoreCache() {
