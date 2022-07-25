@@ -16,11 +16,13 @@ struct AppleSignInData: Codable {
     var email: String
     var firstName: String?
     var lastName: String?
+    var fullName: String?
     
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
         case lastName = "last_name"
         case email = "email"
+        case fullName = "full_name"
     }
 }
 
@@ -53,6 +55,10 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         return (vc?.view.window!)!
     }
     
+    private func getFullName(firstName: String?, lastName: String?) -> String {
+        return String("\(firstName ?? "") \(lastName ?? "")")
+    }
+    
     //If authorization is successful then this method will get triggered
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
@@ -66,7 +72,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             
             if let email = email {
                 //Store email and fullName in AppleSignInData struct if available
-                let userAppleSignInData = AppleSignInData(email: email, firstName: fullName?.givenName, lastName: fullName?.familyName)
+                let userAppleSignInData = AppleSignInData(email: email, firstName: fullName?.givenName, lastName: fullName?.familyName, fullName: getFullName(firstName: fullName?.givenName, lastName: fullName?.familyName))
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(userAppleSignInData) {
                     let defaults = UserDefaults.standard
@@ -90,12 +96,14 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             userData["email"] = AnyCodable.init(loadedAppleSignInData.email)
                             userData["first_name"] = AnyCodable.init(loadedAppleSignInData.firstName)
                             userData["last_name"] = AnyCodable.init(loadedAppleSignInData.lastName)
+                            userData["full_name"] = AnyCodable.init(loadedAppleSignInData.fullName)
                         }
                     } else {
                         if let email = email {
                             userData["email"] = AnyCodable.init(email)
                             userData["first_name"] = AnyCodable.init(fullName?.givenName)
                             userData["last_name"] = AnyCodable.init(fullName?.familyName)
+                            userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
                         }
                     }
                     
