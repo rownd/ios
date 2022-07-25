@@ -107,6 +107,12 @@ public struct UserState {
 
 In addition to the state observable APIs, Rownd provides imperative APIs that you can call to get and retrieve user profile information, retrieve a current access token, or encrypt user data with the user's local key.
 
+### Rownd.requestSignIn() -> Void
+Opens the Rownd Sign in Modal for authentication.
+
+### Rownd.requestSignIn(field: String) -> Void
+if .appleId is passed into field, Sign in with Apple will open and provide authentication to Rownd.
+
 ### Rownd.user.get() -> UserState
 Returns the entire `UserState` object
 
