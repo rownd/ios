@@ -47,6 +47,16 @@ let package = Package(
             name: "LBBottomSheet",
             url: "https://github.com/LunabeeStudio/LBBottomSheet",
             .upToNextMajor(from: "1.0.17")
+        ),
+        .package(
+            name: "SwiftKeychainWrapper",
+            url: "https://github.com/jrendel/SwiftKeychainWrapper",
+            .upToNextMajor(from: "4.0.1")
+        )
+        .package(
+            name: "Sodium",
+            url: "https://github.com/jedisct1/swift-sodium",
+            .upToNextMajor(from: "0.9.1")
         )
 
     ],
@@ -54,7 +64,7 @@ let package = Package(
     targets: [
         .target(
             name: "Rownd",
-            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode", "LBBottomSheet"]
+            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode", "LBBottomSheet", "SwiftKeychainWrapper", "Sodium"]
         )
     ],
     

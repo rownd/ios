@@ -27,7 +27,7 @@ public class Rownd: NSObject {
         }
         
         inst.inflateStoreCache()
-        inst.loadAppConfig()
+        await inst.loadAppConfig()
         inst.loadAppleSignIn()
         
         if await Rownd.getAccessToken() != nil {
@@ -73,6 +73,7 @@ public class Rownd: NSObject {
     public static func signOut() {
         let _ = inst.displayHub(.signOut)
         store.dispatch(SetAuthState(payload: AuthState()))
+        store.dispatch(SetUserState(payload: UserState()))
     }
     
     public static func manageUser() {
@@ -108,8 +109,16 @@ public class Rownd: NSObject {
     }
  
     
-    private func loadAppConfig() {
-        store.dispatch(AppConfig().fetch())
+    private func loadAppConfig() async {
+        if store.state.appConfig.id == nil {
+            // Await the config if it wasn't already cached
+            let appConfig = await AppConfig.fetch()
+            store.dispatch(SetAppConfig(payload: appConfig?.app ?? store.state.appConfig))
+        } else {
+            // Refresh in background if already present
+            store.dispatch(AppConfig.requestAppState())
+        }
+
     }
     
     private func inflateStoreCache() {
@@ -145,7 +154,7 @@ public class Rownd: NSObject {
             .filter({$0.isKeyWindow}).first?.rootViewController
         
         // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
-        // Can't replace it yet (2022) since there are too many devices running iOS 14.
+        // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
         let bottomSheetController = BottomSheetController()
         bottomSheetController.controller = viewController
 
@@ -157,29 +166,80 @@ public class Rownd: NSObject {
 
 public class UserPropAccess {
     public func get() -> UserState {
-        return store.state.user
+        return store.state.user.get()
     }
     
     public func get(field: String) -> Any {
-        return store.state.user.data[field] ?? nil
+        return store.state.user.get(field: field)
     }
     
-    public func get<T>(field: String) throws -> T? {
-        guard let value = store.state.user.data[field] else {
-            return nil
-        }
-        
-        return value as? T
+    public func get<T>(field: String) -> T? {
+        let value: T? = store.state.user.get(field: field)
+        return value
     }
     
     public func set(data: Dictionary<String, AnyCodable>) -> Void {
-        store.dispatch(UserData.save(data))
+        store.state.user.set(data: data)
     }
     
     public func set(field: String, value: AnyCodable) -> Void {
-        var userData = store.state.user.data
-        userData[field] = value
-        store.dispatch(UserData.save(userData))
+        store.state.user.set(field: field, value: value)
+    }
+
+    public func isEncryptionPossible() -> Bool {
+        do {
+            let key = RowndEncryption.loadKey(keyId: try getKeyId())
+
+            guard let _ = key else {
+                return false
+            }
+
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    public func encrypt(plaintext: String) throws -> String {
+        return try RowndEncryption.encrypt(plaintext: plaintext, withKeyId: try getKeyId())
+    }
+
+    public func decrypt(ciphertext: String) throws -> String {
+        return try RowndEncryption.decrypt(ciphertext: ciphertext, withKeyId: try getKeyId())
+    }
+
+    // MARK: User module internal methods
+    internal func getKeyId() throws -> String {
+        return try getKeyId(user: store.state.user)
+    }
+
+    internal func getKeyId(user: UserState) throws -> String {
+        let userId: String? = user.get(field: "user_id")
+
+        guard let userId = userId else {
+            throw RowndError("An encryption key was requested, but the user has not been loaded yet. Are you signed in?")
+        }
+
+        return userId
+    }
+
+    internal func ensureEncryptionKey(user: UserState) -> String? {
+        do {
+            let keyId = try getKeyId(user: user)
+
+            let key = RowndEncryption.loadKey(keyId: keyId)
+
+            guard let _ = key else {
+                let key = RowndEncryption.generateKey()
+                RowndEncryption.storeKey(key: key, keyId: keyId)
+                return keyId
+            }
+
+            return keyId
+        } catch {
+            logger.error("Failed to ensure that an encryption key exists: \(String(describing: error))")
+            return nil
+        }
     }
 }
 
@@ -204,5 +264,17 @@ public struct RowndSignInOptions: Encodable {
     
     enum CodingKeys: String, CodingKey {
         case postSignInRedirect = "post_login_redirect"
+    }
+}
+
+struct RowndError: Error, CustomStringConvertible {
+    var message: String
+
+    init(_ message: String) {
+        self.message = message
+    }
+
+    public var description: String {
+        return message
     }
 }
