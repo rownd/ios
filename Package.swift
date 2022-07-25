@@ -52,7 +52,7 @@ let package = Package(
             name: "SwiftKeychainWrapper",
             url: "https://github.com/jrendel/SwiftKeychainWrapper",
             .upToNextMajor(from: "4.0.1")
-        )
+        ),
         .package(
             name: "Sodium",
             url: "https://github.com/jedisct1/swift-sodium",
