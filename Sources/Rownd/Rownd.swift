@@ -157,9 +157,8 @@ public class Rownd: NSObject {
         // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
         let bottomSheetController = BottomSheetController()
         bottomSheetController.controller = viewController
-
-        rootViewController?.addChild(bottomSheetController)
-        rootViewController?.view.addSubview(bottomSheetController.view)
+        bottomSheetController.modalPresentationStyle = .overFullScreen
+        rootViewController?.present(bottomSheetController, animated: true, completion: nil)
     }
     
 }

@@ -11,6 +11,8 @@ import UIKit
 
 protocol HubViewProtocol {
     var targetPage: HubPageSelector { get set }
+    var hostController: UIViewController? { get set }
+
     func setLoading(_ isLoading: Bool)
     func show()
     func hide()
@@ -21,6 +23,7 @@ public class HubViewController: UIViewController, HubViewProtocol {
     var activityIndicator = UIActivityIndicatorView(style: .large)
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
+    var hostController: UIViewController?
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -65,6 +68,14 @@ public class HubViewController: UIViewController, HubViewProtocol {
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark
         }
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        guard let hostController = hostController else {
+            return
+        }
+
+        hostController.dismiss(animated: true)
     }
     
     func setLoading(_ isLoading: Bool) {

@@ -14,8 +14,13 @@ class BottomSheetController: UIViewController {
     var sheetController: LBBottomSheet.BottomSheetController?
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         guard let controller = controller else {
             return
+        }
+
+        if var hubViewController = controller as? HubViewProtocol {
+            hubViewController.hostController = self
         }
         
         var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
@@ -25,6 +30,7 @@ class BottomSheetController: UIViewController {
         theme.grabber?.topMargin = CGFloat(10.0)
         
         sheetController = presentAsBottomSheet(controller, theme: theme, behavior: behavior)
+
     }
     
     override func viewDidLoad() {
