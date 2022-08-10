@@ -110,6 +110,9 @@ In addition to the state observable APIs, Rownd provides imperative APIs that yo
 ### Rownd.requestSignIn() -> Void
 Opens the Rownd sign-in dialog for authentication.
 
+### Rownd.requestSignIn(RowndSignInOptions(postSignInRedirect: "https://my-domain.com")) -> Void
+Opens the Rownd sign-in dialog for authentication, as above. When the user completes the authentication challenge via email or SMS, they'll be redirected to the URL set for `postSignInRedirect`. If this is a [Universal Link](https://developer.apple.com/ios/universal-links/), it will redirect the user back to your app.
+
 ### Rownd.requestSignIn(with: RowndSignInHint) -> Void
 Requests a sign-in, but with a specific authentication provider (e.g., Sign in with Apple). Rownd treats this information as a hint. If the specified authentication provider is enabled within your Rownd app configuration, it will be honored. If not, Rownd will fall back to the default flow.
 
