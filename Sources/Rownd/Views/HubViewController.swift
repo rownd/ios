@@ -33,11 +33,6 @@ public class HubViewController: UIViewController, HubViewProtocol {
 //            presentation.prefersGrabberVisible = true
 //        }
         
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.startAnimating()
-        view.addSubview(activityIndicator)
-        
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -68,6 +63,11 @@ public class HubViewController: UIViewController, HubViewProtocol {
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark
         }
+
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.startAnimating()
+        view.addSubview(activityIndicator)
     }
 
     public override func viewWillDisappear(_ animated: Bool) {

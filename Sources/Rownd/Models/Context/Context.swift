@@ -21,14 +21,14 @@ extension RowndState {
     static func save(state: RowndState) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(state) {
-            logger.trace("storing: \(String(data: encoded, encoding: .utf8) ?? "{}")")
+//            logger.trace("storing: \(String(data: encoded, encoding: .utf8) ?? "{}")")
             Storage.store?.set(String(data: encoded, encoding: .utf8), forKey: STORAGE_STATE_KEY)
         }
     }
     
     static func load() {
         let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String ?? String("{}")
-        logger.trace("initial store state: \(existingStateStr)")
+//        logger.trace("initial store state: \(existingStateStr)")
         
         let decoder = JSONDecoder()
         if let decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {

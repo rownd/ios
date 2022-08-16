@@ -49,6 +49,13 @@
 		B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */; };
 		B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CE2883C81D00FD0813 /* Sodium */; };
 		B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */; };
+		B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */; };
+		B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0428A8A66700EE764B /* KeyTransferView.swift */; };
+		B3F01B0A28AB510400EE764B /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B3F01B0928AB510400EE764B /* Get */; };
+		B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0B28AB55B600EE764B /* RowndApi.swift */; };
+		B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0F28AB607B00EE764B /* SignInLinks.swift */; };
+		B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1128ABE9C400EE764B /* KeyScanner.swift */; };
+		B3F01B1528ABE9E500EE764B /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = B3F01B1428ABE9E500EE764B /* CodeScanner */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,6 +115,11 @@
 		B38A40C02882185B00FD0813 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleSignUpCoordinator.swift; sourceTree = "<group>"; };
+		B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferViewController.swift; sourceTree = "<group>"; };
+		B3F01B0428A8A66700EE764B /* KeyTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferView.swift; sourceTree = "<group>"; };
+		B3F01B0B28AB55B600EE764B /* RowndApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndApi.swift; sourceTree = "<group>"; };
+		B3F01B0F28AB607B00EE764B /* SignInLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInLinks.swift; sourceTree = "<group>"; };
+		B3F01B1128ABE9C400EE764B /* KeyScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyScanner.swift; sourceTree = "<group>"; };
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,9 +128,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3F01B0A28AB510400EE764B /* Get in Frameworks */,
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
 				B347C2782879358200935115 /* AnyCodable in Frameworks */,
 				B38A40C92882727F00FD0813 /* SwiftKeychainWrapper in Frameworks */,
+				B3F01B1528ABE9E500EE764B /* CodeScanner in Frameworks */,
 				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
@@ -233,6 +247,8 @@
 				B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */,
 				B38A4086287E720E00FD0813 /* Constants.swift */,
 				B38A408F287F5B4900FD0813 /* Encodable.swift */,
+				B3F01B0B28AB55B600EE764B /* RowndApi.swift */,
+				B3F01B0F28AB607B00EE764B /* SignInLinks.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -240,6 +256,7 @@
 		B374E56228545A2900955719 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B3F01B0128A8A53000EE764B /* KeyTransfer */,
 				B38A4095287FC0DC00FD0813 /* HubWebView */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
 				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
@@ -303,6 +320,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B3F01B0128A8A53000EE764B /* KeyTransfer */ = {
+			isa = PBXGroup;
+			children = (
+				B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */,
+				B3F01B0428A8A66700EE764B /* KeyTransferView.swift */,
+				B3F01B1128ABE9C400EE764B /* KeyScanner.swift */,
+			);
+			path = KeyTransfer;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -340,6 +367,8 @@
 				B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */,
 				B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */,
 				B38A40CE2883C81D00FD0813 /* Sodium */,
+				B3F01B0928AB510400EE764B /* Get */,
+				B3F01B1428ABE9E500EE764B /* CodeScanner */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -422,6 +451,8 @@
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+				B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */,
+				B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -470,13 +501,17 @@
 				B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */,
 				B38A4089287F28D000FD0813 /* AccountManagerView.swift in Sources */,
 				B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */,
+				B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */,
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
 				B302E2C228642329005FD927 /* Rownd.swift in Sources */,
 				B302E2872863A8D0005FD927 /* HubWebView.swift.bak in Sources */,
 				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
+				B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
+				B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */,
+				B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */,
 				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
 				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
@@ -489,6 +524,7 @@
 				B302E2BD28641AA9005FD927 /* Context.swift in Sources */,
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
 				B302E2CB28662749005FD927 /* APIResource.swift in Sources */,
+				B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */,
 				B302E2972863A95A005FD927 /* RowndConfig.swift in Sources */,
 				B347C27528792AD900935115 /* User.swift in Sources */,
 			);
@@ -660,6 +696,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to scan QR codes";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -690,6 +727,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to scan QR codes";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -911,6 +949,22 @@
 				minimumVersion = 0.9.1;
 			};
 		};
+		B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Get";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -953,6 +1007,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Sodium;
+		};
+		B3F01B0928AB510400EE764B /* Get */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */;
+			productName = Get;
+		};
+		B3F01B1428ABE9E500EE764B /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

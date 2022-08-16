@@ -12,6 +12,7 @@ import ReSwift
 import WebKit
 import AnyCodable
 import AuthenticationServices
+import LBBottomSheet
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -31,21 +32,30 @@ public class Rownd: NSObject {
         inst.loadAppleSignIn()
         
         if await Rownd.getAccessToken() != nil {
-            store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
-            store.dispatch(UserData.fetch())
+            DispatchQueue.main.async {
+                store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
+                store.dispatch(UserData.fetch())
+            }
         }
-        
-        var launchUrl: URL?
-        if let _launchUrl = launchOptions?[.url] as? URL {
-            launchUrl = _launchUrl
-        } else if UIPasteboard.general.hasURLs, let _launchUrl = UIPasteboard.general.url {
-            launchUrl = _launchUrl
-        }
-        
-        if (launchUrl?.host?.hasSuffix("rownd.link")) != nil {
-            logger.trace("launch_url: \(String(describing: launchUrl?.absoluteString))")
-            
-            // TODO: Ask Rownd to handle this link (probably signing the user in)
+
+        if !inst.state().state.auth.isAuthenticated {
+            var launchUrl: URL?
+            if let _launchUrl = launchOptions?[.url] as? URL {
+                launchUrl = _launchUrl
+            } else if UIPasteboard.general.hasURLs, let _launchUrl = UIPasteboard.general.url {
+                launchUrl = _launchUrl
+            }
+
+            if (launchUrl?.host?.hasSuffix("rownd.link")) != nil, let launchUrl = launchUrl {
+                logger.trace("launch_url: \(String(describing: launchUrl.absoluteString))")
+
+                // TODO: Ask Rownd to handle this link (probably signing the user in)
+                do {
+                    try await SignInLinks.signInWithLink(launchUrl)
+                } catch {
+                    logger.error("Sign-in attempt failed during launch: \(String(describing: error))")
+                }
+            }
         }
     }
     
@@ -74,6 +84,17 @@ public class Rownd: NSObject {
         let _ = inst.displayHub(.signOut)
         store.dispatch(SetAuthState(payload: AuthState()))
         store.dispatch(SetUserState(payload: UserState()))
+    }
+
+    public static func transferEncryptionKey() {
+//        inst.displayViewControllerOnTop(KeyTransferViewController())
+        var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
+        behavior.heightMode = .specific(values: [.screenRatio(value: 1), .screenRatio(value: 0.65)], heightLimit: .statusBar)
+
+        var theme: LBBottomSheet.BottomSheetController.Theme = .init()
+        theme.grabber?.topMargin = CGFloat(10.0)
+
+        inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
     }
     
     public static func manageUser() {
@@ -145,13 +166,17 @@ public class Rownd: NSObject {
         
         return hubController
     }
-    
-    private func displayViewControllerOnTop(_ viewController: UIViewController) {
-        let rootViewController = UIApplication.shared.connectedScenes
+
+    private func getRootViewController() -> UIViewController? {
+        return UIApplication.shared.connectedScenes
             .filter({$0.activationState == .foregroundActive})
             .compactMap({$0 as? UIWindowScene})
             .first?.windows
             .filter({$0.isKeyWindow}).first?.rootViewController
+    }
+    
+    private func displayViewControllerOnTop(_ viewController: UIViewController) {
+        let rootViewController = getRootViewController()
         
         // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
         // But, we can't replace it yet (2022) since there are too many devices running iOS 14.

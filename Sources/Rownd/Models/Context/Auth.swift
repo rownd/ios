@@ -47,12 +47,16 @@ extension AuthState: Codable {
                     if let refreshToken = store.state.auth.refreshToken {
                         Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
                             if let newAuthState = tokenResource {
-                                store.dispatch(SetAuthState(payload: newAuthState))
+                                DispatchQueue.main.async {
+                                    store.dispatch(SetAuthState(payload: newAuthState))
+                                }
                                 continuation.resume(returning: newAuthState.accessToken)
                             } else {
                                 // Sign the user out b/c they need to get a new refresh token
-                                store.dispatch(SetAuthState(payload: AuthState()))
-                                store.dispatch(SetUserData(payload: [:]))
+                                DispatchQueue.main.async {
+                                    store.dispatch(SetAuthState(payload: AuthState()))
+                                    store.dispatch(SetUserData(payload: [:]))
+                                }
                                 continuation.resume(returning: nil)
                             }
                         }
@@ -91,7 +95,9 @@ func receiveAuthTokens() -> Thunk<RowndState> {
     return Thunk<RowndState> { dispatch, getState in
         guard let state = getState() else { return }
 
-        store.dispatch(UserData.fetch())
+        DispatchQueue.main.async {
+            store.dispatch(UserData.fetch())
+        }
 
     }
 }
@@ -153,7 +159,8 @@ class Auth {
             // This guard ensures that the resource allocator doesn't clean up the request object before
             // the parsing closure in request.execute() is finished with it.
             guard request.decode != nil else { return }
-            logger.trace("Received tokens: \(String(describing: tokenResp))")
+            // Only enable this when debugging API responses, since it could log sensitive info
+//            logger.trace("Received tokens: \(String(describing: tokenResp))")
             
             completion(tokenResp)
         }

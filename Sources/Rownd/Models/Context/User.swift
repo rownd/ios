@@ -170,13 +170,17 @@ class UserData {
                     // This guard ensures that the resource allocator doesn't clean up the request object before
                     // the parsing closure in request.execute() is finished with it.
                     guard request.decode != nil else {
-                        dispatch(SetUserLoading(isLoading: false))
+                        DispatchQueue.main.async {
+                            dispatch(SetUserLoading(isLoading: false))
+                        }
                         return
                     }
                     logger.debug("Decoded user response: \(String(describing: userResp))")
 
-                    dispatch(SetUserLoading(isLoading: false))
-                    dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
+                    DispatchQueue.main.async {
+                        dispatch(SetUserLoading(isLoading: false))
+                        dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
+                    }
                 }
             }
         }
@@ -197,8 +201,10 @@ class UserData {
                 guard let accessToken = await Rownd.getAccessToken() else {
                     return
                 }
-                
-                dispatch(SetUserLoading(isLoading: true))
+
+                DispatchQueue.main.async {
+                    dispatch(SetUserLoading(isLoading: true))
+                }
                 var resource = UserDataResource()
                 resource.headers = [
                     "Authorization": "Bearer \(accessToken)",
@@ -226,8 +232,10 @@ class UserData {
                     guard request.decode != nil else { return }
                     logger.debug("Decoded user response: \(String(describing: userResp))")
 
-                    dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
-                    dispatch(SetUserLoading(isLoading: false))
+                    DispatchQueue.main.async {
+                        dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
+                        dispatch(SetUserLoading(isLoading: false))
+                    }
                 }
             }
         }

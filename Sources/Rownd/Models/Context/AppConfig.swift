@@ -98,9 +98,11 @@ class AppConfig {
 
             Task.init {
                 let appConfig = await AppConfig.fetch()
-                
-                dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
-                dispatch(SetAppLoading(isLoading: false))
+
+                DispatchQueue.main.async {
+                    dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
+                    dispatch(SetAppLoading(isLoading: false))
+                }
             }
         }
     }

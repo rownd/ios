@@ -43,7 +43,8 @@ extension NetworkRequest {
                 DispatchQueue.main.async { completion(nil) }
                 return
             }
-            logger.trace("Successful API response: \(String(decoding: data, as: UTF8.self))")
+            // Only enable this when debugging API responses, since it could log sensitive info
+//            logger.trace("Successful API response: \(String(decoding: data, as: UTF8.self))")
             DispatchQueue.main.async { completion(value) }
         }
         task.resume()

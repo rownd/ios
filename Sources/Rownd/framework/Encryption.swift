@@ -17,7 +17,7 @@ class RowndEncryption {
     }
 
     static func storeKey(key: SecretBox.Key, keyId: String?) -> Void {
-        KeychainWrapper.standard.set(key.asData(), forKey: keyName(keyId))
+        KeychainWrapper.standard.set(key.asData(), forKey: keyName(keyId), withAccessibility: .whenUnlocked, isSynchronizable: true)
     }
 
     static func loadKey(keyId: String?) -> SecretBox.Key? {
@@ -27,7 +27,9 @@ class RowndEncryption {
             return nil
         }
 
-        return Array(keyData) as SecretBox.Key
+        let key = Array(keyData) as SecretBox.Key
+
+        return key
     }
 
     static func deleteKey(keyId: String?) -> Void {
