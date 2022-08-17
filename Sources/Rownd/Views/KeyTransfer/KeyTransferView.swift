@@ -15,6 +15,7 @@ struct KeyTransferView : View {
 
     @State var appName = "app_name"
     @State private var isShowingCode = false
+    @State private var activeNavSelection: String? = nil
     @State private var isShowingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
@@ -31,7 +32,7 @@ struct KeyTransferView : View {
                             .fixedSize(horizontal: false, vertical: true)
 
                         Button(action: {
-
+                            activeNavSelection = "key-code"
                         }, label: {
                             Text("Show encrpytion key")
                                 .frame(minWidth: 0, maxWidth: .infinity)
@@ -48,7 +49,7 @@ struct KeyTransferView : View {
                             case .notDetermined:
                                 AVCaptureDevice.requestAccess(for: .video) { granted in
                                     if granted {
-                                        isShowingCode = true
+                                        activeNavSelection = "key-scanner"
                                     }
                                 }
                             case .denied:
@@ -81,6 +82,8 @@ struct KeyTransferView : View {
                         NavigationLink(destination: KeyScannerView(), isActive: $isShowingCode) {
                             EmptyView()
                         }
+                        NavigationLink(destination: KeyScannerView(), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
+                        NavigationLink(destination: KeyCodeView(), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
 
                         Spacer()
 
@@ -97,19 +100,6 @@ struct KeyTransferView : View {
                             Spacer()
                         }
                     }
-
-                    //                ZStack {
-                    //                    Color.gray
-                    //                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: 50)
-                    //                        .padding(.all, 15)
-                    //                        .contentShape(RoundedRectangle(cornerRadius: CGFloat(10)))
-                    //                    //                Text(keyState.key)
-                    //                    //                    .foregroundColor(.white)
-                    //                    TextEditor(text: $keyState.key)
-                    //                        .disabled(/*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                    //                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: 200)
-                    //                        .colorInvert()
-                    //                }
                 }
                 .padding(.horizontal)
                 .padding(.top, 30)

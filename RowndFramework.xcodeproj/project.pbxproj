@@ -56,6 +56,8 @@
 		B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0F28AB607B00EE764B /* SignInLinks.swift */; };
 		B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1128ABE9C400EE764B /* KeyScanner.swift */; };
 		B3F01B1528ABE9E500EE764B /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = B3F01B1428ABE9E500EE764B /* CodeScanner */; };
+		B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */; };
+		B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +122,8 @@
 		B3F01B0B28AB55B600EE764B /* RowndApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndApi.swift; sourceTree = "<group>"; };
 		B3F01B0F28AB607B00EE764B /* SignInLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInLinks.swift; sourceTree = "<group>"; };
 		B3F01B1128ABE9C400EE764B /* KeyScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyScanner.swift; sourceTree = "<group>"; };
+		B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeView.swift; sourceTree = "<group>"; };
+		B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewControllerWrapper.swift; sourceTree = "<group>"; };
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -259,6 +263,7 @@
 				B3F01B0128A8A53000EE764B /* KeyTransfer */,
 				B38A4095287FC0DC00FD0813 /* HubWebView */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
+				B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */,
 				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
 				B38A4094287FC0CA00FD0813 /* AccountManager */,
 				B38A409D288111F200FD0813 /* BottomSheetController.swift */,
@@ -326,6 +331,7 @@
 				B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */,
 				B3F01B0428A8A66700EE764B /* KeyTransferView.swift */,
 				B3F01B1128ABE9C400EE764B /* KeyScanner.swift */,
+				B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */,
 			);
 			path = KeyTransfer;
 			sourceTree = "<group>";
@@ -508,8 +514,10 @@
 				B302E2872863A8D0005FD927 /* HubWebView.swift.bak in Sources */,
 				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
 				B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */,
+				B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
+				B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */,
 				B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */,
 				B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */,
 				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,

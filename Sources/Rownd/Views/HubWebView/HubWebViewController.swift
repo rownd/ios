@@ -16,6 +16,7 @@ let logger = Logger(subsystem: "io.rownd.sdk", category: "HubView")
 public enum HubPageSelector {
     case signIn
     case signOut
+    case qrCode
     case unknown
 }
 
@@ -95,6 +96,13 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             webView.evaluateJavaScript("rownd.requestSignIn(\(jsFunctionArgsAsJson))") { (result, error) in
                 if error != nil {
                     logger.error("Failed to request sign in from Rownd: \(String(describing: error))")
+                }
+            }
+        case .qrCode:
+            logger.trace("rownd.generateCodeForMobile('\(self.jsFunctionArgsAsJson)')")
+            webView.evaluateJavaScript("rownd.generateCodeForMobile('\(jsFunctionArgsAsJson)')") { (result, error) in
+                if error != nil {
+                    logger.error("Failed to generate QR code: \(String(describing: error))")
                 }
             }
         case .none:
