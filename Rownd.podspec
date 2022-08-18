@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = "RowndSDK"
+  s.name             = "Rownd"
   s.version          = "1.0.0"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
@@ -18,6 +18,14 @@ Pod::Spec.new do |s|
   }
 
   s.ios.deployment_target     = '14.0'
+
+  s.dependency 'LBBottomSheet'
+  s.dependency 'AnyCodable-FlightSchool'
+  s.dependency 'JWTDecode'
+  s.dependency 'ReSwift'
+  s.dependency 'ReSwiftThunk'
+  s.dependency 'Sodium'
+  s.dependency 'SwiftKeychainWrapper'
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'
