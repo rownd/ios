@@ -14,7 +14,10 @@ class KeyTransferViewState : ObservableObject {
 
 class KeyTransferViewController : UIViewController {
 
-    lazy var contentView: UIHostingController<KeyTransferView> = UIHostingController(rootView: KeyTransferView(keyState: keyState))
+    lazy var contentView: UIHostingController<KeyTransferView> = UIHostingController(rootView: KeyTransferView(
+        parentViewController: self,
+        keyState: keyState
+    ))
     var keyState = KeyTransferViewState()
 
     override func loadView() {

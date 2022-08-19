@@ -13,6 +13,8 @@ struct KeyTransferView : View {
 
     @Environment(\.presentationMode) var presentationMode
 
+    var parentViewController: UIViewController?
+
     @State var appName = "app_name"
     @State private var isShowingCode = false
     @State private var activeNavSelection: String? = nil
@@ -33,6 +35,7 @@ struct KeyTransferView : View {
 
                         Button(action: {
                             activeNavSelection = "key-code"
+                            parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
                         }, label: {
                             Text("Show encrpytion key")
                                 .frame(minWidth: 0, maxWidth: .infinity)
@@ -46,10 +49,12 @@ struct KeyTransferView : View {
                             switch AVCaptureDevice.authorizationStatus(for: .video) {
                             case .authorized:
                                 isShowingCode = true
+                                parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
                             case .notDetermined:
                                 AVCaptureDevice.requestAccess(for: .video) { granted in
                                     if granted {
                                         activeNavSelection = "key-scanner"
+                                        parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
                                     }
                                 }
                             case .denied:
@@ -83,7 +88,7 @@ struct KeyTransferView : View {
                             EmptyView()
                         }
                         NavigationLink(destination: KeyScannerView(), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
-                        NavigationLink(destination: KeyCodeView(), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
+                        NavigationLink(destination: KeyCodeView(keyState: keyState), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
 
                         Spacer()
 
