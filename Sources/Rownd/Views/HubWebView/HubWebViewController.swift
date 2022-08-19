@@ -60,7 +60,8 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         webView.navigationDelegate = self
         webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
-        webView.backgroundColor = .systemGray6
+        webView.backgroundColor = UIColor.clear
+        webView.scrollView.backgroundColor = UIColor.clear
         self.modalPresentationStyle = .pageSheet
         view = webView
     }
@@ -81,6 +82,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
+
+        webView.isOpaque = false
+        webView.backgroundColor = UIColor.clear
+        webView.scrollView.backgroundColor = UIColor.clear
         
         hubViewController?.setLoading(false)
         
@@ -144,11 +149,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .appleId)
                 
             case .signOut:
-                store.dispatch(SetAuthState(payload: AuthState()))
-                store.dispatch(SetUserData(payload: [:]))
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // Change `2.0` to the desired number of seconds.
                     self?.hubViewController?.hide()
                 }
+                store.dispatch(SetAuthState(payload: AuthState()))
+                store.dispatch(SetUserData(payload: [:]))
             case .unknown:
                 break
             }

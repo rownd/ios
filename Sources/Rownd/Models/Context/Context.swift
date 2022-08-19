@@ -19,10 +19,9 @@ public struct RowndState: Codable, Hashable {
 
 extension RowndState {
     static func save(state: RowndState) {
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(state) {
+        if let encoded = try? state.toJson() {
 //            logger.trace("storing: \(String(data: encoded, encoding: .utf8) ?? "{}")")
-            Storage.store?.set(String(data: encoded, encoding: .utf8), forKey: STORAGE_STATE_KEY)
+            Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
         }
     }
     
@@ -34,6 +33,21 @@ extension RowndState {
         if let decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
             store.dispatch(InitializeRowndState(payload: decoded))
         }
+    }
+
+    public func toJson() throws -> String? {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(self) {
+            return String(data: encoded, encoding: .utf8)
+        }
+
+        throw StateError("Failed to encode state")
+    }
+
+    public func toDictionary() throws -> [String:Any?] {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(self)
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
     }
 }
 
@@ -66,3 +80,15 @@ let store = Store(
     state: RowndState(),
     middleware: [thunkMiddleware]
 )
+
+struct StateError: Error, CustomStringConvertible {
+    var message: String
+
+    init(_ message: String) {
+        self.message = message
+    }
+
+    public var description: String {
+        return message
+    }
+}

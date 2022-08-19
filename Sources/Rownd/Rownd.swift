@@ -94,7 +94,8 @@ public class Rownd: NSObject {
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
         theme.grabber?.topMargin = CGFloat(10.0)
 
-        inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
+        let bottomSheet = inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
+        bottomSheet?.grow(toMaximumHeight: true)
     }
     
     public static func manageUser() {
