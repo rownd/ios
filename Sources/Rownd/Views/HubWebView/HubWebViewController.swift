@@ -75,6 +75,28 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 }
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
+
+    private func evaluateJavaScript(code: String, webView: WKWebView) {
+        let wrappedJs = """
+            if (typeof rownd !== 'undefined') {
+                \(code)
+            } else {
+                _rphConfig.push(['onLoaded', () => {
+                    \(code)
+                }]);
+            }
+        """
+
+        logger.trace("Evaluating script: \(code)")
+
+        webView.evaluateJavaScript(wrappedJs) { (result, error) in
+            logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
+            if error != nil {
+                logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
+            }
+        }
+    }
+
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 //        hubViewController?.setLoading(true)
     }
@@ -91,25 +113,12 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         
         switch (hubViewController?.targetPage) {
         case .signOut:
-            webView.evaluateJavaScript("rownd.signOut()") { (result, error) in
-                if error != nil {
-                    logger.error("Failed to request sign out from Rownd: \(String(describing: error))")
-                }
-            }
+            evaluateJavaScript(code: "rownd.signOut()", webView: webView)
             
         case .signIn, .unknown:
-            webView.evaluateJavaScript("rownd.requestSignIn(\(jsFunctionArgsAsJson))") { (result, error) in
-                if error != nil {
-                    logger.error("Failed to request sign in from Rownd: \(String(describing: error))")
-                }
-            }
+            evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
         case .qrCode:
-            logger.trace("rownd.generateCodeForMobile('\(self.jsFunctionArgsAsJson)')")
-            webView.evaluateJavaScript("rownd.generateCodeForMobile('\(jsFunctionArgsAsJson)')") { (result, error) in
-                if error != nil {
-                    logger.error("Failed to generate QR code: \(String(describing: error))")
-                }
-            }
+            evaluateJavaScript(code: "rownd.generateQrCode(\(jsFunctionArgsAsJson))", webView: webView)
         case .none:
             return
         }

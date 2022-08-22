@@ -17,11 +17,25 @@ class RowndEncryption {
     }
 
     static func storeKey(key: SecretBox.Key, keyId: String?) -> Void {
-        KeychainWrapper.standard.set(key.asData(), forKey: keyName(keyId), withAccessibility: .whenUnlocked, isSynchronizable: true)
+        KeychainWrapper.standard.set(
+            key.asData(),
+            forKey: keyName(keyId),
+            withAccessibility: .whenUnlocked,
+            isSynchronizable: true
+        )
     }
 
     static func loadKey(keyId: String?) -> SecretBox.Key? {
-        let keyData = KeychainWrapper.standard.data(forKey: keyName(keyId))
+        var keyData = KeychainWrapper.standard.data(
+            forKey: keyName(keyId),
+            withAccessibility: .whenUnlocked,
+            isSynchronizable: true
+        )
+
+        if keyData == nil {
+            // Early keys may have been stored without accessibility/sync options set, so retry lookup
+            keyData = KeychainWrapper.standard.data(forKey: keyName(keyId))
+        }
 
         guard let keyData = keyData else {
             return nil

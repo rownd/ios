@@ -123,10 +123,12 @@ struct KeyTransferView : View {
 }
 
 struct RowndButton: ViewModifier {
+    var backgroundColor: Color = Color(.systemGray5)
+
     func body(content: Content) -> some View {
         content
             .padding()
-            .background(Color(.systemGray5))
+            .background(backgroundColor)
             .foregroundColor(.primary)
             .clipShape(Capsule())
     }

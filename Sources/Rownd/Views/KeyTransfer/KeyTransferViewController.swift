@@ -10,6 +10,16 @@ import SwiftUI
 
 class KeyTransferViewState : ObservableObject {
     @Published var key = "Loading..."
+    var qrCodeData: String {
+        get {
+            do {
+                return try ["data": "https://rownd.io/#\(self.key)"].asJsonString()
+            } catch {
+                return "Error fetching QR Code data: \(String(describing: error))"
+            }
+        }
+    }
+
 }
 
 class KeyTransferViewController : UIViewController {
@@ -30,6 +40,7 @@ class KeyTransferViewController : UIViewController {
         } catch {
             logger.error("Failed to load key for transfer: \(String(describing: error))")
             keyState.key = "Error"
+            keyState
         }
         
         addChild(contentView)

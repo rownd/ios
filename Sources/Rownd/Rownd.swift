@@ -87,7 +87,6 @@ public class Rownd: NSObject {
     }
 
     public static func transferEncryptionKey() {
-//        inst.displayViewControllerOnTop(KeyTransferViewController())
         var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
         behavior.heightMode = .specific(values: [.screenRatio(value: 1), .screenRatio(value: 0.65)], heightLimit: .statusBar)
 
