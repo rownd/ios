@@ -17,8 +17,10 @@ import LBBottomSheet
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig.inst
+
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
+    internal static var apiClient = RowndApi().client
     
     private override init() {}
     

@@ -14,6 +14,7 @@ struct KeyTransferView : View {
     @Environment(\.presentationMode) var presentationMode
 
     var parentViewController: UIViewController?
+    var setupKeyTransfer: () -> Void
 
     @State var appName = "app_name"
     @State private var isShowingCode = false
@@ -34,6 +35,7 @@ struct KeyTransferView : View {
                             .fixedSize(horizontal: false, vertical: true)
 
                         Button(action: {
+                            self.setupKeyTransfer()
                             activeNavSelection = "key-code"
                             parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
                         }, label: {
@@ -88,7 +90,7 @@ struct KeyTransferView : View {
                             EmptyView()
                         }
                         NavigationLink(destination: KeyScannerView(), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
-                        NavigationLink(destination: KeyCodeView(keyState: keyState), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
+                        NavigationLink(destination: KeyCodeView(), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
 
                         Spacer()
 
@@ -118,7 +120,7 @@ struct KeyTransferView : View {
                     }
                 }
             }
-        }
+        }.environmentObject(keyState)
     }
 }
 
@@ -136,6 +138,8 @@ struct RowndButton: ViewModifier {
 
 struct KeyTransferView_Previews: PreviewProvider {
     static var previews: some View {
-        KeyTransferView(keyState: KeyTransferViewState())
+        KeyTransferView(setupKeyTransfer: {
+            return
+        }, keyState: KeyTransferViewState())
     }
 }

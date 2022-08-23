@@ -12,8 +12,12 @@ import WebKit
 struct KeyCodeView : View {
 
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var keyState: KeyTransferViewState
 
-    @ObservedObject var keyState: KeyTransferViewState
+//    @Binding var keyState: KeyTransferViewState
+//    @Binding var key: String
+//    @Binding var signInLink: String
+//    var qrCodeData: String
 
     @State var appName = "app_name"
     @State private var isShowingCode = false
@@ -32,8 +36,18 @@ struct KeyCodeView : View {
                     Text("Your encryption key is automatically saved in your iCloud keychain. To sign in on another device, scan the QR code below with the new device.")
 
                     VStack(alignment: .center) {
-                        HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
-                            .frame(maxHeight: .infinity)
+                        if keyState.signInLink == "" {
+                            HStack(alignment: .center) {
+                                Spacer()
+                                ProgressView()
+                                    .scaleEffect(2)
+                                    .frame(maxHeight: .infinity)
+                                Spacer()
+                            }
+                        } else {
+                            HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
+                                .frame(maxHeight: .infinity)
+                        }
                     }
                     .padding()
 

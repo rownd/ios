@@ -31,7 +31,7 @@ class SignInLinks {
                 
             }
 
-            let authResp: SignInLinkResp = try await RowndApi.client.send(.get(signInUrl.absoluteString)).value
+            let authResp: SignInLinkResp = try await Rownd.apiClient.send(.get(signInUrl.absoluteString)).value
 
             DispatchQueue.main.async {
                 store.dispatch(SetAuthState(payload: AuthState(

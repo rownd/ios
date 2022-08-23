@@ -29,6 +29,7 @@
 		B347C27B287CB46A00935115 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = B347C27A287CB46A00935115 /* JWTDecode */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
 		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */; };
+		B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430C28B4077F0038CF16 /* MagicLink.swift */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
 		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
@@ -98,6 +99,7 @@
 		B347C27428792AD900935115 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B35E1ED02874C9C9007E989F /* HubViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewController.swift; sourceTree = "<group>"; };
 		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpinnerViewController.swift.bak; sourceTree = "<group>"; };
+		B36D430C28B4077F0038CF16 /* MagicLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicLink.swift; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B374E55B28545A1C00955719 /* framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framework.h; sourceTree = "<group>"; };
 		B374E5652855872F00955719 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = SOURCE_ROOT; };
@@ -171,6 +173,7 @@
 				B302E2942863A95A005FD927 /* RowndConfig.swift */,
 				B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */,
 				B302E2932863A95A005FD927 /* Storage.swift */,
+				B36D430C28B4077F0038CF16 /* MagicLink.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -523,6 +526,7 @@
 				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
 				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
+				B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */,
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
