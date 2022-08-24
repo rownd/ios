@@ -11,16 +11,23 @@ Pod::Spec.new do |s|
   s.author           = {
     "Rownd" => "support@rownd.io",
   }
-  s.documentation_url = "https://reswift.github.io/ReSwift/"
-  s.social_media_url  = "https://twitter.com/benjaminencz"
+  s.documentation_url = "https://github.com/rownd/ios"
   s.source            = {
-    :git => "https://github.com/ReSwift/ReSwift.git",
+    :git => "https://github.com/rownd/ios.git",
     :tag => s.version.to_s
   }
 
   s.ios.deployment_target     = '14.0'
 
+  s.dependency 'LBBottomSheet'
+  s.dependency 'AnyCodable-FlightSchool'
+  s.dependency 'JWTDecode'
+  s.dependency 'ReSwift'
+  s.dependency 'ReSwiftThunk'
+  s.dependency 'Sodium'
+  s.dependency 'SwiftKeychainWrapper'
+
   s.requires_arc     = true
-  s.source_files     = 'Sources/**/*.swift'
+  s.source_files     = 'Sources/**/*'
   s.swift_versions   = [ "5.5", "5.4", "5.3", "5.2", "5.0" ]
 end
