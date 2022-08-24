@@ -40,7 +40,7 @@ public class Rownd: NSObject {
             }
         }
 
-        if !inst.state().state.auth.isAuthenticated {
+        if !store.state.auth.isAuthenticated {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
                 launchUrl = _launchUrl
@@ -51,7 +51,6 @@ public class Rownd: NSObject {
             if (launchUrl?.host?.hasSuffix("rownd.link")) != nil, let launchUrl = launchUrl {
                 logger.trace("launch_url: \(String(describing: launchUrl.absoluteString))")
 
-                // TODO: Ask Rownd to handle this link (probably signing the user in)
                 do {
                     try await SignInLinks.signInWithLink(launchUrl)
                 } catch {
@@ -99,7 +98,13 @@ public class Rownd: NSObject {
     }
     
     public static func manageUser() {
-        inst.displayViewControllerOnTop(AccountManagerViewController())
+        var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
+        behavior.heightMode = .specific(values: [.screenRatio(value: 1), .screenRatio(value: 0.65)], heightLimit: .statusBar)
+
+        var theme: LBBottomSheet.BottomSheetController.Theme = .init()
+        theme.grabber?.topMargin = CGFloat(10.0)
+
+        inst.getRootViewController()?.presentAsBottomSheet(AccountManagerViewController(), theme: theme, behavior: behavior)
     }
     
     public static func getAccessToken() async -> String? {

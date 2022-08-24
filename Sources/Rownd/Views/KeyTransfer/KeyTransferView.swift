@@ -15,9 +15,9 @@ struct KeyTransferView : View {
 
     var parentViewController: UIViewController?
     var setupKeyTransfer: () -> Void
+    var receiveKeyTransfer: (_ url: String) -> Void
 
     @State var appName = "app_name"
-    @State private var isShowingCode = false
     @State private var activeNavSelection: String? = nil
     @State private var isShowingAlert = false
     @State private var alertTitle = ""
@@ -31,18 +31,20 @@ struct KeyTransferView : View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading) {
 
-                        Text("Your encryption key is already saved to your iCloud keychain. To view your key or transfer it to another device, tap below.")
-                            .fixedSize(horizontal: false, vertical: true)
+                        if store.state.auth.isAuthenticated {
+                            Text("Your encryption key is already saved to your iCloud keychain. To view your key or transfer it to another device, tap below.")
+                                .fixedSize(horizontal: false, vertical: true)
 
-                        Button(action: {
-                            self.setupKeyTransfer()
-                            activeNavSelection = "key-code"
-                            parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
-                        }, label: {
-                            Text("Show encrpytion key")
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                        })
-                        .modifier(RowndButton())
+                            Button(action: {
+                                self.setupKeyTransfer()
+                                activeNavSelection = "key-code"
+                                parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
+                            }, label: {
+                                Text("Show encrpytion key")
+                                    .frame(minWidth: 0, maxWidth: .infinity)
+                            })
+                            .modifier(RowndButton())
+                        }
 
                         Text("To sign in to your account using another device, scan the encryption key QR code that's displayed on the other device.")
                             .fixedSize(horizontal: false, vertical: true)
@@ -50,7 +52,7 @@ struct KeyTransferView : View {
                         Button(action: {
                             switch AVCaptureDevice.authorizationStatus(for: .video) {
                             case .authorized:
-                                isShowingCode = true
+                                activeNavSelection = "key-scanner"
                                 parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
                             case .notDetermined:
                                 AVCaptureDevice.requestAccess(for: .video) { granted in
@@ -86,10 +88,7 @@ struct KeyTransferView : View {
                                 dismissButton: .default(Text("OK"))
                             )
                         }
-                        NavigationLink(destination: KeyScannerView(), isActive: $isShowingCode) {
-                            EmptyView()
-                        }
-                        NavigationLink(destination: KeyScannerView(), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
+                        NavigationLink(destination: KeyScannerView(receiveKeyTransfer: receiveKeyTransfer), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
                         NavigationLink(destination: KeyCodeView(), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
 
                         Spacer()
@@ -120,7 +119,9 @@ struct KeyTransferView : View {
                     }
                 }
             }
-        }.environmentObject(keyState)
+        }
+        .navigationViewStyle(.stack)
+        .environmentObject(keyState)
     }
 }
 
@@ -139,6 +140,8 @@ struct RowndButton: ViewModifier {
 struct KeyTransferView_Previews: PreviewProvider {
     static var previews: some View {
         KeyTransferView(setupKeyTransfer: {
+            return
+        }, receiveKeyTransfer: { url in
             return
         }, keyState: KeyTransferViewState())
     }

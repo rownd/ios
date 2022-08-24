@@ -10,14 +10,22 @@ import SwiftUI
 import CodeScanner
 
 struct KeyScannerView: View {
-    @State private var isPresentingScanner = false
+    var receiveKeyTransfer: (_ url: String) -> Void
+    @State private var isPresentingScanner = true
     @State private var scannedCode: String?
+    @State private var isTransferringKey = false
+    @State private var activeNavSelection = ""
 
     var body: some View {
         ZStack {
             Color(.systemGray6).edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 10) {
                 if let code = scannedCode {
+
+//                    let url = URL(string: code)
+//                    if let url = url {
+//                        SignInLinks.signInWithLink(url)
+//                    }
                     //                NavigationLink("Next page", destination: NextView(scannedCode: code), isActive: .constant(true)).hidden()
                 }
 
@@ -30,8 +38,10 @@ struct KeyScannerView: View {
                 CodeScannerView(codeTypes: [.qr]) { response in
                     if case let .success(result) = response {
                         scannedCode = result.string
-                        isPresentingScanner = false
+//                        isPresentingScanner = false
+                        isTransferringKey = true
                         print(result.string)
+                        receiveKeyTransfer(result.string)
                     }
                 }
                 .cornerRadius(15)
@@ -41,7 +51,7 @@ struct KeyScannerView: View {
                     Spacer()
 
                     Button(action: {
-
+                        
                     }, label: {
                         Text("Enter code manually")
                     })
@@ -49,6 +59,8 @@ struct KeyScannerView: View {
 
                     Spacer()
                 }
+
+                NavigationLink(destination: KeyTransferProgress(isShowingProgressView: $isTransferringKey), isActive: $isTransferringKey) { EmptyView() }
 
             }
             .padding(.horizontal)

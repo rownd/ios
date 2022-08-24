@@ -16,13 +16,25 @@ class RowndEncryption {
         return key
     }
 
-    static func storeKey(key: SecretBox.Key, keyId: String?) -> Void {
-        KeychainWrapper.standard.set(
+    @discardableResult static func storeKey(key: SecretBox.Key, keyId: String?) -> Bool {
+        return KeychainWrapper.standard.set(
             key.asData(),
             forKey: keyName(keyId),
             withAccessibility: .whenUnlocked,
             isSynchronizable: true
         )
+    }
+
+    @discardableResult static func storeKey(key: String, keyId: String?) throws -> Bool {
+        let dataKey = Data(base64Encoded: key)
+
+        guard let dataKey = dataKey else {
+            throw EncryptionError("The provided key could not be decoded as base64")
+        }
+
+        let secretBoxKey = Array(dataKey) as SecretBox.Key
+
+        return storeKey(key: secretBoxKey, keyId: keyId)
     }
 
     static func loadKey(keyId: String?) -> SecretBox.Key? {
@@ -46,8 +58,15 @@ class RowndEncryption {
         return key
     }
 
-    static func deleteKey(keyId: String?) -> Void {
-        KeychainWrapper.standard.removeObject(forKey: keyName(keyId))
+    @discardableResult static func deleteKey(keyId: String?) -> Bool {
+        var result = KeychainWrapper.standard.removeObject(forKey: keyName(keyId), withAccessibility: .whenUnlocked, isSynchronizable: true)
+
+        if !result {
+            // Fallback for previous behavior. This might fail too, but that's ok
+            result = KeychainWrapper.standard.removeObject(forKey: keyName(keyId))
+        }
+
+        return result
     }
 
     static private func keyName(_ keyId: String?) -> String {

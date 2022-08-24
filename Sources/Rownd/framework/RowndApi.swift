@@ -27,5 +27,7 @@ class RowndApiClientDelegate : APIClientDelegate {
         if store.state.auth.isAuthenticated, let accessToken = await Rownd.getAccessToken() {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
+
+        print("request url: \(request.url)")
     }
 }
