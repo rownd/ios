@@ -457,11 +457,11 @@
 			);
 			mainGroup = B374E54E28545A1C00955719;
 			packageReferences = (
-				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */,
-				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */,
+				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
+				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
 				B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */,
-				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */,
-				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */,
+				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
+				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
@@ -705,7 +705,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 34CNMPW6U9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -720,7 +720,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.1;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -736,7 +736,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 34CNMPW6U9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -751,7 +751,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.1;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.rownd.framework;
 				PRODUCT_NAME = Rownd;
 				SKIP_INSTALL = YES;
@@ -901,7 +901,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */ = {
+		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift.git";
 			requirement = {
@@ -909,7 +909,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */ = {
+		B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift-Thunk.git";
 			requirement = {
@@ -925,7 +925,7 @@
 				minimumVersion = 0.6.5;
 			};
 		};
-		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */ = {
+		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
 			requirement = {
@@ -933,7 +933,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */ = {
+		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LunabeeStudio/LBBottomSheet.git";
 			requirement = {
@@ -986,12 +986,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		B302E2BA28641A7A005FD927 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
 			productName = ReSwift;
 		};
 		B302E2C62865012F005FD927 /* ReSwiftThunk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */;
+			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
 			productName = ReSwiftThunk;
 		};
 		B347C2772879358200935115 /* AnyCodable */ = {
@@ -1001,12 +1001,12 @@
 		};
 		B347C27A287CB46A00935115 /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */;
+			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
 			productName = JWTDecode;
 		};
 		B38A40A02881157D00FD0813 /* LBBottomSheet */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */;
+			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */;
 			productName = LBBottomSheet;
 		};
 		B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */ = {
