@@ -57,14 +57,33 @@ let package = Package(
             name: "Sodium",
             url: "https://github.com/jedisct1/swift-sodium",
             .upToNextMajor(from: "0.9.1")
+        ),
+        .package(
+            name: "CodeScanner",
+            url: "https://github.com/twostraws/CodeScanner",
+            .upToNextMajor(from: "2.1.2")
+        ),
+        .package(
+            name: "Get",
+            url: "https://github.com/kean/Get",
+            .upToNextMajor(from: "1.0.2")
         )
-
     ],
     
     targets: [
         .target(
             name: "Rownd",
-            dependencies: ["AnyCodable", "ReSwift", "ReSwiftThunk", "JWTDecode", "LBBottomSheet", "SwiftKeychainWrapper", "Sodium"]
+            dependencies: [
+                "AnyCodable",
+                "ReSwift",
+                "ReSwiftThunk",
+                "JWTDecode",
+                "LBBottomSheet",
+                "SwiftKeychainWrapper",
+                "Sodium",
+                "CodeScanner",
+                "Get"
+            ]
         )
     ],
     
