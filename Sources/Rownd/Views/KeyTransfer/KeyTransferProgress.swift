@@ -11,6 +11,7 @@ import SwiftUI
 struct KeyTransferProgress: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var keyState: KeyTransferViewState
+    var parentViewController: UIViewController
 
     @Binding var isShowingProgressView: Bool
 
@@ -94,6 +95,14 @@ struct KeyTransferProgress: View {
                                 .frame(minWidth: 0, maxWidth: .infinity)
                             Spacer()
                         }
+
+                        Button(action: {
+                            parentViewController.dismiss(animated: true)
+                        }, label: {
+                            Text("Finish")
+                                .frame(minWidth: 0, maxWidth: .infinity)
+                        })
+                        .modifier(RowndButton())
                     }.frame(maxHeight: .infinity)
                 }
             }

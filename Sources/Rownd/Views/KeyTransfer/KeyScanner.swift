@@ -11,6 +11,7 @@ import CodeScanner
 
 struct KeyScannerView: View {
     var receiveKeyTransfer: (_ url: String) -> Void
+    var parentViewController: UIViewController
     @State private var isPresentingScanner = true
     @State private var scannedCode: String?
     @State private var isTransferringKey = false
@@ -60,7 +61,10 @@ struct KeyScannerView: View {
                     Spacer()
                 }
 
-                NavigationLink(destination: KeyTransferProgress(isShowingProgressView: $isTransferringKey), isActive: $isTransferringKey) { EmptyView() }
+                NavigationLink(destination: KeyTransferProgress(
+                    parentViewController: parentViewController,
+                    isShowingProgressView: $isTransferringKey
+                ), isActive: $isTransferringKey) { EmptyView() }
 
             }
             .padding(.horizontal)

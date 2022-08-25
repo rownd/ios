@@ -74,6 +74,7 @@ class KeyTransferViewController : UIViewController {
 
     private func receiveKeyTransfer(_ url: String) {
         keyState.isReceivingKey = true
+        keyState.operationError = nil
 
         Task {
             let url = URL(string: url)

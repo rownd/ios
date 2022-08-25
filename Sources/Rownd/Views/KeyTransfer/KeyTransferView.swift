@@ -13,7 +13,7 @@ struct KeyTransferView : View {
 
     @Environment(\.presentationMode) var presentationMode
 
-    var parentViewController: UIViewController?
+    var parentViewController: UIViewController
     var setupKeyTransfer: () -> Void
     var receiveKeyTransfer: (_ url: String) -> Void
 
@@ -38,7 +38,7 @@ struct KeyTransferView : View {
                             Button(action: {
                                 self.setupKeyTransfer()
                                 activeNavSelection = "key-code"
-                                parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
+                                parentViewController.bottomSheetController?.grow(toMaximumHeight: true)
                             }, label: {
                                 Text("Show encrpytion key")
                                     .frame(minWidth: 0, maxWidth: .infinity)
@@ -53,12 +53,12 @@ struct KeyTransferView : View {
                             switch AVCaptureDevice.authorizationStatus(for: .video) {
                             case .authorized:
                                 activeNavSelection = "key-scanner"
-                                parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
+                                parentViewController.bottomSheetController?.grow(toMaximumHeight: true)
                             case .notDetermined:
                                 AVCaptureDevice.requestAccess(for: .video) { granted in
                                     if granted {
                                         activeNavSelection = "key-scanner"
-                                        parentViewController?.bottomSheetController?.grow(toMaximumHeight: true)
+                                        parentViewController.bottomSheetController?.grow(toMaximumHeight: true)
                                     }
                                 }
                             case .denied:
@@ -88,7 +88,10 @@ struct KeyTransferView : View {
                                 dismissButton: .default(Text("OK"))
                             )
                         }
-                        NavigationLink(destination: KeyScannerView(receiveKeyTransfer: receiveKeyTransfer), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
+                        NavigationLink(destination: KeyScannerView(
+                            receiveKeyTransfer: receiveKeyTransfer,
+                            parentViewController: parentViewController
+                        ), tag: "key-scanner", selection: $activeNavSelection) { EmptyView() }
                         NavigationLink(destination: KeyCodeView(), tag: "key-code", selection: $activeNavSelection) { EmptyView() }
 
                         Spacer()
@@ -139,7 +142,8 @@ struct RowndButton: ViewModifier {
 
 struct KeyTransferView_Previews: PreviewProvider {
     static var previews: some View {
-        KeyTransferView(setupKeyTransfer: {
+        KeyTransferView(parentViewController: KeyTransferViewController(),
+                        setupKeyTransfer: {
             return
         }, receiveKeyTransfer: { url in
             return
