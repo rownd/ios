@@ -30,6 +30,26 @@ extension AuthState: Codable {
         case refreshToken = "refresh_token"
         case isVerifiedUser = "is_verified_user"
     }
+
+    func toRphInitHash() -> String? {
+        let userId: String? = store.state.user.get(field: "user_id") as? String ?? nil
+        let rphInit = [
+            "access_token": self.accessToken,
+            "refresh_token": self.refreshToken,
+            "app_id": store.state.appConfig.id,
+            "app_user_id": userId
+        ]
+
+        do {
+            let encoder = JSONEncoder()
+            let encoded = try encoder.encode(rphInit)
+
+            return encoded.base64EncodedString()
+        } catch {
+            logger.error("Failed to build rph_init hash string: \(String(describing: error))")
+            return nil
+        }
+    }
     
     func getAccessToken() async -> String? {
         guard let accessToken = store.state.auth.accessToken else { return nil }
@@ -160,7 +180,7 @@ class Auth {
             // the parsing closure in request.execute() is finished with it.
             guard request.decode != nil else { return }
             // Only enable this when debugging API responses, since it could log sensitive info
-//            logger.trace("Received tokens: \(String(describing: tokenResp))")
+            //            logger.trace("Received tokens: \(String(describing: tokenResp))")
             
             completion(tokenResp)
         }

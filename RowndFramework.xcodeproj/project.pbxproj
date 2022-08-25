@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9D362451A94D6B891F557206 /* Pods_Rownd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52E97FBA2193C85E33D9852A /* Pods_Rownd.framework */; };
 		B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2812863A8D0005FD927 /* HubWebViewController.swift */; };
-		B302E2872863A8D0005FD927 /* HubWebView.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B302E2822863A8D0005FD927 /* HubWebView.swift.bak */; };
 		B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */; };
 		B302E2962863A95A005FD927 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2932863A95A005FD927 /* Storage.swift */; };
 		B302E2972863A95A005FD927 /* RowndConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2942863A95A005FD927 /* RowndConfig.swift */; };
@@ -29,7 +27,6 @@
 		B347C2782879358200935115 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = B347C2772879358200935115 /* AnyCodable */; };
 		B347C27B287CB46A00935115 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = B347C27A287CB46A00935115 /* JWTDecode */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
-		B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */; };
 		B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430C28B4077F0038CF16 /* MagicLink.swift */; };
 		B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -81,11 +78,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		52E97FBA2193C85E33D9852A /* Pods_Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D512F014037AD8EFFD4A3F3 /* Pods-Rownd.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rownd.release.xcconfig"; path = "Target Support Files/Pods-Rownd/Pods-Rownd.release.xcconfig"; sourceTree = "<group>"; };
-		AA25A2F52983551D2266AC39 /* Pods-Rownd.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rownd.debug.xcconfig"; path = "Target Support Files/Pods-Rownd/Pods-Rownd.debug.xcconfig"; sourceTree = "<group>"; };
 		B302E2812863A8D0005FD927 /* HubWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HubWebViewController.swift; sourceTree = "<group>"; };
-		B302E2822863A8D0005FD927 /* HubWebView.swift.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HubWebView.swift.bak; sourceTree = "<group>"; };
 		B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowndHubInteropMessage.swift; sourceTree = "<group>"; };
 		B302E2932863A95A005FD927 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		B302E2942863A95A005FD927 /* RowndConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowndConfig.swift; sourceTree = "<group>"; };
@@ -103,7 +96,6 @@
 		B347C25528786D8B00935115 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		B347C27428792AD900935115 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B35E1ED02874C9C9007E989F /* HubViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewController.swift; sourceTree = "<group>"; };
-		B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpinnerViewController.swift.bak; sourceTree = "<group>"; };
 		B36D430C28B4077F0038CF16 /* MagicLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicLink.swift; sourceTree = "<group>"; };
 		B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferProgress.swift; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,7 +142,6 @@
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
 				B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */,
-				9D362451A94D6B891F557206 /* Pods_Rownd.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,10 +166,7 @@
 		673FA6B470E9230725EB3F93 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				AA25A2F52983551D2266AC39 /* Pods-Rownd.debug.xcconfig */,
-				7D512F014037AD8EFFD4A3F3 /* Pods-Rownd.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -285,7 +273,6 @@
 				B38A4095287FC0DC00FD0813 /* HubWebView */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
 				B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */,
-				B35E1ED22874DBEC007E989F /* SpinnerViewController.swift.bak */,
 				B38A4094287FC0CA00FD0813 /* AccountManager */,
 				B38A409D288111F200FD0813 /* BottomSheetController.swift */,
 			);
@@ -304,7 +291,6 @@
 		B38A4095287FC0DC00FD0813 /* HubWebView */ = {
 			isa = PBXGroup;
 			children = (
-				B302E2822863A8D0005FD927 /* HubWebView.swift.bak */,
 				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
 			);
 			path = HubWebView;
@@ -342,7 +328,6 @@
 			isa = PBXGroup;
 			children = (
 				B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */,
-				52E97FBA2193C85E33D9852A /* Pods_Rownd.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -377,7 +362,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "Rownd" */;
 			buildPhases = (
-				1A410A3E277CFE2DD4213C1D /* [CP] Check Pods Manifest.lock */,
 				B374E55328545A1C00955719 /* Headers */,
 				B374E55428545A1C00955719 /* Sources */,
 				B374E55528545A1C00955719 /* Frameworks */,
@@ -522,31 +506,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		1A410A3E277CFE2DD4213C1D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Rownd-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		B374E55428545A1C00955719 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -560,8 +519,6 @@
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
 				B302E2C228642329005FD927 /* Rownd.swift in Sources */,
-				B302E2872863A8D0005FD927 /* HubWebView.swift.bak in Sources */,
-				B35E1ED32874DBEC007E989F /* SpinnerViewController.swift.bak in Sources */,
 				B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */,
 				B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
@@ -745,7 +702,6 @@
 		};
 		B374E56028545A1C00955719 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA25A2F52983551D2266AC39 /* Pods-Rownd.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -777,7 +733,6 @@
 		};
 		B374E56128545A1C00955719 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7D512F014037AD8EFFD4A3F3 /* Pods-Rownd.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;

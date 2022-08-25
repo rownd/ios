@@ -50,9 +50,18 @@ public class HubViewController: UIViewController, HubViewProtocol {
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
 
-        let hubLoaderUrl = URL(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
+        var hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
+
+        // This ensures that the Hub in the webview doesn't attempt to refresh its own tokens,
+        // which might trigger an undesired sign-out now or in the future
+        if store.state.auth.isAuthenticated {
+            let rphInit = store.state.auth.toRphInitHash()
+            if let rphInit = rphInit {
+                hubLoaderUrl?.fragment = "rph_init=\(rphInit)"
+            }
+        }
         
-        hubWebController.setUrl(url: hubLoaderUrl!)
+        hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
         
         view = UIView()
         view.backgroundColor = .systemGray6
