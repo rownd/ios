@@ -77,7 +77,7 @@ public class Rownd: NSObject {
         }
     }
     
-    public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {        
+    public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
@@ -94,7 +94,9 @@ public class Rownd: NSObject {
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
         theme.grabber?.topMargin = CGFloat(10.0)
 
-        inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
+        DispatchQueue.main.async {
+            inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
+        }
     }
     
     public static func manageUser() {
@@ -104,7 +106,9 @@ public class Rownd: NSObject {
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
         theme.grabber?.topMargin = CGFloat(10.0)
 
-        inst.getRootViewController()?.presentAsBottomSheet(AccountManagerViewController(), theme: theme, behavior: behavior)
+        DispatchQueue.main.async {
+            inst.getRootViewController()?.presentAsBottomSheet(AccountManagerViewController(), theme: theme, behavior: behavior)
+        }
     }
     
     public static func getAccessToken() async -> String? {
@@ -189,7 +193,10 @@ public class Rownd: NSObject {
         let bottomSheetController = BottomSheetController()
         bottomSheetController.controller = viewController
         bottomSheetController.modalPresentationStyle = .overFullScreen
-        rootViewController?.present(bottomSheetController, animated: true, completion: nil)
+
+        DispatchQueue.main.async {
+            rootViewController?.present(bottomSheetController, animated: true, completion: nil)
+        }
     }
     
 }
