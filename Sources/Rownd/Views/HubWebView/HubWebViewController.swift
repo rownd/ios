@@ -143,7 +143,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             switch hubMessage.type {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
-                if store.state.auth.isAuthenticated {
+                if hubViewController?.targetPage != .signIn {
                     // The Hub is open for something else, so just chill...
                     return
                 }
