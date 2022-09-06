@@ -106,11 +106,12 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
     switch action {
     case let action as SetAuthState:
         state = action.payload
-        if (state.hasPreviouslySignedIn ?? false || state.isAuthenticated) {
-            state.hasPreviouslySignedIn = true
-        }
     default:
         break
+    }
+
+    if (state.hasPreviouslySignedIn ?? false || state.isAuthenticated) {
+        state.hasPreviouslySignedIn = true
     }
     
     return state
