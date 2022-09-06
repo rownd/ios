@@ -18,6 +18,7 @@ public struct AuthState: Hashable {
     public var accessToken: String?
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
+    public var helloWorld: String = "Hello World"
 }
 
 extension AuthState: Codable {
