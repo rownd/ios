@@ -91,6 +91,7 @@ You can subscribe to any state object that Rownd supports. Here's a list of avai
 public struct AuthState {
     public var accessToken: String?     // Current, valid access token for the user (valid for one hour)
     public var isVerifiedUser: Bool?    // Whether the current user has verified at least one identifier (e.g., email)
+    public var hasPreviouslySignedIn: Bool    // Whether the app has been previously signed in before
 }
 ```
 
