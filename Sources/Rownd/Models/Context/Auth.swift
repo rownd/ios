@@ -18,7 +18,7 @@ public struct AuthState: Hashable {
     public var accessToken: String?
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
-    public var hasPreviouslySignedIn: Bool?
+    public var hasPreviouslySignedIn: Bool = false
 }
 
 extension AuthState: Codable {
@@ -30,7 +30,7 @@ extension AuthState: Codable {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case isVerifiedUser = "is_verified_user"
-        case hasPreviouslySignedIn = "has_Previously_Signed_In"
+        case hasPreviouslySignedIn = "has_previously_signed_in"
     }
 
     func toRphInitHash() -> String? {
@@ -103,6 +103,8 @@ struct SetAuthState: Action {
 func authReducer(action: Action, state: AuthState?) -> AuthState {
     var state = state ?? AuthState()
     
+    let hasPreviouslySignedIn = state.hasPreviouslySignedIn
+    
     switch action {
     case let action as SetAuthState:
         state = action.payload
@@ -110,7 +112,7 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
         break
     }
 
-    if (state.hasPreviouslySignedIn ?? false || state.isAuthenticated) {
+    if (hasPreviouslySignedIn || state.isAuthenticated) {
         state.hasPreviouslySignedIn = true
     }
     
