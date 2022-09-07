@@ -17,6 +17,7 @@ public enum HubPageSelector {
     case signIn
     case signOut
     case qrCode
+    case manageAccount
     case unknown
 }
 
@@ -119,6 +120,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
         case .qrCode:
             evaluateJavaScript(code: "rownd.generateQrCode(\(jsFunctionArgsAsJson))", webView: webView)
+        case .manageAccount:
+            evaluateJavaScript(code: "rownd.user.manageAccount()", webView: webView)
         case .none:
             return
         }

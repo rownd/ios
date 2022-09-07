@@ -100,15 +100,7 @@ public class Rownd: NSObject {
     }
     
     public static func manageUser() {
-        var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
-        behavior.heightMode = .specific(values: [.screenRatio(value: 1), .screenRatio(value: 0.65)], heightLimit: .statusBar)
-
-        var theme: LBBottomSheet.BottomSheetController.Theme = .init()
-        theme.grabber?.topMargin = CGFloat(10.0)
-
-        DispatchQueue.main.async {
-            inst.getRootViewController()?.presentAsBottomSheet(AccountManagerViewController(), theme: theme, behavior: behavior)
-        }
+        let _ = inst.displayHub(.manageAccount)
     }
     
     public static func getAccessToken() async -> String? {
