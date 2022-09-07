@@ -113,7 +113,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         
         switch (hubViewController?.targetPage) {
         case .signOut:
-            evaluateJavaScript(code: "rownd.signOut()", webView: webView)
+            evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
             
         case .signIn, .unknown:
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
