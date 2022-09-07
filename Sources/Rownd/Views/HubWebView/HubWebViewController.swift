@@ -156,6 +156,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     self?.hubViewController?.hide()
                 }
                 
+            case .userDataUpdate:
+                guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
+                store.dispatch(SetUserData(payload: userDataMessage.data))
+                store.dispatch(UserData.fetch())
+                
             case .triggerSignInWithApple:
                 self.hubViewController?.hide()
                 Rownd.requestSignIn(with: .appleId)
