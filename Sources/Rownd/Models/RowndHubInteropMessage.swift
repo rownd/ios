@@ -26,6 +26,7 @@
  */
 
 import Foundation
+import AnyCodable
 
 struct RowndHubInteropMessage: Decodable {
     var type: MessageType
@@ -43,6 +44,7 @@ enum MessageType: String, Codable {
     case authentication
     case signOut = "sign_out"
     case triggerSignInWithApple = "trigger_sign_in_with_apple"
+    case userDataUpdate = "user_data_update"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -62,6 +64,7 @@ enum MessageType: String, Codable {
 
 enum MessagePayload: Decodable {
     case authentication(AuthenticationMessage)
+    case userDataUpdate(UserDataUpdateMessage)
     case signOut
     case unknown
     case triggerSignInWithApple
@@ -88,6 +91,10 @@ enum MessagePayload: Decodable {
             let payload = try objectContainer.decode(AuthenticationMessage.self)
             self = .authentication(payload)
             
+        case .userDataUpdate:
+            let payload = try objectContainer.decode(UserDataUpdateMessage.self)
+            self = .userDataUpdate(payload)
+            
         case .signOut:
             self = .signOut
             
@@ -103,6 +110,14 @@ enum MessagePayload: Decodable {
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
             case refreshToken = "refresh_token"
+        }
+    }
+    
+    public struct UserDataUpdateMessage: Codable {
+        var data: Dictionary<String, AnyCodable>
+        
+        enum CodingKeys: String, CodingKey {
+            case data = "data"
         }
     }
 }
