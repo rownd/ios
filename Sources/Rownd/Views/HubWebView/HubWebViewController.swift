@@ -114,7 +114,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         
         switch (hubViewController?.targetPage) {
         case .signOut:
-            evaluateJavaScript(code: "rownd.signOut()", webView: webView)
+            evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
             
         case .signIn, .unknown:
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
@@ -155,7 +155,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
                     self?.hubViewController?.hide()
                 }
-                
+            case .closeHubViewController:
+                DispatchQueue.main.async {
+                    self.hubViewController?.hide()
+                }
             case .userDataUpdate:
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
                 store.dispatch(SetUserData(payload: userDataMessage.data))

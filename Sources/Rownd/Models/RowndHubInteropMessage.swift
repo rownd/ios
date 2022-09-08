@@ -43,6 +43,7 @@ struct RowndHubInteropMessage: Decodable {
 enum MessageType: String, Codable {
     case authentication
     case signOut = "sign_out"
+    case closeHubViewController = "close_hub_view_controller"
     case triggerSignInWithApple = "trigger_sign_in_with_apple"
     case userDataUpdate = "user_data_update"
     case unknown
@@ -66,6 +67,7 @@ enum MessagePayload: Decodable {
     case authentication(AuthenticationMessage)
     case userDataUpdate(UserDataUpdateMessage)
     case signOut
+    case closeHubViewController
     case unknown
     case triggerSignInWithApple
     
@@ -90,6 +92,9 @@ enum MessagePayload: Decodable {
         case .authentication:
             let payload = try objectContainer.decode(AuthenticationMessage.self)
             self = .authentication(payload)
+        
+        case .closeHubViewController:
+            self = .closeHubViewController
             
         case .userDataUpdate:
             let payload = try objectContainer.decode(UserDataUpdateMessage.self)
