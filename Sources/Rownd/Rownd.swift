@@ -99,7 +99,7 @@ public class Rownd: NSObject {
         }
     }
     
-    public static func manageUser() {
+    public static func manageAccount() {
         let _ = inst.displayHub(.manageAccount)
     }
     
