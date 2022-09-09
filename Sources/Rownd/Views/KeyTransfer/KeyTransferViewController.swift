@@ -64,8 +64,8 @@ class KeyTransferViewController : UIViewController {
 
         Task {
             do {
-                let magicLink: MagicLink = try await Rownd.apiClient.send(Get.Request(method: "post", url: "/me/auth/magic")).value
-                keyState.signInLink = magicLink.link
+                //let magicLink: MagicLink = try await Rownd.apiClient.send(Get.Request(url: URL("/me/auth/magic"), method: "post")).value
+                //keyState.signInLink = magicLink.link
             } catch {
                 logger.error("Failed to fetch magic link: \(String(describing: error))")
             }

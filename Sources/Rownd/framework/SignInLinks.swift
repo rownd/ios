@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Get
 
 struct SignInLinkResp: Hashable, Codable {
     public var accessToken: String?
@@ -31,25 +32,25 @@ class SignInLinks {
                 signInUrl = URL(string: signInUrl.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? signInUrl
             }
 
-            let authResp: SignInLinkResp = try await Rownd.apiClient.send(.get(signInUrl.absoluteString)).value
+            //let authResp: SignInLinkResp = try await Rownd.apiClient.send(.get(signInUrl.absoluteString)).value
 
-            if let encKey = encKey {
-                RowndEncryption.deleteKey(keyId: authResp.appUserId)
-                let storedSuccessfully = try RowndEncryption.storeKey(key: encKey, keyId: authResp.appUserId)
-
-                if !storedSuccessfully {
-                    throw EncryptionError("Failed to store encryption key in keychain")
-                }
-            }
-
-            DispatchQueue.main.async {
-                store.dispatch(SetAuthState(payload: AuthState(
-                    accessToken: authResp.accessToken,
-                    refreshToken: authResp.refreshToken
-                )))
-
-                store.dispatch(UserData.fetch())
-            }
+//            if let encKey = encKey {
+//                RowndEncryption.deleteKey(keyId: authResp.appUserId)
+//                let storedSuccessfully = try RowndEncryption.storeKey(key: encKey, keyId: authResp.appUserId)
+//
+//                if !storedSuccessfully {
+//                    throw EncryptionError("Failed to store encryption key in keychain")
+//                }
+//            }
+//
+//            DispatchQueue.main.async {
+//                store.dispatch(SetAuthState(payload: AuthState(
+//                    accessToken: authResp.accessToken,
+//                    refreshToken: authResp.refreshToken
+//                )))
+//
+//                store.dispatch(UserData.fetch())
+//            }
         } catch {
             logger.error("Auto sign-in failed: \(String(describing: error))")
             throw SignInError("Auto sign-in failed: \(error.localizedDescription)")
