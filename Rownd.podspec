@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Rownd"
-  s.version          = "1.6.0"
+  s.version          = "1.8.0"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
                         Rownd is a user management platform designed to make authentication
@@ -14,7 +14,8 @@ Pod::Spec.new do |s|
   s.documentation_url = "https://github.com/rownd/ios"
   s.source            = {
     :git => "https://github.com/rownd/ios.git",
-    :tag => s.version.to_s
+    :tag => s.version.to_s,
+    :branch => 'cocoapods-rough-draft'
   }
 
   s.ios.deployment_target     = '14.0'
