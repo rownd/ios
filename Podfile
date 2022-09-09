@@ -8,11 +8,11 @@ target 'Rownd' do
   source 'https://github.com/CocoaPods/Specs.git'
 
   # Pods for framework
-  pod 'LBBottomSheet'
+  pod 'LBBottomSheet', '~> 1.0.24'
   pod 'AnyCodable-FlightSchool', '~> 0.6.0'
   pod 'JWTDecode', '~> 2.6.3'
   pod 'ReSwift', '~> 6.1.0'
   pod 'ReSwiftThunk', '~> 2.0.1'
-  pod 'Sodium', '~> 0.9.1'
   pod 'SwiftKeychainWrapper', '~> 4.0.1'
+  pod 'CodeScanner_Rownd'
 end

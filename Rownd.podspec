@@ -26,6 +26,8 @@ Pod::Spec.new do |s|
   s.dependency 'ReSwiftThunk'
   s.dependency 'Sodium'
   s.dependency 'SwiftKeychainWrapper'
+  s.dependency 'Get'
+  s.dependency 'CodeScanner_Rownd'
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'

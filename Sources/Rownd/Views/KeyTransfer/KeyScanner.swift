@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import CodeScanner
+import CodeScanner_Rownd
 
 struct KeyScannerView: View {
     var receiveKeyTransfer: (_ url: String) -> Void
