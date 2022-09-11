@@ -14,5 +14,5 @@ target 'Rownd' do
   pod 'ReSwift', '~> 6.1.0'
   pod 'ReSwiftThunk', '~> 2.0.1'
   pod 'SwiftKeychainWrapper', '~> 4.0.1'
-  pod 'CodeScanner_Rownd', '~> 1.0.3'
+  pod 'CodeScanner_Rownd', '~> 1.0.4'
 end
