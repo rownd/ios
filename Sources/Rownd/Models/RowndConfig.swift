@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public struct RowndConfig: Hashable, Codable {
     static let inst = RowndConfig();
@@ -16,6 +17,7 @@ public struct RowndConfig: Hashable, Codable {
     public var appKey = ""
     public var forceDarkMode = false
     public var postSignInRedirect: String? = nil
+    public var fontSize = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
     
     func toJson() -> String {
         let encoder = JSONEncoder()
