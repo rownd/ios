@@ -30,7 +30,7 @@ struct KeyCodeView : View {
 
     var body: some View {
         ZStack {
-            Color(.systemGray6).edgesIgnoringSafeArea(.all)
+            Color(Rownd.config.customizations.sheetBackgroundColor).edgesIgnoringSafeArea(.all)
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Your encryption key is automatically saved in your iCloud keychain. To sign in on another device, scan the QR code below with the new device.")
@@ -45,8 +45,8 @@ struct KeyCodeView : View {
                                 Spacer()
                             }
                         } else {
-                            HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
-                                .frame(maxHeight: .infinity)
+//                            HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
+//                                .frame(maxHeight: .infinity)
                         }
                     }
                     .padding()

@@ -35,8 +35,29 @@ class KeyTransferViewController : UIViewController {
     ))
     var keyState = KeyTransferViewState()
 
+    private func uiColorAs1ptImage(_ color: UIColor) -> UIImage? {
+        UIGraphicsBeginImageContext(CGSizeMake(1, 1))
+        guard let ctx = UIGraphicsGetCurrentContext() else { return nil }
+        color.setFill()
+        ctx.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
+
     override func loadView() {
         super.loadView()
+
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithOpaqueBackground()
+        coloredAppearance.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
+        coloredAppearance.shadowColor = .clear
+
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
+
+//        UIToolbar.appearance().barTintColor = Rownd.config.customizations.sheetBackgroundColor
         
         addChild(contentView)
         view.addSubview(contentView.view)

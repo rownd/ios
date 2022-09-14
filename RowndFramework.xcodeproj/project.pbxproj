@@ -190,6 +190,7 @@
 		B302E2B52863BCA3005FD927 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				B349906728D036FC004ADF3F /* Assets.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -210,7 +211,6 @@
 		B347C25228786AE300935115 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				B349906728D036FC004ADF3F /* Assets.xcassets */,
 				B347C2562878989F00935115 /* Rownd */,
 			);
 			path = Sources;

@@ -103,7 +103,7 @@ public class Rownd: NSObject {
         let _ = inst.displayHub(.manageAccount)
     }
     
-    public static func getAccessToken() async -> String? {
+    @discardableResult public static func getAccessToken() async -> String? {
         return await store.state.auth.getAccessToken()
     }
     

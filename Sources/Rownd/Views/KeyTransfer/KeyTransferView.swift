@@ -27,7 +27,7 @@ struct KeyTransferView : View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(.systemGray6).edgesIgnoringSafeArea(.all)
+                Color(Rownd.config.customizations.sheetBackgroundColor).edgesIgnoringSafeArea(.all)
                 HStack(alignment: .top) {
                     VStack(alignment: .leading) {
 
