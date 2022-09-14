@@ -56,8 +56,6 @@ class KeyTransferViewController : UIViewController {
         UINavigationBar.appearance().standardAppearance = coloredAppearance
         UINavigationBar.appearance().compactAppearance = coloredAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
-
-//        UIToolbar.appearance().barTintColor = Rownd.config.customizations.sheetBackgroundColor
         
         addChild(contentView)
         view.addSubview(contentView.view)

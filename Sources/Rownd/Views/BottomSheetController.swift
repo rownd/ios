@@ -33,8 +33,6 @@ class BottomSheetController: UIViewController {
 
         theme.grabber?.topMargin = CGFloat(10.0)
         theme.grabber?.size = CGSize(width: 100.0, height: 5.0)
-//        theme.grabber?.cornerRadiusType = .fixed(CGFloat(20.0))
-//        theme.grabber?.background = .color(UIColor.black.withAlphaComponent(0.1), isTranslucent: true)
         
         sheetController = presentAsBottomSheet(controller, theme: theme, behavior: behavior)
 
