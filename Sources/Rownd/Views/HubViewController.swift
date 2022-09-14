@@ -64,7 +64,7 @@ public class HubViewController: UIViewController, HubViewProtocol {
         hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
         
         view = UIView()
-        view.backgroundColor = .systemGray6
+        view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
         addChild(hubWebController)
         view.addSubview(hubWebController.view)
         setupConstraints()
