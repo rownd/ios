@@ -68,19 +68,15 @@ public class HubViewController: UIViewController, HubViewProtocol {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     self.hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
-
-                    self.addChild(self.hubWebController)
-                    self.view.addSubview(self.hubWebController.view)
-                    self.setupConstraints()
                 }
             }
         } else {
             hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
-
-            addChild(hubWebController)
-            view.addSubview(hubWebController.view)
-            setupConstraints()
         }
+
+        addChild(hubWebController)
+        view.addSubview(hubWebController.view)
+        setupConstraints()
 
         
         if Rownd.config.forceDarkMode {

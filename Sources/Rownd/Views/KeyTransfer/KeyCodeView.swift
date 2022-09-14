@@ -45,8 +45,8 @@ struct KeyCodeView : View {
                                 Spacer()
                             }
                         } else {
-//                            HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
-//                                .frame(maxHeight: .infinity)
+                            HubViewControllerWrapper(targetPage: .qrCode, data: keyState.qrCodeData)
+                                .frame(maxHeight: .infinity)
                         }
                     }
                     .padding()

@@ -55,12 +55,23 @@ extension WKWebView {
 public class HubWebViewController: UIViewController, WKUIDelegate {
     
     var webView: WKWebView!
-    var url = URL(string: "https://hub.rownd.io/mobile_app")!
+    var url: URL? = nil
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
     
     func setUrl(url: URL) {
         self.url = url
+        self.startLoading()
+    }
+
+    private func startLoading() {
+        guard let webView = self.webView, let url = self.url else { return }
+
+        // Skip loading if already begun
+        if webView.isLoading { return }
+
+        let hubRequest = URLRequest(url: url)
+        webView.load(hubRequest)
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -101,9 +112,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let hubRequest = URLRequest(url: url)
-        webView.load(hubRequest)
+        startLoading()
     }
 }
 
