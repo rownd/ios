@@ -10,8 +10,18 @@ import SwiftUI
 
 public struct RowndCustomizations: Encodable {
     public init(){}
+    @Environment(\.colorScheme) private var colorScheme
 
-    public var sheetBackgroundColor: UIColor = UIColor(named: "SheetBackgroundColor", in: getFrameworkBundle(), compatibleWith: nil)!
+    public var sheetBackgroundColor: UIColor {
+        switch(colorScheme) {
+        case .light:
+            return .white
+        case .dark:
+            return .systemGray6
+        @unknown default:
+            return .white
+        }
+    }
 
     public var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
