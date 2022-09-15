@@ -8,10 +8,10 @@
 import Foundation
 import SwiftUI
 
-public struct RowndCustomizations: Encodable {
+open class RowndCustomizations: Encodable {
     public init(){}
 
-    public var sheetBackgroundColor: UIColor {
+    open var sheetBackgroundColor: UIColor {
         switch(UIViewController().colorScheme) {
         case .light, .unspecified:
             return .white
@@ -22,17 +22,17 @@ public struct RowndCustomizations: Encodable {
         }
     }
 
-    public var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
+    open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
-    public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
+    open var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
-    internal enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case sheetBackgroundColor
         case sheetCornerBorderRadius
         case defaultFontSize
     }
 
-    public func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(sheetCornerBorderRadius, forKey: .sheetCornerBorderRadius)
         try container.encode(defaultFontSize, forKey: .defaultFontSize)
