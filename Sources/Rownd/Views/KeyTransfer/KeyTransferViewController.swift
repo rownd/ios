@@ -37,6 +37,15 @@ class KeyTransferViewController : UIViewController {
 
     override func loadView() {
         super.loadView()
+
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithOpaqueBackground()
+        coloredAppearance.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
+        coloredAppearance.shadowColor = .clear
+
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
         
         addChild(contentView)
         view.addSubview(contentView.view)

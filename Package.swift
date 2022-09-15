@@ -84,6 +84,9 @@ let package = Package(
                 "Sodium",
                 "CodeScanner",
                 "Get"
+            ],
+            resources: [
+                .process("Resources/")
             ]
         )
     ],

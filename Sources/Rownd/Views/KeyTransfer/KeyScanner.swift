@@ -19,7 +19,7 @@ struct KeyScannerView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGray6).edgesIgnoringSafeArea(.all)
+            Color(Rownd.config.customizations.sheetBackgroundColor).edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 10) {
                 if let code = scannedCode {
 

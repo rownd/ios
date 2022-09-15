@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct RowndConfig: Hashable, Codable {
-    static let inst = RowndConfig();
-    private init(){}
+public struct RowndConfig: Encodable {
+    internal init(){}
 
     public var apiUrl = "https://api.rownd.io"
     public var baseUrl = "https://hub.rownd.io"
     public var appKey = ""
     public var forceDarkMode = false
     public var postSignInRedirect: String? = nil
+    public var customizations: RowndCustomizations = RowndCustomizations()
     
     func toJson() -> String {
         let encoder = JSONEncoder()

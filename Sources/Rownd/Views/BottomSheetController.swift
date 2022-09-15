@@ -27,7 +27,12 @@ class BottomSheetController: UIViewController {
         behavior.heightMode = .specific(values: [.screenRatio(value: 0.5), .screenRatio(value: 0.9)], heightLimit: .statusBar)
         
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
+        theme.cornerRadius = Rownd.config.customizations.sheetCornerBorderRadius
+        theme.shadow?.color = .systemGray6
+        theme.dimmingBackgroundColor = UIColor.black.withAlphaComponent(CGFloat(0.25))
+
         theme.grabber?.topMargin = CGFloat(10.0)
+        theme.grabber?.size = CGSize(width: 100.0, height: 5.0)
         
         sheetController = presentAsBottomSheet(controller, theme: theme, behavior: behavior)
 

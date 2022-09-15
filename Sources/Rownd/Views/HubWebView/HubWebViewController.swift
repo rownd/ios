@@ -55,12 +55,23 @@ extension WKWebView {
 public class HubWebViewController: UIViewController, WKUIDelegate {
     
     var webView: WKWebView!
-    var url = URL(string: "https://hub.rownd.io/mobile_app")!
+    var url: URL? = nil
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
     
     func setUrl(url: URL) {
         self.url = url
+        self.startLoading()
+    }
+
+    private func startLoading() {
+        guard let webView = self.webView, let url = self.url else { return }
+
+        // Skip loading if already begun
+        if webView.isLoading { return }
+
+        let hubRequest = URLRequest(url: url)
+        webView.load(hubRequest)
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -101,9 +112,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let hubRequest = URLRequest(url: url)
-        webView.load(hubRequest)
+        startLoading()
     }
 }
 
@@ -178,13 +187,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             switch hubMessage.type {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
-                if hubViewController?.targetPage != .signIn {
-                    // The Hub is open for something else, so just chill...
-                    return
-                }
+                guard hubViewController?.targetPage == .signIn  else { return }
                 store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
                 store.dispatch(UserData.fetch())
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in // Change `2.0` to the desired number of seconds.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
             case .closeHubViewController:
@@ -201,7 +207,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .appleId)
                 
             case .signOut:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // Change `2.0` to the desired number of seconds.
+                guard hubViewController?.targetPage == .signOut  else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
                 store.dispatch(SetAuthState(payload: AuthState()))

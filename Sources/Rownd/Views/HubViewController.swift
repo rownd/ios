@@ -52,22 +52,32 @@ public class HubViewController: UIViewController, HubViewProtocol {
 
         var hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
 
+        view = UIView()
+        view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
+
         // This ensures that the Hub in the webview doesn't attempt to refresh its own tokens,
         // which might trigger an undesired sign-out now or in the future
         if store.state.auth.isAuthenticated {
-            let rphInit = store.state.auth.toRphInitHash()
-            if let rphInit = rphInit {
-                hubLoaderUrl?.fragment = "rph_init=\(rphInit)"
+            Task {
+                await Rownd.getAccessToken()
+                let rphInit = store.state.auth.toRphInitHash()
+                if let rphInit = rphInit {
+                    hubLoaderUrl?.fragment = "rph_init=\(rphInit)"
+                }
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
+                }
             }
+        } else {
+            hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
         }
-        
-        hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
-        
-        view = UIView()
-        view.backgroundColor = .systemGray6
+
         addChild(hubWebController)
         view.addSubview(hubWebController.view)
         setupConstraints()
+
         
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark

@@ -16,7 +16,7 @@ import LBBottomSheet
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
-    public static var config: RowndConfig = RowndConfig.inst
+    public static var config: RowndConfig = RowndConfig()
 
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
@@ -103,7 +103,7 @@ public class Rownd: NSObject {
         let _ = inst.displayHub(.manageAccount)
     }
     
-    public static func getAccessToken() async -> String? {
+    @discardableResult public static func getAccessToken() async -> String? {
         return await store.state.auth.getAccessToken()
     }
     

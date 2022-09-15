@@ -17,7 +17,7 @@ struct KeyTransferProgress: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGray6).edgesIgnoringSafeArea(.all)
+            Color(Rownd.config.customizations.sheetBackgroundColor).edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 10) {
                 Text("Hang on just a sec. Don't close this window.")
                     .font(.subheadline)
