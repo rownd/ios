@@ -24,7 +24,7 @@ open class RowndCustomizations: Encodable {
 
     open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
-    open var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
+    public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
     public enum CodingKeys: String, CodingKey {
         case sheetBackgroundColor
@@ -32,7 +32,7 @@ open class RowndCustomizations: Encodable {
         case defaultFontSize
     }
 
-    open func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(sheetCornerBorderRadius, forKey: .sheetCornerBorderRadius)
         try container.encode(defaultFontSize, forKey: .defaultFontSize)

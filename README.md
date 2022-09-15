@@ -26,7 +26,7 @@ In your `AppDelegate` file, call the `Rownd.configure()` method during applicati
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     
-    Task.init {
+    Task {
         await Rownd.configure(launchOptions: launchOptions, appKey: "YOUR_API_KEY")
     }
     
@@ -101,6 +101,41 @@ public struct UserState {
     public var id: String?                           // The user's ID as known to Rownd
     public var data: Dictionary<String, AnyCodable>  // Contains key/value pairs for the current user based on your Rownd's app config
     public var redacted: [String]                    // An array of field keys that the current user has disabled your app from accessing
+}
+```
+
+### Customizing the UI
+
+While most customizations are handled via the [Rownd dashboard](https://app.rownd.io), there are a few things that have to be customized directly in the SDK.
+
+The `RowndCustomizations` class exists to facilitate these customizations. It provides the following properties that may be subclassed or overridden.
+
+- `sheetBackgroundColor: UIColor` (default: `light: .white`, `dark: .systemGray6`; requires subclassing) - Allows changing the background color underlaying the bottom sheet that appears when signing in, managing the user account, transferring encryption keys, etc.
+- `sheetCornerBorderRadius: CGFloat` (default: `25.0`) - Modifies the curvature radius of the bottom sheet corners.
+
+To apply customizations, we recommend subclassing the `RowndCustomizations` class. Here's an example:
+
+```swift
+class AppCustomizations : RowndCustomizations {
+    override var sheetBackgroundColor: UIColor {
+        return UIColor(red: 31/255, green: 37/255, blue: 80/255, alpha: 1.0)
+    }
+}
+
+// AppDelegate.swift
+import Rownd
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+
+        Rownd.config.customizations = AppCustomizations()   // Apply the customizations
+
+        Task {
+            await Rownd.configure(launchOptions: launchOptions, appKey: "YOUR_API_KEY")
+        }
+
+        return true
+    }
 }
 ```
 
