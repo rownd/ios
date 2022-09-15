@@ -10,11 +10,10 @@ import SwiftUI
 
 public struct RowndCustomizations: Encodable {
     public init(){}
-    @Environment(\.colorScheme) private var colorScheme
 
     public var sheetBackgroundColor: UIColor {
-        switch(colorScheme) {
-        case .light:
+        switch(UIViewController().colorScheme) {
+        case .light, .unspecified:
             return .white
         case .dark:
             return .systemGray6
@@ -46,3 +45,14 @@ fileprivate func uiColorToRgbaString(color: UIColor) -> String {
     return String(format: "rgba(%d, %d, %d, %.1f)", Int(round(ciColor.red * 255)), Int(round(ciColor.green * 255)), Int(round(ciColor.blue * 255)), round(ciColor.alpha))
 }
 
+extension UIViewController {
+    var colorScheme: UIUserInterfaceStyle {
+        if #available(iOS 13.0, *) {
+            return self.traitCollection.userInterfaceStyle
+        }
+        else {
+            return UIUserInterfaceStyle.unspecified
+        }
+    }
+
+}
