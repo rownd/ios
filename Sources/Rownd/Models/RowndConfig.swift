@@ -29,9 +29,3 @@ public struct RowndConfig: Encodable {
         }
     }
 }
-
-extension RowndConfig {
-    internal func getInstance() -> RowndConfig {
-        return RowndConfig()
-    }
-}
