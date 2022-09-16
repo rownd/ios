@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Rownd"
-  s.version          = "1.7.0"
+  s.version          = "1.8.1"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
                         Rownd is a user management platform designed to make authentication
@@ -19,18 +19,17 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target     = '14.0'
 
-  s.dependency 'LBBottomSheet'
-  s.dependency 'AnyCodable-FlightSchool'
-  s.dependency 'JWTDecode'
-  s.dependency 'ReSwift'
-  s.dependency 'ReSwiftThunk'
-  s.dependency 'Sodium'
-  s.dependency 'SwiftKeychainWrapper'
+  s.dependency 'LBBottomSheet', '~> 1.0.24'
+  s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
+  s.dependency 'JWTDecode', '~> 3.0.0'
+  s.dependency 'ReSwift', '~> 6.1.0'
+  s.dependency 'ReSwiftThunk', '~> 2.0.1'
+  s.dependency 'Sodium', '~> 0.9.1'
+  s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
+  s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
+  s.dependency 'Get', '~> 2.0.1'
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'
-  s.resource_bundles = {
-    "Rownd" => ["Sources/Rownd/Resources/*/**"]
-  }
   s.swift_versions   = [ "5.5", "5.4", "5.3", "5.2", "5.0" ]
 end
