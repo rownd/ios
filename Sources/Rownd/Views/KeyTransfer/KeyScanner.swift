@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import CodeScanner
+import CodeScanner_Rownd
 
 struct KeyScannerView: View {
     var receiveKeyTransfer: (_ url: String) -> Void
@@ -21,15 +21,6 @@ struct KeyScannerView: View {
         ZStack {
             Color(Rownd.config.customizations.sheetBackgroundColor).edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 10) {
-                if let code = scannedCode {
-
-//                    let url = URL(string: code)
-//                    if let url = url {
-//                        SignInLinks.signInWithLink(url)
-//                    }
-                    //                NavigationLink("Next page", destination: NextView(scannedCode: code), isActive: .constant(true)).hidden()
-                }
-
                 Text("If you have an account attached to another device, you can securely transfer that account data to this device.")
                     .fixedSize(horizontal: false, vertical: true)
 

@@ -60,14 +60,14 @@ let package = Package(
             .upToNextMajor(from: "0.9.1")
         ),
         .package(
-            name: "CodeScanner",
-            url: "https://github.com/twostraws/CodeScanner",
+            name: "CodeScanner_Rownd",
+            url: "https://github.com/rownd/CodeScanner_Rownd",
             .upToNextMajor(from: "2.1.2")
         ),
         .package(
             name: "Get",
-            url: "https://github.com/kean/Get",
-            .upToNextMajor(from: "1.0.2")
+            url: "https://github.com/rownd/Get",
+            .upToNextMajor(from: "2.0.1")
         )
     ],
     
@@ -82,7 +82,7 @@ let package = Package(
                 "LBBottomSheet",
                 "SwiftKeychainWrapper",
                 "Sodium",
-                "CodeScanner",
+                "CodeScanner_Rownd",
                 "Get"
             ],
             resources: [

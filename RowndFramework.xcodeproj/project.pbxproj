@@ -50,13 +50,13 @@
 		B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */; };
 		B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CE2883C81D00FD0813 /* Sodium */; };
 		B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */; };
+		B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B396004128D42F7C00754238 /* CodeScanner_Rownd */; };
+		B396004528D4348D00754238 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B396004428D4348D00754238 /* Get */; };
 		B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */; };
 		B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0428A8A66700EE764B /* KeyTransferView.swift */; };
-		B3F01B0A28AB510400EE764B /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B3F01B0928AB510400EE764B /* Get */; };
 		B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0B28AB55B600EE764B /* RowndApi.swift */; };
 		B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0F28AB607B00EE764B /* SignInLinks.swift */; };
 		B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1128ABE9C400EE764B /* KeyScanner.swift */; };
-		B3F01B1528ABE9E500EE764B /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = B3F01B1428ABE9E500EE764B /* CodeScanner */; };
 		B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */; };
 		B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */; };
 /* End PBXBuildFile section */
@@ -93,7 +93,7 @@
 		B302E2D0286A452F005FD927 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
 		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; };
+		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		B347C25528786D8B00935115 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		B347C27428792AD900935115 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B349906528CFCED9004ADF3F /* Customizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Customizations.swift; sourceTree = "<group>"; };
@@ -134,16 +134,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3F01B0A28AB510400EE764B /* Get in Frameworks */,
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
 				B347C2782879358200935115 /* AnyCodable in Frameworks */,
 				B38A40C92882727F00FD0813 /* SwiftKeychainWrapper in Frameworks */,
-				B3F01B1528ABE9E500EE764B /* CodeScanner in Frameworks */,
 				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
+				B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */,
 				B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */,
+				B396004528D4348D00754238 /* Get in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,8 +384,8 @@
 				B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */,
 				B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */,
 				B38A40CE2883C81D00FD0813 /* Sodium */,
-				B3F01B0928AB510400EE764B /* Get */,
-				B3F01B1428ABE9E500EE764B /* CodeScanner */,
+				B396004128D42F7C00754238 /* CodeScanner_Rownd */,
+				B396004428D4348D00754238 /* Get */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -468,8 +468,8 @@
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
-				B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */,
-				B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */,
+				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -969,20 +969,20 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */ = {
+		B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kean/Get";
+			repositoryURL = "https://github.com/rownd/codescanner_rownd";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.2.1;
 			};
 		};
-		B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+		B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			repositoryURL = "https://github.com/rownd/get";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
+				minimumVersion = 2.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1028,15 +1028,15 @@
 			package = B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Sodium;
 		};
-		B3F01B0928AB510400EE764B /* Get */ = {
+		B396004128D42F7C00754238 /* CodeScanner_Rownd */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3F01B0828AB510400EE764B /* XCRemoteSwiftPackageReference "Get" */;
-			productName = Get;
+			package = B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */;
+			productName = CodeScanner_Rownd;
 		};
-		B3F01B1428ABE9E500EE764B /* CodeScanner */ = {
+		B396004428D4348D00754238 /* Get */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3F01B1328ABE9E500EE764B /* XCRemoteSwiftPackageReference "CodeScanner" */;
-			productName = CodeScanner;
+			package = B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */;
+			productName = Get;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

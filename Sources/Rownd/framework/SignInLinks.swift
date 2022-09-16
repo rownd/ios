@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Get
 
 struct SignInLinkResp: Hashable, Codable {
     public var accessToken: String?
@@ -31,7 +32,7 @@ class SignInLinks {
                 signInUrl = URL(string: signInUrl.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? signInUrl
             }
 
-            let authResp: SignInLinkResp = try await Rownd.apiClient.send(.get(signInUrl.absoluteString)).value
+            let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
 
             if let encKey = encKey {
                 RowndEncryption.deleteKey(keyId: authResp.appUserId)
