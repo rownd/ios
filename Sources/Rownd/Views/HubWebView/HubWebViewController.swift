@@ -143,6 +143,17 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 //        hubViewController?.setLoading(true)
     }
     
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        //This function is called whenever the Webview attempts to navigate to a different url
+            if navigationAction.targetFrame == nil {
+                let url = navigationAction.request.url
+                if UIApplication.shared.canOpenURL(url!) {
+                    UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                }
+            }
+            return nil
+    }
+    
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
