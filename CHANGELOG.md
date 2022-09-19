@@ -1,5 +1,12 @@
 
 
+## [1.8.2](https://github.com/rownd/ios/compare/1.8.1...1.8.2) (2022-09-19)
+
+
+### Bug Fixes
+
+* concurrent mutation errors during react native build ([dd5b900](https://github.com/rownd/ios/commit/dd5b900825f488463920df28404e9008da6ca3b5))
+
 ## [1.8.1](https://github.com/rownd/ios/compare/1.8.0...1.8.1) (2022-09-16)
 
 # Changelog
