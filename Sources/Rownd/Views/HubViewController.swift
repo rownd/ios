@@ -58,14 +58,15 @@ public class HubViewController: UIViewController, HubViewProtocol {
         // This ensures that the Hub in the webview doesn't attempt to refresh its own tokens,
         // which might trigger an undesired sign-out now or in the future
         if store.state.auth.isAuthenticated {
-            Task {
+            Task { [hubLoaderUrl] in
+                var hubLoaderUrl = hubLoaderUrl // Capture local copy of var to prevent compiler mutation issues
                 await Rownd.getAccessToken()
                 let rphInit = store.state.auth.toRphInitHash()
                 if let rphInit = rphInit {
                     hubLoaderUrl?.fragment = "rph_init=\(rphInit)"
                 }
 
-                DispatchQueue.main.async { [weak self] in
+                DispatchQueue.main.async { [weak self, hubLoaderUrl] in
                     guard let self = self else { return }
                     self.hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
                 }
