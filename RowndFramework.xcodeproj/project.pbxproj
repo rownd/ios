@@ -21,6 +21,11 @@
 		B302E2CD2866C75A005FD927 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CC2866C75A005FD927 /* Auth.swift */; };
 		B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */; };
 		B302E2D1286A4530005FD927 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2D0286A452F005FD927 /* Exporter.swift */; };
+		B34490FE28DB9EEC00A992E9 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34490FD28DB9EEC00A992E9 /* AuthTests.swift */; };
+		B344910228DBA36200A992E9 /* MockedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B344910128DBA36200A992E9 /* MockedData.swift */; };
+		B344910528DBA42B00A992E9 /* Mocker in Frameworks */ = {isa = PBXBuildFile; productRef = B344910428DBA42B00A992E9 /* Mocker */; };
+		B344910928DBA72600A992E9 /* auth_refresh_response.json in Resources */ = {isa = PBXBuildFile; fileRef = B344910828DBA49E00A992E9 /* auth_refresh_response.json */; };
+		B344910A28DBA93800A992E9 /* auth_refresh_response.json in Resources */ = {isa = PBXBuildFile; fileRef = B344910828DBA49E00A992E9 /* auth_refresh_response.json */; };
 		B347C24F2877DAB600935115 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C24E2877DAB600935115 /* Encryption.swift */; };
 		B347C25428786C5C00935115 /* Rownd.podspec in Resources */ = {isa = PBXBuildFile; fileRef = B347C25328786C5C00935115 /* Rownd.podspec */; };
 		B347C27528792AD900935115 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C27428792AD900935115 /* User.swift */; };
@@ -91,6 +96,9 @@
 		B302E2CC2866C75A005FD927 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSwiftObserver.swift; sourceTree = "<group>"; };
 		B302E2D0286A452F005FD927 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
+		B34490FD28DB9EEC00A992E9 /* AuthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTests.swift; sourceTree = "<group>"; };
+		B344910128DBA36200A992E9 /* MockedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedData.swift; sourceTree = "<group>"; };
+		B344910828DBA49E00A992E9 /* auth_refresh_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = auth_refresh_response.json; sourceTree = "<group>"; };
 		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -152,6 +160,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B38A40AB2882020900FD0813 /* Rownd.framework in Frameworks */,
+				B344910528DBA42B00A992E9 /* Mocker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +212,22 @@
 				B347C27428792AD900935115 /* User.swift */,
 			);
 			path = Context;
+			sourceTree = "<group>";
+		};
+		B344910628DBA44B00A992E9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B344910728DBA45A00A992E9 /* Mocks */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B344910728DBA45A00A992E9 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				B344910828DBA49E00A992E9 /* auth_refresh_response.json */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		B347C25228786AE300935115 /* Sources */ = {
@@ -304,6 +329,8 @@
 			children = (
 				B38A40A92882020900FD0813 /* RowndTests.swift */,
 				B38A40B12882024400FD0813 /* EncryptionTests.swift */,
+				B34490FD28DB9EEC00A992E9 /* AuthTests.swift */,
+				B344910128DBA36200A992E9 /* MockedData.swift */,
 			);
 			path = RowndTests;
 			sourceTree = "<group>";
@@ -311,6 +338,7 @@
 		B38A40B82882185800FD0813 /* RowndFrameworkTestApp */ = {
 			isa = PBXGroup;
 			children = (
+				B344910628DBA44B00A992E9 /* Resources */,
 				B38A40B92882185800FD0813 /* RowndFrameworkTestAppApp.swift */,
 				B38A40BB2882185800FD0813 /* ContentView.swift */,
 				B38A40BD2882185B00FD0813 /* Assets.xcassets */,
@@ -406,6 +434,9 @@
 				B38A40C62882187300FD0813 /* PBXTargetDependency */,
 			);
 			name = RowndTests;
+			packageProductDependencies = (
+				B344910428DBA42B00A992E9 /* Mocker */,
+			);
 			productName = RowndTests;
 			productReference = B38A40A72882020800FD0813 /* RowndTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -470,6 +501,7 @@
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
 				B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
+				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -495,6 +527,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B344910928DBA72600A992E9 /* auth_refresh_response.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,6 +537,7 @@
 			files = (
 				B38A40C12882185B00FD0813 /* Preview Assets.xcassets in Resources */,
 				B38A40BE2882185B00FD0813 /* Assets.xcassets in Resources */,
+				B344910A28DBA93800A992E9 /* auth_refresh_response.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,7 +588,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B344910228DBA36200A992E9 /* MockedData.swift in Sources */,
 				B38A40B22882024400FD0813 /* EncryptionTests.swift in Sources */,
+				B34490FE28DB9EEC00A992E9 /* AuthTests.swift in Sources */,
 				B38A40AA2882020900FD0813 /* RowndTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -921,6 +957,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/WeTransfer/Mocker#activating-the-mocker";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Flight-School/AnyCodable";
@@ -997,6 +1041,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
 			productName = ReSwiftThunk;
+		};
+		B344910428DBA42B00A992E9 /* Mocker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */;
+			productName = Mocker;
 		};
 		B347C2772879358200935115 /* AnyCodable */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -18,7 +18,7 @@ public struct AuthState: Hashable {
     public var accessToken: String?
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
-    public var hasPreviouslySignedIn: Bool = false
+    public var hasPreviouslySignedIn: Bool? = false
 }
 
 extension AuthState: Codable {
@@ -70,7 +70,12 @@ extension AuthState: Codable {
                         Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
                             if let newAuthState = tokenResource {
                                 DispatchQueue.main.async {
-                                    store.dispatch(SetAuthState(payload: newAuthState))
+                                    store.dispatch(SetAuthState(payload: AuthState(
+                                        accessToken: tokenResource?.accessToken,
+                                        refreshToken: tokenResource?.refreshToken,
+                                        isVerifiedUser: store.state.auth.isVerifiedUser,
+                                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn
+                                    )))
                                 }
                                 continuation.resume(returning: newAuthState.accessToken)
                             } else {
@@ -112,7 +117,7 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
         break
     }
 
-    if (hasPreviouslySignedIn || state.isAuthenticated) {
+    if (hasPreviouslySignedIn ?? false || state.isAuthenticated) {
         state.hasPreviouslySignedIn = true
     }
     
@@ -153,6 +158,8 @@ struct TokenResource: APIResource {
         return "/hub/auth/token"
     }
 }
+
+
 
 class Auth {
     static func fetchToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
