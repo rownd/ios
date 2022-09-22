@@ -1,5 +1,12 @@
 
 
+## [1.8.3](https://github.com/rownd/ios/compare/1.8.2...1.8.3) (2022-09-22)
+
+
+### Bug Fixes
+
+* **auth:** decoding issue during token refresh ([a7aaae2](https://github.com/rownd/ios/commit/a7aaae2419875c6c046d1005a3be67018bbc3c95))
+
 ## [1.8.2](https://github.com/rownd/ios/compare/1.8.1...1.8.2) (2022-09-19)
 
 
