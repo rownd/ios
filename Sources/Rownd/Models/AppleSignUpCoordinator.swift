@@ -85,7 +85,9 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
                 Auth.fetchToken(idToken: idToken) { authState in
-                    store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
+                    DispatchQueue.main.async {
+                        store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
+                    }
                     var userData = store.state.user.data
                     
                     let defaults = UserDefaults.standard
@@ -106,8 +108,10 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
                         }
                     }
-                    
-                    store.dispatch(UserData.save(userData))
+
+                    DispatchQueue.main.async {
+                        store.dispatch(UserData.save(userData))
+                    }
                 }
             } else {
                 logger.trace("apple sign credential alternative")

@@ -83,8 +83,11 @@ public class Rownd: NSObject {
     
     public static func signOut() {
         let _ = inst.displayHub(.signOut)
-        store.dispatch(SetAuthState(payload: AuthState()))
-        store.dispatch(SetUserState(payload: UserState()))
+
+        DispatchQueue.main.async {
+            store.dispatch(SetAuthState(payload: AuthState()))
+            store.dispatch(SetUserState(payload: UserState()))
+        }
     }
 
     public static func transferEncryptionKey() {
@@ -111,15 +114,6 @@ public class Rownd: NSObject {
         return store
     }
     
-//    public func state(type: RowndStateType) -> StateObject<AnyObject> {
-//        switch(type) {
-//        case .auth:
-//            return state().subscribe { $0.auth }
-//        case .none
-//            return nil
-//        }
-//    }
-    
     public static func _refreshToken() {
         Auth.fetchToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
             print(authState)
@@ -136,10 +130,14 @@ public class Rownd: NSObject {
         if store.state.appConfig.id == nil {
             // Await the config if it wasn't already cached
             let appConfig = await AppConfig.fetch()
-            store.dispatch(SetAppConfig(payload: appConfig?.app ?? store.state.appConfig))
+            DispatchQueue.main.async {
+                store.dispatch(SetAppConfig(payload: appConfig?.app ?? store.state.appConfig))
+            }
         } else {
-            // Refresh in background if already present
-            store.dispatch(AppConfig.requestAppState())
+            DispatchQueue.main.async {
+                // Refresh in background if already present
+                store.dispatch(AppConfig.requestAppState())
+            }
         }
 
     }

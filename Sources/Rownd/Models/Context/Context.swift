@@ -31,7 +31,9 @@ extension RowndState {
         
         let decoder = JSONDecoder()
         if let decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
-            store.dispatch(InitializeRowndState(payload: decoded))
+            DispatchQueue.main.async {
+                store.dispatch(InitializeRowndState(payload: decoded))
+            }
         }
     }
 

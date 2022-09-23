@@ -41,13 +41,17 @@ extension UserState: Codable {
     }
 
     public func set(data: Dictionary<String, AnyCodable>) -> Void {
-        store.dispatch(UserData.save(data))
+        DispatchQueue.main.async {
+            store.dispatch(UserData.save(data))
+        }
     }
 
     public func set(field: String, value: AnyCodable) -> Void {
         var userData = self.data
         userData[field] = value
-        store.dispatch(UserData.save(userData))
+        DispatchQueue.main.async {
+            store.dispatch(UserData.save(userData))
+        }
     }
 
     internal func dataAsEncrypted() -> Dictionary<String, AnyCodable> {
@@ -160,8 +164,10 @@ class UserData {
                 guard let accessToken = await Rownd.getAccessToken() else {
                     return
                 }
-                
-                dispatch(SetUserLoading(isLoading: true))
+
+                DispatchQueue.main.async {
+                    dispatch(SetUserLoading(isLoading: true))
+                }
                 var resource = UserDataResource()
                 resource.headers = ["Authorization": "Bearer \(accessToken)"]
                 let request = APIRequest(resource: resource)
@@ -194,8 +200,10 @@ class UserData {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
             guard !state.user.isLoading else { return }
-            
-            dispatch(SetUserData(payload: data))
+
+            DispatchQueue.main.async {
+                dispatch(SetUserData(payload: data))
+            }
             
             Task.init {
                 guard let accessToken = await Rownd.getAccessToken() else {
@@ -224,7 +232,9 @@ class UserData {
                 do {
                     body = try encoder.encode(userDataPayload)
                 } catch {
-                    dispatch(SetUserError(errorMessage: "The user profile could not be encoded: \(error)"))
+                    DispatchQueue.main.async {
+                        dispatch(SetUserError(errorMessage: "The user profile could not be encoded: \(error)"))
+                    }
                 }
                 request.execute(method: "PUT", body: body) { userResp in
                     // This guard ensures that the resource allocator doesn't clean up the request object before

@@ -199,8 +199,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .signIn  else { return }
-                store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
-                store.dispatch(UserData.fetch())
+                DispatchQueue.main.async {
+                    store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
+                    store.dispatch(UserData.fetch())
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
@@ -210,8 +212,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             case .userDataUpdate:
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
-                store.dispatch(SetUserData(payload: userDataMessage.data))
-                store.dispatch(UserData.fetch())
+                DispatchQueue.main.async {
+                    store.dispatch(SetUserData(payload: userDataMessage.data))
+                    store.dispatch(UserData.fetch())
+                }
                 
             case .triggerSignInWithApple:
                 self.hubViewController?.hide()
@@ -222,8 +226,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
-                store.dispatch(SetAuthState(payload: AuthState()))
-                store.dispatch(SetUserData(payload: [:]))
+                DispatchQueue.main.async {
+                    store.dispatch(SetAuthState(payload: AuthState()))
+                    store.dispatch(SetUserData(payload: [:]))
+                }
             case .unknown:
                 break
             }
