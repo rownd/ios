@@ -39,9 +39,14 @@ struct KeyCodeView : View {
                         if keyState.signInLink == "" {
                             HStack(alignment: .center) {
                                 Spacer()
-                                ProgressView()
-                                    .scaleEffect(2)
-                                    .frame(maxHeight: .infinity)
+                                if let animation = Rownd.config.customizations.loadingAnimation {
+                                    LottieSwiftView(animation: animation)
+                                        .frame(maxWidth: 100, maxHeight: .infinity)
+                                } else {
+                                    ProgressView()
+                                        .scaleEffect(2)
+                                        .frame(maxHeight: .infinity)
+                                }
                                 Spacer()
                             }
                         } else {

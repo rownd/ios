@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import Lottie
 
 protocol HubViewProtocol {
     var targetPage: HubPageSelector { get set }
@@ -21,6 +22,7 @@ protocol HubViewProtocol {
 public class HubViewController: UIViewController, HubViewProtocol {
     
     var activityIndicator = UIActivityIndicatorView(style: .large)
+    var customLoadingAnimationView: Lottie.AnimationView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: UIViewController?
@@ -32,11 +34,18 @@ public class HubViewController: UIViewController, HubViewProtocol {
 //            presentation.detents = [.medium(), .large()]
 //            presentation.prefersGrabberVisible = true
 //        }
-        
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        ])
+
+        if let customLoadingAnimationView = customLoadingAnimationView {
+            NSLayoutConstraint.activate([
+                customLoadingAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                customLoadingAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            ])
+        }
         
         hubWebController.didMove(toParent: self)
         hubWebController.view.frame = view.bounds
@@ -84,10 +93,15 @@ public class HubViewController: UIViewController, HubViewProtocol {
             self.overrideUserInterfaceStyle = .dark
         }
 
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.startAnimating()
-        view.addSubview(activityIndicator)
+        if let _ = Rownd.config.customizations.loadingAnimation {
+            customLoadingAnimationView = Rownd.config.customizations.loadingAnimationView
+            view.addSubview(customLoadingAnimationView!)
+        } else {
+            activityIndicator.hidesWhenStopped = true
+            activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+            activityIndicator.startAnimating()
+            view.addSubview(activityIndicator)
+        }
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -99,11 +113,20 @@ public class HubViewController: UIViewController, HubViewProtocol {
     }
     
     func setLoading(_ isLoading: Bool) {
-        if (isLoading) {
-            activityIndicator.startAnimating()
+        if customLoadingAnimationView != nil {
+            if (isLoading) {
+                customLoadingAnimationView?.startAnimating()
+            } else {
+                customLoadingAnimationView?.stopAnimating()
+            }
         } else {
-            activityIndicator.stopAnimating()
+            if (isLoading) {
+                activityIndicator.startAnimating()
+            } else {
+                activityIndicator.stopAnimating()
+            }
         }
+
     }
     
     func hide() {
