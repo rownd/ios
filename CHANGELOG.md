@@ -1,5 +1,12 @@
 
 
+## [1.8.4](https://github.com/rownd/ios/compare/1.8.3...1.8.4) (2022-09-26)
+
+
+### Bug Fixes
+
+* **state:** occasional crash during async state updates ([8fd78bd](https://github.com/rownd/ios/commit/8fd78bdf15db50efda7616fc29192ffa26a7de6f))
+
 ## [1.8.3](https://github.com/rownd/ios/compare/1.8.2...1.8.3) (2022-09-22)
 
 
