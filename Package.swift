@@ -68,7 +68,7 @@ let package = Package(
             name: "Get",
             url: "https://github.com/rownd/Get",
             .upToNextMajor(from: "2.0.1")
-        )
+        ),
         .package(
             name: "Lottie",
             url: "https://github.com/airbnb/lottie-ios",
