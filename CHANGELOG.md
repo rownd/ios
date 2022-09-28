@@ -1,5 +1,12 @@
 
 
+# [1.9.0](https://github.com/rownd/ios/compare/1.8.4...1.9.0) (2022-09-28)
+
+
+### Features
+
+* **customizations:** support lottie animated loading indicators ([#16](https://github.com/rownd/ios/issues/16)) ([1580297](https://github.com/rownd/ios/commit/15802975a5bd25967ad74a348a5435b613b41de6))
+
 ## [1.8.4](https://github.com/rownd/ios/compare/1.8.3...1.8.4) (2022-09-26)
 
 
