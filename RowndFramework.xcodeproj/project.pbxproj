@@ -57,6 +57,9 @@
 		B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */; };
 		B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B396004128D42F7C00754238 /* CodeScanner_Rownd */; };
 		B396004528D4348D00754238 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B396004428D4348D00754238 /* Get */; };
+		B39ECA9728E242B10055CB60 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = B39ECA9628E242B10055CB60 /* Lottie */; };
+		B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */; };
+		B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */; };
 		B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */; };
 		B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0428A8A66700EE764B /* KeyTransferView.swift */; };
 		B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0B28AB55B600EE764B /* RowndApi.swift */; };
@@ -127,6 +130,8 @@
 		B38A40C02882185B00FD0813 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleSignUpCoordinator.swift; sourceTree = "<group>"; };
+		B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieSwiftView.swift; sourceTree = "<group>"; };
+		B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationView.swift; sourceTree = "<group>"; };
 		B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferViewController.swift; sourceTree = "<group>"; };
 		B3F01B0428A8A66700EE764B /* KeyTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferView.swift; sourceTree = "<group>"; };
 		B3F01B0B28AB55B600EE764B /* RowndApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndApi.swift; sourceTree = "<group>"; };
@@ -148,6 +153,7 @@
 				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
+				B39ECA9728E242B10055CB60 /* Lottie in Frameworks */,
 				B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */,
 				B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */,
@@ -290,6 +296,8 @@
 				B3F01B0B28AB55B600EE764B /* RowndApi.swift */,
 				B3F01B0F28AB607B00EE764B /* SignInLinks.swift */,
 				B349906528CFCED9004ADF3F /* Customizations.swift */,
+				B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */,
+				B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -414,6 +422,7 @@
 				B38A40CE2883C81D00FD0813 /* Sodium */,
 				B396004128D42F7C00754238 /* CodeScanner_Rownd */,
 				B396004428D4348D00754238 /* Get */,
+				B39ECA9628E242B10055CB60 /* Lottie */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -502,6 +511,7 @@
 				B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */,
+				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -571,6 +581,7 @@
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */,
+				B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
 				B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */,
 				B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */,
@@ -579,6 +590,7 @@
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
 				B302E2CB28662749005FD927 /* APIResource.swift in Sources */,
 				B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */,
+				B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */,
 				B302E2972863A95A005FD927 /* RowndConfig.swift in Sources */,
 				B347C27528792AD900935115 /* User.swift in Sources */,
 			);
@@ -1029,6 +1041,14 @@
 				minimumVersion = 2.0.1;
 			};
 		};
+		B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1086,6 +1106,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */;
 			productName = Get;
+		};
+		B39ECA9628E242B10055CB60 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

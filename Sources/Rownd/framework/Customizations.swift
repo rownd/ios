@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Lottie
 
 open class RowndCustomizations: Encodable {
     public init(){}
@@ -24,7 +25,24 @@ open class RowndCustomizations: Encodable {
 
     open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
+    open var loadingAnimation: Lottie.Animation? = nil
+
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
+
+    internal var loadingAnimationView: Lottie.AnimationView {
+        let aniView = AnimationView(animation: loadingAnimation!)
+        aniView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
+        aniView.contentMode = .scaleAspectFit
+        aniView.frame = CGRect.init(
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100
+        )
+
+        aniView.startAnimating()
+        return aniView
+    }
 
     public enum CodingKeys: String, CodingKey {
         case sheetBackgroundColor
@@ -55,4 +73,19 @@ extension UIViewController {
         }
     }
 
+}
+
+extension AnimationView {
+
+    func startAnimating(_ hideWhenFinished: Bool = true) {
+        self.play { finished in
+            if hideWhenFinished {
+                self.isHidden = true
+            }
+        }
+    }
+
+    func stopAnimating() {
+        self.stop()
+    }
 }

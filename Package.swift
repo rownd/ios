@@ -68,6 +68,11 @@ let package = Package(
             name: "Get",
             url: "https://github.com/rownd/Get",
             .upToNextMajor(from: "2.0.1")
+        ),
+        .package(
+            name: "Lottie",
+            url: "https://github.com/airbnb/lottie-ios",
+            .upToNextMajor(from: "3.4.3")
         )
     ],
     
@@ -83,7 +88,8 @@ let package = Package(
                 "SwiftKeychainWrapper",
                 "Sodium",
                 "CodeScanner_Rownd",
-                "Get"
+                "Get",
+                "Lottie"
             ],
             resources: [
                 .process("Resources/")
