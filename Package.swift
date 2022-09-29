@@ -68,6 +68,11 @@ let package = Package(
             name: "Get",
             url: "https://github.com/rownd/Get",
             .upToNextMajor(from: "2.0.1")
+        ),
+        .package(
+            name: "GoogleSignIn",
+            url: "https://github.com/google/GoogleSignIn-iOS.git",
+            .upToNextMajor(from: "6.2.4")
         )
     ],
     
@@ -83,7 +88,8 @@ let package = Package(
                 "SwiftKeychainWrapper",
                 "Sodium",
                 "CodeScanner_Rownd",
-                "Get"
+                "Get",
+                "GoogleSignIn"
             ],
             resources: [
                 .process("Resources/")

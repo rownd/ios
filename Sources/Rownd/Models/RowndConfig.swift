@@ -15,6 +15,7 @@ public struct RowndConfig: Encodable {
     public var appKey = ""
     public var forceDarkMode = false
     public var postSignInRedirect: String? = nil
+    public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
     
     func toJson() -> String {

@@ -13,6 +13,7 @@ import WebKit
 import AnyCodable
 import AuthenticationServices
 import LBBottomSheet
+import GoogleSignIn
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -58,6 +59,16 @@ public class Rownd: NSObject {
                 }
             }
         }
+        
+        if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
+            GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+                if error != nil || user == nil {
+                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
+                } else {
+                    logger.debug("Successfully restored previous Google Sign-in")
+                }
+            }
+        }
     }
     
     public static func getInstance() -> Rownd {
@@ -72,6 +83,44 @@ public class Rownd: NSObject {
         switch with {
         case .appleId:
             appleSignUpCoordinator?.didTapButton()
+        case .googleId:
+            let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
+            if (googleConfig == nil || googleConfig?.enabled == false) {
+                return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
+            }
+            if (googleConfig?.clientId == nil || googleConfig?.clientId == "" || config.googleClientId == "") {
+                let clientId = googleConfig?.clientId
+                return logger.error("Cannot sign in with Google. Missing client configuration")
+            }
+            let gidConfig = GIDConfiguration(
+                clientID: config.googleClientId,   // (IOS)
+                serverClientID: googleConfig?.clientId  // (Web)
+            )
+
+            GIDSignIn.sharedInstance.signIn(
+                with: gidConfig,
+                presenting: inst.getRootViewController()!
+            ) { user, error in
+                guard error == nil else { return logger.error("Failed to sign in with Google: \(String(describing: error))")}
+                guard let user = user else { return }
+
+                user.authentication.do { authentication, error in
+                    guard error == nil else { return }
+                    guard let authentication = authentication else { return }
+
+                    if let idToken = authentication.idToken {
+                        logger.debug("Successully completed Google sign-in")
+                        Auth.fetchToken(idToken: idToken) { authState in
+                            DispatchQueue.main.async {
+                                store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
+                                store.dispatch(UserData.fetch())
+                            }
+                        }
+                    } else {
+                        logger.error("Could not complete Google sign-in. Missing idToken")
+                    }
+                }
+            }
         default:
             requestSignIn()
         }
@@ -279,7 +328,7 @@ public enum UserFieldAccessType {
 }
 
 public enum RowndSignInHint {
-      case appleId
+    case appleId, googleId
 }
 
 public struct RowndSignInOptions: Encodable {
