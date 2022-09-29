@@ -73,6 +73,11 @@ let package = Package(
             name: "GoogleSignIn",
             url: "https://github.com/google/GoogleSignIn-iOS.git",
             .upToNextMajor(from: "6.2.4")
+        ),
+        .package(
+            name: "Lottie",
+            url: "https://github.com/airbnb/lottie-ios",
+            .upToNextMajor(from: "3.4.3")
         )
     ],
     
@@ -89,7 +94,8 @@ let package = Package(
                 "Sodium",
                 "CodeScanner_Rownd",
                 "Get",
-                "GoogleSignIn"
+                "GoogleSignIn",
+                "Lottie"
             ],
             resources: [
                 .process("Resources/")

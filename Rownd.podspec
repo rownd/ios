@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
   s.dependency 'Get', '~> 2.0.1'
   s.dependency 'GoogleSignIn', '~> 6.2.4'
+  s.dependency 'lottie-ios', '~> 3.4.3'
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'
