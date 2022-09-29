@@ -29,7 +29,6 @@
 		B347C24F2877DAB600935115 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C24E2877DAB600935115 /* Encryption.swift */; };
 		B347C25428786C5C00935115 /* Rownd.podspec in Resources */ = {isa = PBXBuildFile; fileRef = B347C25328786C5C00935115 /* Rownd.podspec */; };
 		B347C27528792AD900935115 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C27428792AD900935115 /* User.swift */; };
-		B347C2782879358200935115 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = B347C2772879358200935115 /* AnyCodable */; };
 		B347C27B287CB46A00935115 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = B347C27A287CB46A00935115 /* JWTDecode */; };
 		B349906628CFCED9004ADF3F /* Customizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B349906528CFCED9004ADF3F /* Customizations.swift */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
@@ -67,6 +66,9 @@
 		B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1128ABE9C400EE764B /* KeyScanner.swift */; };
 		B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */; };
 		B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */; };
+		C5ACD08328E3823300A9F2D9 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08228E3823300A9F2D9 /* GoogleSignIn */; };
+		C5ACD08528E3823300A9F2D9 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08428E3823300A9F2D9 /* GoogleSignInSwift */; };
+		C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,10 +150,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
-				B347C2782879358200935115 /* AnyCodable in Frameworks */,
 				B38A40C92882727F00FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
+				C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
+				C5ACD08528E3823300A9F2D9 /* GoogleSignInSwift in Frameworks */,
+				C5ACD08328E3823300A9F2D9 /* GoogleSignIn in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
 				B39ECA9728E242B10055CB60 /* Lottie in Frameworks */,
 				B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */,
@@ -414,7 +418,6 @@
 			packageProductDependencies = (
 				B302E2BA28641A7A005FD927 /* ReSwift */,
 				B302E2C62865012F005FD927 /* ReSwiftThunk */,
-				B347C2772879358200935115 /* AnyCodable */,
 				B347C27A287CB46A00935115 /* JWTDecode */,
 				B38A40A02881157D00FD0813 /* LBBottomSheet */,
 				B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */,
@@ -422,6 +425,8 @@
 				B38A40CE2883C81D00FD0813 /* Sodium */,
 				B396004128D42F7C00754238 /* CodeScanner_Rownd */,
 				B396004428D4348D00754238 /* Get */,
+				C5ACD08228E3823300A9F2D9 /* GoogleSignIn */,
+				C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */,
 				B39ECA9628E242B10055CB60 /* Lottie */,
 			);
 			productName = framework;
@@ -502,7 +507,6 @@
 			packageReferences = (
 				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
 				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
-				B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
 				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
@@ -511,6 +515,8 @@
 				B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */,
+				C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
@@ -977,14 +983,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Flight-School/AnyCodable";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.5;
-			};
-		};
 		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
@@ -1041,6 +1039,21 @@
 				minimumVersion = 2.0.1;
 			};
 		};
+		C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+		C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Flight-School/AnyCodable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.0;
+    };
 		B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios/";
@@ -1066,11 +1079,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */;
 			productName = Mocker;
-		};
-		B347C2772879358200935115 /* AnyCodable */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B347C2762879358200935115 /* XCRemoteSwiftPackageReference "AnyCodable" */;
-			productName = AnyCodable;
 		};
 		B347C27A287CB46A00935115 /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1107,6 +1115,16 @@
 			package = B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */;
 			productName = Get;
 		};
+		C5ACD08228E3823300A9F2D9 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
+    };
 		B39ECA9628E242B10055CB60 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */;

@@ -16,12 +16,23 @@ public struct AppConfigState: Hashable {
     public var icon: String?
     public var userVerificationFields: [String]?
     public var schema: Dictionary<String, AppSchemaField>?
+    public var config: AppConfigConfig?
 }
 
 extension AppConfigState: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, icon, schema
+        case id, icon, schema, config
         case userVerificationFields = "user_verification_fields"
+    }
+}
+
+public struct AppConfigConfig: Hashable {
+    public var hub: AppHubConfigState?
+}
+
+extension AppConfigConfig: Codable {
+    enum CodingKeys: String, CodingKey {
+        case hub
     }
 }
 
@@ -47,6 +58,49 @@ public struct AppSchemaFieldEncryption: Hashable, Codable {
 
 public enum AppSchemaEncryptionState: String, Codable {
     case enabled, disabled
+}
+
+public struct AppHubConfigState: Hashable {
+    public var auth: AppHubAuthConfigState?
+}
+
+extension AppHubConfigState: Codable {
+    enum CodingKeys: String, CodingKey {
+        case auth
+    }
+}
+
+public struct AppHubAuthConfigState: Hashable {
+    public var signInMethods: SignInMethods?
+}
+
+extension AppHubAuthConfigState: Codable {
+    enum CodingKeys: String, CodingKey {
+        case signInMethods = "sign_in_methods"
+    }
+}
+
+
+public struct SignInMethods: Hashable {
+    public var google: GoogleSignInMethodConfig?
+}
+
+extension SignInMethods: Codable {
+    enum CodingKeys: String, CodingKey {
+        case google
+    }
+}
+
+public struct GoogleSignInMethodConfig: Hashable {
+    public var enabled: Bool?
+    public var clientId: String?
+}
+
+extension GoogleSignInMethodConfig: Codable {
+    enum CodingKeys: String, CodingKey {
+        case enabled
+        case clientId = "client_id"
+    }
 }
 
 struct SetAppConfig: Action {

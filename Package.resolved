@@ -11,21 +11,57 @@
         }
       },
       {
-        "package": "CodeScanner",
-        "repositoryURL": "https://github.com/twostraws/CodeScanner",
+        "package": "AppAuth",
+        "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
         "state": {
           "branch": null,
-          "revision": "04ea970273e83d8152e8a1c59a7d45f88cdadfee",
-          "version": "2.1.2"
+          "revision": "3d36a58a2b736f7bc499453e996a704929b25080",
+          "version": "1.6.0"
+        }
+      },
+      {
+        "package": "CodeScanner_Rownd",
+        "repositoryURL": "https://github.com/rownd/CodeScanner_Rownd",
+        "state": {
+          "branch": null,
+          "revision": "22be2da64ca86d6a92578d95a35ae9792b2c1848",
+          "version": "2.2.1"
         }
       },
       {
         "package": "Get",
-        "repositoryURL": "https://github.com/kean/Get",
+        "repositoryURL": "https://github.com/rownd/Get",
         "state": {
           "branch": null,
-          "revision": "db5248ce985c703c5ea0030b7c4d3f908db304c9",
-          "version": "1.0.2"
+          "revision": "16486f86671fc67ffbb3f2c012c7550e0f8c717a",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "GoogleSignIn",
+        "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
+        "state": {
+          "branch": null,
+          "revision": "9c9b36af86a4dd3da16048a36cf37351e63ccfe1",
+          "version": "6.2.4"
+        }
+      },
+      {
+        "package": "GTMSessionFetcher",
+        "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
+        "state": {
+          "branch": null,
+          "revision": "d4289da23e978f37c344ea6a386e5546e2466294",
+          "version": "2.1.0"
+        }
+      },
+      {
+        "package": "GTMAppAuth",
+        "repositoryURL": "https://github.com/google/GTMAppAuth.git",
+        "state": {
+          "branch": null,
+          "revision": "6dee0cde8a1b223737a5159e55e6b4ec16bbbdd9",
+          "version": "1.3.1"
         }
       },
       {
