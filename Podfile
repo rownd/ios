@@ -16,4 +16,5 @@ target 'Rownd' do
   pod 'Sodium', '~> 0.9.1'
   pod 'SwiftKeychainWrapper', '~> 4.0.1'
   pod 'GoogleSignIn', '~> 6.2.4'
+  pod 'lottie-ios', '~> 3.4.3'
 end

@@ -16,6 +16,7 @@ PODS:
   - GTMSessionFetcher/Core (2.1.0)
   - JWTDecode (2.6.3)
   - LBBottomSheet (1.0.17)
+  - lottie-ios (3.4.3)
   - ReSwift (6.1.0)
   - ReSwiftThunk (2.0.1):
     - ReSwift (~> 6.0)
@@ -30,6 +31,7 @@ DEPENDENCIES:
   - GoogleSignIn (~> 6.2.4)
   - JWTDecode (~> 2.6.3)
   - LBBottomSheet
+  - lottie-ios (~> 3.4.3)
   - ReSwift (~> 6.1.0)
   - ReSwiftThunk (~> 2.0.1)
   - Sodium (~> 0.9.1)
@@ -44,6 +46,7 @@ SPEC REPOS:
     - GTMSessionFetcher
     - JWTDecode
     - LBBottomSheet
+    - lottie-ios
     - ReSwift
     - ReSwiftThunk
     - Sodium
@@ -57,11 +60,12 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: ffbb25ec00ebcb5201adab0a56d808f6f1902d9f
   JWTDecode: 33e5e26e5ddbd21b2065820894c08fef0cad9509
   LBBottomSheet: 5a9c07a45ca93eb7d28102b1f4e293c26947cdf0
+  lottie-ios: 9ae750cdc7820fecbd3c2f0cfc493038208fcdc4
   ReSwift: eab3c01e4279ba81b54a61e4fd6499634d20123a
   ReSwiftThunk: 7ca5145764be6f30b62db88a52d170133954629e
   Sodium: 23d11554ecd556196d313cf6130d406dfe7ac6da
   SwiftKeychainWrapper: 807ba1d63c33a7d0613288512399cd1eda1e470c
 
-PODFILE CHECKSUM: cda0d5ba404c08437dc2d57c37addfb610ac3da8
+PODFILE CHECKSUM: 86df726b8bd81ab559b49a2c026644cfc99b660a
 
 COCOAPODS: 1.11.3

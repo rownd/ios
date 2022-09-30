@@ -21,6 +21,9 @@
 		B302E2CD2866C75A005FD927 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CC2866C75A005FD927 /* Auth.swift */; };
 		B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */; };
 		B302E2D1286A4530005FD927 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2D0286A452F005FD927 /* Exporter.swift */; };
+		B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD8E28E780BF00216034 /* GoogleSignIn */; };
+		B30FBD9128E780BF00216034 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9028E780BF00216034 /* GoogleSignInSwift */; };
+		B30FBD9428E7811D00216034 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9328E7811D00216034 /* CodeScanner_Rownd */; };
 		B34490FE28DB9EEC00A992E9 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34490FD28DB9EEC00A992E9 /* AuthTests.swift */; };
 		B344910228DBA36200A992E9 /* MockedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B344910128DBA36200A992E9 /* MockedData.swift */; };
 		B344910528DBA42B00A992E9 /* Mocker in Frameworks */ = {isa = PBXBuildFile; productRef = B344910428DBA42B00A992E9 /* Mocker */; };
@@ -54,11 +57,9 @@
 		B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */; };
 		B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CE2883C81D00FD0813 /* Sodium */; };
 		B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */; };
-		B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B396004128D42F7C00754238 /* CodeScanner_Rownd */; };
 		B396004528D4348D00754238 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B396004428D4348D00754238 /* Get */; };
 		B39ECA9728E242B10055CB60 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = B39ECA9628E242B10055CB60 /* Lottie */; };
 		B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */; };
-		B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */; };
 		B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */; };
 		B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0428A8A66700EE764B /* KeyTransferView.swift */; };
 		B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0B28AB55B600EE764B /* RowndApi.swift */; };
@@ -66,8 +67,6 @@
 		B3F01B1228ABE9C400EE764B /* KeyScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1128ABE9C400EE764B /* KeyScanner.swift */; };
 		B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B1E28AC9AF300EE764B /* KeyCodeView.swift */; };
 		B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */; };
-		C5ACD08328E3823300A9F2D9 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08228E3823300A9F2D9 /* GoogleSignIn */; };
-		C5ACD08528E3823300A9F2D9 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08428E3823300A9F2D9 /* GoogleSignInSwift */; };
 		C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */; };
 /* End PBXBuildFile section */
 
@@ -133,7 +132,6 @@
 		B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleSignUpCoordinator.swift; sourceTree = "<group>"; };
 		B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieSwiftView.swift; sourceTree = "<group>"; };
-		B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationView.swift; sourceTree = "<group>"; };
 		B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferViewController.swift; sourceTree = "<group>"; };
 		B3F01B0428A8A66700EE764B /* KeyTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferView.swift; sourceTree = "<group>"; };
 		B3F01B0B28AB55B600EE764B /* RowndApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndApi.swift; sourceTree = "<group>"; };
@@ -151,14 +149,14 @@
 			files = (
 				B302E2C72865012F005FD927 /* ReSwiftThunk in Frameworks */,
 				B38A40C92882727F00FD0813 /* SwiftKeychainWrapper in Frameworks */,
+				B30FBD9428E7811D00216034 /* CodeScanner_Rownd in Frameworks */,
+				B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */,
+				B30FBD9128E780BF00216034 /* GoogleSignInSwift in Frameworks */,
 				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
-				C5ACD08528E3823300A9F2D9 /* GoogleSignInSwift in Frameworks */,
-				C5ACD08328E3823300A9F2D9 /* GoogleSignIn in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
 				B39ECA9728E242B10055CB60 /* Lottie in Frameworks */,
-				B396004228D42F7C00754238 /* CodeScanner_Rownd in Frameworks */,
 				B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */,
 				B396004528D4348D00754238 /* Get in Frameworks */,
@@ -184,13 +182,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		673FA6B470E9230725EB3F93 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		B302E28B2863A8E5005FD927 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -272,7 +263,6 @@
 				B38A40B82882185800FD0813 /* RowndFrameworkTestApp */,
 				B374E55928545A1C00955719 /* Products */,
 				B38A40D628873F9B00FD0813 /* Frameworks */,
-				673FA6B470E9230725EB3F93 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -301,7 +291,6 @@
 				B3F01B0F28AB607B00EE764B /* SignInLinks.swift */,
 				B349906528CFCED9004ADF3F /* Customizations.swift */,
 				B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */,
-				B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -423,11 +412,12 @@
 				B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */,
 				B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */,
 				B38A40CE2883C81D00FD0813 /* Sodium */,
-				B396004128D42F7C00754238 /* CodeScanner_Rownd */,
 				B396004428D4348D00754238 /* Get */,
-				C5ACD08228E3823300A9F2D9 /* GoogleSignIn */,
 				C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */,
 				B39ECA9628E242B10055CB60 /* Lottie */,
+				B30FBD8E28E780BF00216034 /* GoogleSignIn */,
+				B30FBD9028E780BF00216034 /* GoogleSignInSwift */,
+				B30FBD9328E7811D00216034 /* CodeScanner_Rownd */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -512,12 +502,12 @@
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
-				B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */,
-				C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -587,7 +577,6 @@
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */,
-				B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
 				B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */,
 				B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */,
@@ -975,6 +964,22 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rownd/CodeScanner_Rownd.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WeTransfer/Mocker#activating-the-mocker";
@@ -1023,14 +1028,6 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rownd/codescanner_rownd";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.1;
-			};
-		};
 		B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rownd/get";
@@ -1039,12 +1036,12 @@
 				minimumVersion = 2.0.1;
 			};
 		};
-		C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			repositoryURL = "https://github.com/airbnb/lottie-ios/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
+				minimumVersion = 3.0.0;
 			};
 		};
 		C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
@@ -1053,13 +1050,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.6.0;
-    };
-		B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-ios/";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1074,6 +1064,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
 			productName = ReSwiftThunk;
+		};
+		B30FBD8E28E780BF00216034 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		B30FBD9028E780BF00216034 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		B30FBD9328E7811D00216034 /* CodeScanner_Rownd */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */;
+			productName = CodeScanner_Rownd;
 		};
 		B344910428DBA42B00A992E9 /* Mocker */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1105,30 +1110,20 @@
 			package = B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Sodium;
 		};
-		B396004128D42F7C00754238 /* CodeScanner_Rownd */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B396004028D42F7C00754238 /* XCRemoteSwiftPackageReference "codescanner_rownd" */;
-			productName = CodeScanner_Rownd;
-		};
 		B396004428D4348D00754238 /* Get */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */;
 			productName = Get;
 		};
-		C5ACD08228E3823300A9F2D9 /* GoogleSignIn */ = {
+		B39ECA9628E242B10055CB60 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C5ACD08128E3823300A9F2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
+			package = B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 		C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */;
 			productName = AnyCodable;
-    };
-		B39ECA9628E242B10055CB60 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
