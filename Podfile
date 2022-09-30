@@ -15,4 +15,5 @@ target 'Rownd' do
   pod 'ReSwiftThunk', '~> 2.0.1'
   pod 'Sodium', '~> 0.9.1'
   pod 'SwiftKeychainWrapper', '~> 4.0.1'
+  pod 'lottie-ios', '~> 3.4.3'
 end

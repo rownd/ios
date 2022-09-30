@@ -2,6 +2,7 @@ PODS:
   - AnyCodable-FlightSchool (0.6.5)
   - JWTDecode (2.6.3)
   - LBBottomSheet (1.0.17)
+  - lottie-ios (3.4.3)
   - ReSwift (6.1.0)
   - ReSwiftThunk (2.0.1):
     - ReSwift (~> 6.0)
@@ -15,6 +16,7 @@ DEPENDENCIES:
   - AnyCodable-FlightSchool (~> 0.6.0)
   - JWTDecode (~> 2.6.3)
   - LBBottomSheet
+  - lottie-ios (~> 3.4.3)
   - ReSwift (~> 6.1.0)
   - ReSwiftThunk (~> 2.0.1)
   - Sodium (~> 0.9.1)
@@ -25,6 +27,7 @@ SPEC REPOS:
     - AnyCodable-FlightSchool
     - JWTDecode
     - LBBottomSheet
+    - lottie-ios
     - ReSwift
     - ReSwiftThunk
     - Sodium
@@ -34,11 +37,12 @@ SPEC CHECKSUMS:
   AnyCodable-FlightSchool: 84b795a9d3ec7ba9e5488673d15cc1b37a566af4
   JWTDecode: 33e5e26e5ddbd21b2065820894c08fef0cad9509
   LBBottomSheet: 5a9c07a45ca93eb7d28102b1f4e293c26947cdf0
+  lottie-ios: 9ae750cdc7820fecbd3c2f0cfc493038208fcdc4
   ReSwift: eab3c01e4279ba81b54a61e4fd6499634d20123a
   ReSwiftThunk: 7ca5145764be6f30b62db88a52d170133954629e
   Sodium: 23d11554ecd556196d313cf6130d406dfe7ac6da
   SwiftKeychainWrapper: 807ba1d63c33a7d0613288512399cd1eda1e470c
 
-PODFILE CHECKSUM: 6c2e7b94e11cb3ce800bee36b7e81fedd34823f1
+PODFILE CHECKSUM: 73307965167aaa7682363e736e7d95c0e71bfc66
 
 COCOAPODS: 1.11.3
