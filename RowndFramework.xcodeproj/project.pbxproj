@@ -59,7 +59,6 @@
 		B396004528D4348D00754238 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B396004428D4348D00754238 /* Get */; };
 		B39ECA9728E242B10055CB60 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = B39ECA9628E242B10055CB60 /* Lottie */; };
 		B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */; };
-		B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */; };
 		B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */; };
 		B3F01B0528A8A66700EE764B /* KeyTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0428A8A66700EE764B /* KeyTransferView.swift */; };
 		B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B0B28AB55B600EE764B /* RowndApi.swift */; };
@@ -131,7 +130,6 @@
 		B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleSignUpCoordinator.swift; sourceTree = "<group>"; };
 		B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieSwiftView.swift; sourceTree = "<group>"; };
-		B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationView.swift; sourceTree = "<group>"; };
 		B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferViewController.swift; sourceTree = "<group>"; };
 		B3F01B0428A8A66700EE764B /* KeyTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferView.swift; sourceTree = "<group>"; };
 		B3F01B0B28AB55B600EE764B /* RowndApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndApi.swift; sourceTree = "<group>"; };
@@ -297,7 +295,6 @@
 				B3F01B0F28AB607B00EE764B /* SignInLinks.swift */,
 				B349906528CFCED9004ADF3F /* Customizations.swift */,
 				B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */,
-				B39ECA9F28E2A6780055CB60 /* LottieAnimationView.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -581,7 +578,6 @@
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
 				B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */,
 				B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */,
-				B39ECAA028E2A6780055CB60 /* LottieAnimationView.swift in Sources */,
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
 				B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */,
 				B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */,
