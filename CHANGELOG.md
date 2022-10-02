@@ -1,5 +1,12 @@
 
 
+## [1.9.1](https://github.com/rownd/ios/compare/1.9.0...1.9.1) (2022-10-02)
+
+
+### Bug Fixes
+
+* **auth:** working sign-in links ([15476f7](https://github.com/rownd/ios/commit/15476f7967060168e2457e32aab3d3b27e68456e))
+
 # [1.9.0](https://github.com/rownd/ios/compare/1.8.4...1.9.0) (2022-09-28)
 
 

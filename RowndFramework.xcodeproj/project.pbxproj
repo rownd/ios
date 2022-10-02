@@ -495,19 +495,19 @@
 			);
 			mainGroup = B374E54E28545A1C00955719;
 			packageReferences = (
-				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
-				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
-				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
-				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
+				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */,
+				B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */,
+				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */,
+				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
-				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */,
+				B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker#activating-the-mocker" */,
 				C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
-				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
-				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */,
+				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */,
+				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -948,7 +948,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */ = {
+		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift.git";
 			requirement = {
@@ -956,7 +956,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */ = {
+		B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift-Thunk.git";
 			requirement = {
@@ -964,7 +964,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
 			requirement = {
@@ -972,7 +972,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */ = {
+		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rownd/CodeScanner_Rownd.git";
 			requirement = {
@@ -980,7 +980,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */ = {
+		B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker#activating-the-mocker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WeTransfer/Mocker#activating-the-mocker";
 			requirement = {
@@ -988,7 +988,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
+		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
 			requirement = {
@@ -996,7 +996,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
+		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LunabeeStudio/LBBottomSheet.git";
 			requirement = {
@@ -1057,42 +1057,42 @@
 /* Begin XCSwiftPackageProductDependency section */
 		B302E2BA28641A7A005FD927 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
 			productName = ReSwift;
 		};
 		B302E2C62865012F005FD927 /* ReSwiftThunk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
+			package = B302E2C52865012F005FD927 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */;
 			productName = ReSwiftThunk;
 		};
 		B30FBD8E28E780BF00216034 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
 			productName = GoogleSignIn;
 		};
 		B30FBD9028E780BF00216034 /* GoogleSignInSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
 			productName = GoogleSignInSwift;
 		};
 		B30FBD9328E7811D00216034 /* CodeScanner_Rownd */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */;
+			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */;
 			productName = CodeScanner_Rownd;
 		};
 		B344910428DBA42B00A992E9 /* Mocker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker" */;
+			package = B344910328DBA42B00A992E9 /* XCRemoteSwiftPackageReference "Mocker#activating-the-mocker" */;
 			productName = Mocker;
 		};
 		B347C27A287CB46A00935115 /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
+			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */;
 			productName = JWTDecode;
 		};
 		B38A40A02881157D00FD0813 /* LBBottomSheet */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */;
+			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet.git" */;
 			productName = LBBottomSheet;
 		};
 		B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */ = {

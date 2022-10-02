@@ -45,30 +45,54 @@ public class Rownd: NSObject {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
                 launchUrl = _launchUrl
-            } else if UIPasteboard.general.hasURLs, let _launchUrl = UIPasteboard.general.url {
-                launchUrl = _launchUrl
+            } else if UIPasteboard.general.hasStrings, var _launchUrl = UIPasteboard.general.string {
+                if !_launchUrl.starts(with: "http") {
+                    _launchUrl = "https://\(_launchUrl)"
+                }
+                launchUrl = URL(string: _launchUrl)
             }
 
-            if (launchUrl?.host?.hasSuffix("rownd.link")) != nil, let launchUrl = launchUrl {
-                logger.trace("launch_url: \(String(describing: launchUrl.absoluteString))")
+            handleSignInLink(url: launchUrl)
 
+            if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
+                GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+                    if error != nil || user == nil {
+                        logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
+                    } else {
+                        logger.debug("Successfully restored previous Google Sign-in")
+                    }
+                }
+            }
+        }
+    }
+
+    @discardableResult public static func handleSignInLink(url: URL?) -> Bool {
+        if store.state.auth.isAuthenticated {
+            return true
+        }
+
+        if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
+            logger.trace("handling url: \(String(describing: url.absoluteString))")
+
+            var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
+            urlComponents?.scheme = "https"
+
+            guard let url = urlComponents?.url else {
+                return false
+            }
+
+            Task {
                 do {
-                    try await SignInLinks.signInWithLink(launchUrl)
+                    try await SignInLinks.signInWithLink(url)
                 } catch {
                     logger.error("Sign-in attempt failed during launch: \(String(describing: error))")
                 }
             }
+
+            return true
         }
-        
-        if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
-            GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-                if error != nil || user == nil {
-                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
-                } else {
-                    logger.debug("Successfully restored previous Google Sign-in")
-                }
-            }
-        }
+
+        return false
     }
     
     public static func getInstance() -> Rownd {
