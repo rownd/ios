@@ -222,9 +222,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .appleId)
                 
             case .triggerSignInWithGoogle:
-                self.hubViewController?.hide()
-                Rownd.requestSignIn(with: .googleId)
-                
+                Rownd.requestSignIn(with: .googleId) {
+                    self.hubViewController?.hide()
+                }
+
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds

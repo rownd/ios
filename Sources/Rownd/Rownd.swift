@@ -103,24 +103,33 @@ public class Rownd: NSObject {
         requestSignIn(nil)
     }
     
-    public static func requestSignIn(with: RowndSignInHint) {
+    public static func requestSignIn(with: RowndSignInHint, completion: (() -> Void)? = nil) {
         switch with {
         case .appleId:
             appleSignUpCoordinator?.didTapButton()
         case .googleId:
             let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
-            if (googleConfig == nil || googleConfig?.enabled == false) {
+            guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
                 return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
             }
-            if (googleConfig?.serverClientId == nil ||
-                googleConfig?.serverClientId == "" ||
-                googleConfig?.iosClientId == nil ||
-                googleConfig?.iosClientId == "") {
+
+            if (googleConfig.serverClientId == nil ||
+                googleConfig.serverClientId == "" ||
+                googleConfig.iosClientId == nil ||
+                googleConfig.iosClientId == "") {
                 return logger.error("Cannot sign in with Google. Missing client configuration")
             }
+
+            let reversedClientId = googleConfig.iosClientId!.split(separator: ".").reversed().joined(separator: ".")
+            if let url = NSURL(string: reversedClientId + "://") {
+                if (UIApplication.shared.canOpenURL(url as URL) == false) {
+                    return logger.error("Cannot sign in with Google. \(String(describing: reversedClientId)) is not defined in URL schemes")
+                }
+            }
+
             let gidConfig = GIDConfiguration(
-                clientID: (googleConfig?.iosClientId)!,   // (IOS)
-                serverClientID: googleConfig?.serverClientId  // (Web)
+                clientID: (googleConfig.iosClientId)!,   // (IOS)
+                serverClientID: googleConfig.serverClientId  // (Web)
             )
 
             GIDSignIn.sharedInstance.signIn(
@@ -142,8 +151,13 @@ public class Rownd: NSObject {
                                 store.dispatch(UserData.fetch())
                             }
                         }
+
                     } else {
                         logger.error("Could not complete Google sign-in. Missing idToken")
+                    }
+                    
+                    if let completion = completion {
+                        completion()
                     }
                 }
             }
