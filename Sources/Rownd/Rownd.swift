@@ -112,13 +112,15 @@ public class Rownd: NSObject {
             if (googleConfig == nil || googleConfig?.enabled == false) {
                 return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
             }
-            if (googleConfig?.clientId == nil || googleConfig?.clientId == "" || config.googleClientId == "") {
-                let clientId = googleConfig?.clientId
+            if (googleConfig?.serverClientId == nil ||
+                googleConfig?.serverClientId == "" ||
+                googleConfig?.iosClientId == nil ||
+                googleConfig?.iosClientId == "") {
                 return logger.error("Cannot sign in with Google. Missing client configuration")
             }
             let gidConfig = GIDConfiguration(
-                clientID: config.googleClientId,   // (IOS)
-                serverClientID: googleConfig?.clientId  // (Web)
+                clientID: (googleConfig?.iosClientId)!,   // (IOS)
+                serverClientID: googleConfig?.serverClientId  // (Web)
             )
 
             GIDSignIn.sharedInstance.signIn(

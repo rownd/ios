@@ -93,13 +93,15 @@ extension SignInMethods: Codable {
 
 public struct GoogleSignInMethodConfig: Hashable {
     public var enabled: Bool?
-    public var clientId: String?
+    public var serverClientId: String?
+    public var iosClientId: String?
 }
 
 extension GoogleSignInMethodConfig: Codable {
     enum CodingKeys: String, CodingKey {
         case enabled
-        case clientId = "client_id"
+        case serverClientId = "client_id"
+        case iosClientId = "ios_client_id"
     }
 }
 
