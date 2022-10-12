@@ -100,7 +100,7 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn() {
-        requestSignIn(nil)
+        requestSignIn(RowndSignInOptions())
     }
     
     public static func requestSignIn(with: RowndSignInHint, completion: (() -> Void)? = nil) {
@@ -180,14 +180,8 @@ public class Rownd: NSObject {
     }
 
     public static func transferEncryptionKey() {
-        var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
-        behavior.heightMode = .specific(values: [.screenRatio(value: 1), .screenRatio(value: 0.65)], heightLimit: .statusBar)
-
-        var theme: LBBottomSheet.BottomSheetController.Theme = .init()
-        theme.grabber?.topMargin = CGFloat(10.0)
-
         DispatchQueue.main.async {
-            inst.getRootViewController()?.presentAsBottomSheet(KeyTransferViewController(), theme: theme, behavior: behavior)
+            inst.displayViewControllerOnTop(KeyTransferViewController())
         }
     }
     

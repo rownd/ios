@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Get
+import LBBottomSheet
 
 class KeyTransferViewState : ObservableObject {
     @Published var key = "Loading..."
@@ -25,7 +26,9 @@ class KeyTransferViewState : ObservableObject {
 
 }
 
-class KeyTransferViewController : UIViewController {
+class KeyTransferViewController : UIViewController, BottomSheetControllerProtocol, BottomSheetHostProtocol {
+
+    var hostController: UIViewController?
 
     lazy var contentView: UIHostingController<KeyTransferView> = UIHostingController(rootView: KeyTransferView(
         parentViewController: self,
@@ -34,6 +37,8 @@ class KeyTransferViewController : UIViewController {
         keyState: self.keyState
     ))
     var keyState = KeyTransferViewState()
+
+    var detents: [LBBottomSheet.BottomSheetController.Behavior.HeightValue] = [.screenRatio(value: 0.7), .screenRatio(value: 0.9)]
 
     override func loadView() {
         super.loadView()
@@ -59,6 +64,14 @@ class KeyTransferViewController : UIViewController {
         contentView.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         contentView.view.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         contentView.view.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        guard let hostController = hostController else {
+            return
+        }
+
+        hostController.dismiss(animated: true)
     }
 
     private func setupKeyTransfer() {

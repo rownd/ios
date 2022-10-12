@@ -8,6 +8,14 @@
 import UIKit
 import LBBottomSheet
 
+protocol BottomSheetControllerProtocol {
+    var detents: [LBBottomSheet.BottomSheetController.Behavior.HeightValue] { get set }
+}
+
+protocol BottomSheetHostProtocol {
+    var hostController: UIViewController? { get set }
+}
+
 class BottomSheetController: UIViewController {
     
     var controller: UIViewController?
@@ -19,12 +27,17 @@ class BottomSheetController: UIViewController {
             return
         }
 
-        if var hubViewController = controller as? HubViewProtocol {
+        if var hubViewController = controller as? BottomSheetHostProtocol {
             hubViewController.hostController = self
         }
         
         var behavior: LBBottomSheet.BottomSheetController.Behavior = .init(swipeMode: .full)
-        behavior.heightMode = .specific(values: [.screenRatio(value: 0.5), .screenRatio(value: 0.9)], heightLimit: .statusBar)
+        if let controller = controller as? BottomSheetControllerProtocol {
+            behavior.heightMode = .specific(values: controller.detents, heightLimit: .statusBar)
+        } else {
+            behavior.heightMode = .specific(values: [.screenRatio(value: 0.5), .screenRatio(value: 0.9)], heightLimit: .statusBar)
+        }
+
         
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
         theme.cornerRadius = Rownd.config.customizations.sheetCornerBorderRadius

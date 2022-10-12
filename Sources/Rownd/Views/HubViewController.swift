@@ -12,14 +12,13 @@ import Lottie
 
 protocol HubViewProtocol {
     var targetPage: HubPageSelector { get set }
-    var hostController: UIViewController? { get set }
 
     func setLoading(_ isLoading: Bool)
     func show()
     func hide()
 }
 
-public class HubViewController: UIViewController, HubViewProtocol {
+public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
     
     var activityIndicator = UIActivityIndicatorView(style: .large)
     var customLoadingAnimationView: Lottie.AnimationView?
