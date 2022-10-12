@@ -113,7 +113,7 @@ struct KeyTransferView : View {
                     }
                 }
                 .padding(.horizontal)
-                //.padding(.top, 50)
+                .padding(.top, 30)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
