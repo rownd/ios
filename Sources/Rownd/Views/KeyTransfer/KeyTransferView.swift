@@ -124,6 +124,7 @@ struct KeyTransferView : View {
                     }
                 }
             }
+            .ignoresSafeArea(.all, edges: [])
             .padding(.bottom, 50)
         }
         .navigationViewStyle(.stack)
@@ -140,6 +141,32 @@ struct RowndButton: ViewModifier {
             .background(backgroundColor)
             .foregroundColor(.primary)
             .clipShape(Capsule())
+    }
+}
+
+//@available(iOS 15, *)
+//struct NavToolbarSafeAreaModifier: ViewModifier {
+//    func body(content: Content) -> some View {
+//        content.safeAreaInset(edge: .top, spacing: 44) {}
+//    }
+//}
+
+//struct NavToolbarSafeAreaModifier: ViewModifier {
+//    func body(content: Content) -> some View {
+//        content
+//    }
+//}
+
+extension View {
+    @ViewBuilder
+    func topToolbarSafeAreaInset() -> some View {
+        if #available(iOS 15, *) {
+//            self.safeAreaInset(edge: .top, spacing: 44) {}
+            self.ignoresSafeArea(.all, edges: [])
+//            self.edgesIgnoringSafeArea([])
+        } else {
+            self
+        }
     }
 }
 
