@@ -113,8 +113,8 @@ struct KeyTransferView : View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 30)
-                .navigationBarTitleDisplayMode(.inline)
+                .padding(.top, 50)
+                .navigationBarTitleDisplayMode(.automatic)
                 .toolbar {
                     ToolbarItem(placement: .navigation) {
                         VStack {
