@@ -113,14 +113,14 @@ struct KeyTransferView : View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 50)
-                .navigationBarTitleDisplayMode(.automatic)
-                .toolbar {
-                    ToolbarItem(placement: .navigation) {
-                        VStack {
-                            Text("Encryption key")
-                                .font(.headline)
-                        }
+                //.padding(.top, 50)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    VStack {
+                        Text("Encryption key")
+                            .font(.headline)
                     }
                 }
             }
