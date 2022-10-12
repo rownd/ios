@@ -1,5 +1,20 @@
 
 
+# [1.10.0](https://github.com/rownd/ios/compare/1.9.1...1.10.0) (2022-10-12)
+
+
+### Bug Fixes
+
+* **build:** xcodeproj corruption ([f4c882e](https://github.com/rownd/ios/commit/f4c882ee2ab598483d97e1bf92388bf809c07da5))
+* **google:** don't close hub if error ([#19](https://github.com/rownd/ios/issues/19)) ([7bbd6b0](https://github.com/rownd/ios/commit/7bbd6b07af4118d092fca2ea5c40c156d6c760d1))
+* ui inconsistencies & crash in key xfer ([85e40c2](https://github.com/rownd/ios/commit/85e40c2da1eba845ffaabb41d853af45e95b218b))
+
+
+### Features
+
+* add sign in with google ([#17](https://github.com/rownd/ios/issues/17)) ([fdf5a8a](https://github.com/rownd/ios/commit/fdf5a8a786727164f0958c87a90355bc39fb919d))
+* **google:** use iosClientConfig from AppConfig ([#18](https://github.com/rownd/ios/issues/18)) ([a92a0c9](https://github.com/rownd/ios/commit/a92a0c912af4a72f2e56d76711097a3d9d368fad))
+
 ## [1.9.1](https://github.com/rownd/ios/compare/1.9.0...1.9.1) (2022-10-02)
 
 
