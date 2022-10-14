@@ -1,5 +1,12 @@
 
 
+# [1.11.0](https://github.com/rownd/ios/compare/1.10.2...1.11.0) (2022-10-14)
+
+
+### Features
+
+* **state:** detect when sdk has finished initializing ([5f24e9f](https://github.com/rownd/ios/commit/5f24e9f122025fe4766e8baf93ae997812d8edfe))
+
 # [1.10.0](https://github.com/rownd/ios/compare/1.9.1...1.10.0) (2022-10-12)
 
 
