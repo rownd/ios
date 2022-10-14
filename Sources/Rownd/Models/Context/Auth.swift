@@ -25,6 +25,20 @@ extension AuthState: Codable {
     public var isAuthenticated: Bool {
         return accessToken != nil
     }
+
+    public var isAccessTokenValid: Bool {
+        guard let accessToken = accessToken else {
+            return false
+        }
+
+        do {
+            let jwt = try decode(jwt: accessToken)
+
+            return !jwt.expired
+        } catch {
+            return false
+        }
+    }
     
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
