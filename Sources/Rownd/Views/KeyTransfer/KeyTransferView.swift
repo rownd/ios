@@ -53,7 +53,9 @@ struct KeyTransferView : View {
                             switch AVCaptureDevice.authorizationStatus(for: .video) {
                             case .authorized:
                                 activeNavSelection = "key-scanner"
-                                parentViewController.bottomSheetController?.grow(toMaximumHeight: true)
+                                DispatchQueue.main.async {
+                                    parentViewController.bottomSheetController?.grow(toMaximumHeight: true)
+                                }
                             case .notDetermined:
                                 AVCaptureDevice.requestAccess(for: .video) { granted in
                                     if granted {

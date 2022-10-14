@@ -12,25 +12,31 @@ import ReSwiftThunk
 fileprivate let STORAGE_STATE_KEY = "RowndState"
 
 public struct RowndState: Codable, Hashable {
+    public var isInitialized = false
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
 }
 
 extension RowndState {
+    enum CodingKeys: String, CodingKey {
+        case appConfig, auth, user
+    }
+
     static func save(state: RowndState) {
         if let encoded = try? state.toJson() {
-//            logger.trace("storing: \(String(data: encoded, encoding: .utf8) ?? "{}")")
+            logger.trace("storing: \(encoded)")
             Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
         }
     }
     
     static func load() {
         let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String ?? String("{}")
-//        logger.trace("initial store state: \(existingStateStr)")
+        logger.trace("initial store state: \(existingStateStr)")
         
         let decoder = JSONDecoder()
-        if let decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
+        if var decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
+            decoded.isInitialized = true
             DispatchQueue.main.async {
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
