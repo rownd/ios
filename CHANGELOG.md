@@ -1,5 +1,12 @@
 
 
+# [1.12.0](https://github.com/rownd/ios/compare/1.11.0...1.12.0) (2022-10-14)
+
+
+### Features
+
+* **auth:** add flag to determine whether the access token is valid ([d086255](https://github.com/rownd/ios/commit/d086255d036c539f5fe51191a02ae80e719bfa02))
+
 # [1.11.0](https://github.com/rownd/ios/compare/1.10.2...1.11.0) (2022-10-14)
 
 
