@@ -32,7 +32,7 @@ extension RowndState {
     
     static func load() {
         let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String ?? String("{}")
-//        logger.trace("initial store state: \(existingStateStr)")
+        logger.trace("initial store state: \(existingStateStr)")
         
         let decoder = JSONDecoder()
         if var decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
