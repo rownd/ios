@@ -70,6 +70,7 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
         newState = initializeAction.payload
     default:
         newState = RowndState(
+            isInitialized: true,
             appConfig: appConfigReducer(action: action, state: state?.appConfig),
             auth: authReducer(action: action, state: state?.auth),
             user: userReducer(action: action, state: state?.user)
