@@ -1,5 +1,12 @@
 
 
+## [1.12.1](https://github.com/rownd/ios/compare/1.12.0...1.12.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* **state:** handle fresh install case where store load fails ([930e088](https://github.com/rownd/ios/commit/930e088fd3eb4c80cc731bebb6c41a7e1340fba8))
+
 # [1.12.0](https://github.com/rownd/ios/compare/1.11.0...1.12.0) (2022-10-14)
 
 
