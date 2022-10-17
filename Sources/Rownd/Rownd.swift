@@ -198,8 +198,31 @@ public class Rownd: NSObject {
     }
     
     public static func _refreshToken() {
-        Auth.fetchToken(refreshToken: store.state.auth.refreshToken ?? "no token") { authState in
-            print(authState)
+        Task {
+            do {
+                var refreshResp = try await authenticator.refreshToken()
+                print("refresh 1: \(String(describing: refreshResp))")
+            } catch {
+                print("Error refreshing token 1: \(String(describing: error))")
+            }
+        }
+
+        Task {
+            do {
+                var refreshResp = try await authenticator.refreshToken()
+                print("refresh 2: \(String(describing: refreshResp))")
+            } catch {
+                print("Error refreshing token 2: \(String(describing: error))")
+            }
+        }
+
+        Task {
+            do {
+                var refreshResp = try await authenticator.refreshToken()
+                print("refresh 3: \(String(describing: refreshResp))")
+            } catch {
+                print("Error refreshing token 3: \(String(describing: error))")
+            }
         }
     }
     

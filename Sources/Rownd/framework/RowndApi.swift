@@ -8,9 +8,17 @@
 import Foundation
 import Get
 
-let rowndApi = Get.APIClient(baseURL: URL(string: Rownd.config.apiUrl))
+let baseConfig = APIClient.Configuration(
+    baseURL: URL(string: Rownd.config.apiUrl),
+    delegate: RowndUnauthenticatedApiClientDelegate()
+)
+let rowndApi = Get.APIClient(configuration: baseConfig)
 
-
+class RowndUnauthenticatedApiClientDelegate : APIClientDelegate {
+    func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
+        print("Making a request to \(String(describing: request.url))")
+    }
+}
 
 class RowndApi {
     let client: APIClient
@@ -30,6 +38,6 @@ class RowndApiClientDelegate : APIClientDelegate {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
 
-        print("request url: \(request.url)")
+        print("request url: \(String(describing: request.url))")
     }
 }

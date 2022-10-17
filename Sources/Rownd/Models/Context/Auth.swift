@@ -68,48 +68,55 @@ extension AuthState: Codable {
     }
     
     func getAccessToken() async -> String? {
-        guard let accessToken = store.state.auth.accessToken else { return nil }
-        
-        return await withCheckedContinuation { continuation in
-            tokenQueue.async {
-                do {
-                    let jwt = try decode(jwt: accessToken)
-                    
-                    if !jwt.expired {
-                        continuation.resume(returning: accessToken)
-                        return
-                    }
-                    
-                    if let refreshToken = store.state.auth.refreshToken {
-                        Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
-                            if let newAuthState = tokenResource {
-                                DispatchQueue.main.async {
-                                    store.dispatch(SetAuthState(payload: AuthState(
-                                        accessToken: tokenResource?.accessToken,
-                                        refreshToken: tokenResource?.refreshToken,
-                                        isVerifiedUser: store.state.auth.isVerifiedUser,
-                                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn
-                                    )))
-                                }
-                                continuation.resume(returning: newAuthState.accessToken)
-                            } else {
-                                // Sign the user out b/c they need to get a new refresh token
-                                DispatchQueue.main.async {
-                                    store.dispatch(SetAuthState(payload: AuthState()))
-                                    store.dispatch(SetUserData(payload: [:]))
-                                }
-                                continuation.resume(returning: nil)
-                            }
-                        }
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
-                    
-                } catch {
-                    continuation.resume(returning: nil)
-                }
-            }
+        do {
+            let authState = try await authenticator.getValidToken()
+            return authState.accessToken
+        } catch {
+            logger.warning("Failed to retrieve access token: \(String(describing: error))")
+            return nil
         }
+//        guard let accessToken = store.state.auth.accessToken else { return nil }
+//
+//        return await withCheckedContinuation { continuation in
+//            tokenQueue.async {
+//                do {
+//                    let jwt = try decode(jwt: accessToken)
+//
+//                    if !jwt.expired {
+//                        continuation.resume(returning: accessToken)
+//                        return
+//                    }
+//
+//                    if let refreshToken = store.state.auth.refreshToken {
+//                        Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
+//                            if let newAuthState = tokenResource {
+//                                DispatchQueue.main.async {
+//                                    store.dispatch(SetAuthState(payload: AuthState(
+//                                        accessToken: tokenResource?.accessToken,
+//                                        refreshToken: tokenResource?.refreshToken,
+//                                        isVerifiedUser: store.state.auth.isVerifiedUser,
+//                                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn
+//                                    )))
+//                                }
+//                                continuation.resume(returning: newAuthState.accessToken)
+//                            } else {
+//                                // Sign the user out b/c they need to get a new refresh token
+//                                DispatchQueue.main.async {
+//                                    store.dispatch(SetAuthState(payload: AuthState()))
+//                                    store.dispatch(SetUserData(payload: [:]))
+//                                }
+//                                continuation.resume(returning: nil)
+//                            }
+//                        }
+//                    } else {
+//                        continuation.resume(returning: nil)
+//                    }
+//
+//                } catch {
+//                    continuation.resume(returning: nil)
+//                }
+//            }
+//        }
     }
 }
 
@@ -176,10 +183,10 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-    static func fetchToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
-        let tokenRequest = TokenRequest(refreshToken: refreshToken)
-        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
-    }
+//    static func fetchToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+//        let tokenRequest = TokenRequest(refreshToken: refreshToken)
+//        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
+//    }
     
     static func fetchToken(idToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         guard let appId = store.state.appConfig.id else { return completion(nil) }
