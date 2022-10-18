@@ -20,9 +20,15 @@ class AuthTests: XCTestCase {
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
         )))
 
-        let mock = Mock(url: URL(string: "https://api.rownd.io/hub/auth/token")!, ignoreQuery: true, dataType: .json, statusCode: 200, data: [
-            .post : try! Data(contentsOf: MockedData.refreshTokenResponse)
-        ])
+        let mock = Mock(
+            url: URL(string: "https://api.rownd.io/hub/auth/token")!,
+            ignoreQuery: true,
+            dataType: .json,
+            statusCode: 200,
+            data: [
+                .post : try! Data(contentsOf: MockedData.refreshTokenResponse)
+            ]
+        )
         mock.register()
 
         let expectation = self.expectation(description: "Refreshing token")
@@ -52,7 +58,7 @@ class AuthTests: XCTestCase {
 
         var numTimesRefreshCalled = 0
         var mock = Mock(
-            url: URL(string: "\(Rownd.config.apiUrl)/hub/auth/token")!,
+            url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
             dataType: .json,
             statusCode: 200,
@@ -67,24 +73,13 @@ class AuthTests: XCTestCase {
             XCTAssertLessThanOrEqual(numTimesRefreshCalled, 1)
         }
 
-//        mock.completion = {
-//            store.dispatch(SetAuthState(payload: AuthState(
-//                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
-//                refreshToken: store.state.auth.refreshToken // doesn't matter
-//            )))
-//        }
-
         mock.delay = DispatchTimeInterval.seconds(2)
 
         mock.register()
 
         let expectation1 = self.expectation(description: "Refreshing token 1")
         let expectation2 = self.expectation(description: "Refreshing token 2")
-//        var xAuthState: AuthState? = nil
-//        Auth.fetchToken(refreshToken: "this is a fake refresh token") { authState in
-//            xAuthState = authState
-//            expectation.fulfill()
-//        }
+
         Task {
             let token1 = await Rownd.getAccessToken()
             XCTAssertEqual(token1, responseData.accessToken)

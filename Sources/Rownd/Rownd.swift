@@ -196,7 +196,10 @@ public class Rownd: NSObject {
     public func state() -> Store<RowndState> {
         return store
     }
-    
+
+    // This is an internal test function used only to manually test
+    // ensuring refresh tokens are only used once when attempting
+    // to fetch new access tokens
     public static func _refreshToken() {
         Task {
             do {
