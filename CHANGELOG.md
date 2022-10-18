@@ -1,5 +1,12 @@
 
 
+## [1.12.2](https://github.com/rownd/ios/compare/1.12.1...1.12.2) (2022-10-18)
+
+
+### Bug Fixes
+
+* **auth:** properly handle concurrent refresh token requests ([#20](https://github.com/rownd/ios/issues/20)) ([d655b9f](https://github.com/rownd/ios/commit/d655b9f2d6b24efde48e4138a1e514d0fed70236))
+
 ## [1.12.1](https://github.com/rownd/ios/compare/1.12.0...1.12.1) (2022-10-16)
 
 
