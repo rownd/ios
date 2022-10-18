@@ -160,7 +160,7 @@ class UserData {
             guard let state = getState() else { return }
             guard !state.user.isLoading else { return }
             
-            Task.init {
+            Task {
                 guard let accessToken = await Rownd.getAccessToken() else {
                     return
                 }
