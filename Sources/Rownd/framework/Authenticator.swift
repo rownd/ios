@@ -19,6 +19,13 @@ actor Authenticator {
     private var refreshTask: Task<AuthState, Error>?
 
     private var stateListener: Cancellable?
+
+    init() {
+        Task {
+            await subscribeToAuthState()
+        }
+    }
+
     private func subscribeToAuthState() {
         stateListener = store
             .subscribe { $0.auth }
