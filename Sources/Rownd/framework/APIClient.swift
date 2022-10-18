@@ -56,7 +56,6 @@ class APIRequest<Resource: APIResource> {
     
     init(resource: Resource) {
         self.resource = resource
-        print("decoding fn:", self.decode)
     }
 }
  

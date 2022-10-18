@@ -200,8 +200,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .signIn  else { return }
                 DispatchQueue.main.async {
-                    store.dispatch(SetAuthState(payload: AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)))
-                    store.dispatch(UserData.fetch())
+                    store.dispatch(store.state.auth.onReceiveAuthTokens(
+                        AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
+                    ))
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()

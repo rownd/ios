@@ -75,48 +75,20 @@ extension AuthState: Codable {
             logger.warning("Failed to retrieve access token: \(String(describing: error))")
             return nil
         }
-//        guard let accessToken = store.state.auth.accessToken else { return nil }
-//
-//        return await withCheckedContinuation { continuation in
-//            tokenQueue.async {
-//                do {
-//                    let jwt = try decode(jwt: accessToken)
-//
-//                    if !jwt.expired {
-//                        continuation.resume(returning: accessToken)
-//                        return
-//                    }
-//
-//                    if let refreshToken = store.state.auth.refreshToken {
-//                        Auth.fetchToken(refreshToken: refreshToken) { tokenResource in
-//                            if let newAuthState = tokenResource {
-//                                DispatchQueue.main.async {
-//                                    store.dispatch(SetAuthState(payload: AuthState(
-//                                        accessToken: tokenResource?.accessToken,
-//                                        refreshToken: tokenResource?.refreshToken,
-//                                        isVerifiedUser: store.state.auth.isVerifiedUser,
-//                                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn
-//                                    )))
-//                                }
-//                                continuation.resume(returning: newAuthState.accessToken)
-//                            } else {
-//                                // Sign the user out b/c they need to get a new refresh token
-//                                DispatchQueue.main.async {
-//                                    store.dispatch(SetAuthState(payload: AuthState()))
-//                                    store.dispatch(SetUserData(payload: [:]))
-//                                }
-//                                continuation.resume(returning: nil)
-//                            }
-//                        }
-//                    } else {
-//                        continuation.resume(returning: nil)
-//                    }
-//
-//                } catch {
-//                    continuation.resume(returning: nil)
-//                }
-//            }
-//        }
+    }
+
+    func onReceiveAuthTokens(_ newAuthState: AuthState) -> Thunk<RowndState> {
+        return Thunk<RowndState> { dispatch, getState in
+            guard let state = getState() else { return }
+
+            dispatch(SetAuthState(payload: newAuthState))
+            dispatch(UserData.fetch())
+
+            DispatchQueue.main.async {
+
+            }
+
+        }
     }
 }
 
@@ -143,17 +115,6 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
     }
     
     return state
-}
-
-func receiveAuthTokens() -> Thunk<RowndState> {
-    return Thunk<RowndState> { dispatch, getState in
-        guard let state = getState() else { return }
-
-        DispatchQueue.main.async {
-            store.dispatch(UserData.fetch())
-        }
-
-    }
 }
 
 // MARK: Token / auth API calls
