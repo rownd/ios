@@ -1,5 +1,12 @@
 
 
+## [1.12.3](https://github.com/rownd/ios/compare/1.12.2...1.12.3) (2022-10-18)
+
+
+### Bug Fixes
+
+* **auth:** race condition preventing user data fetch ([#21](https://github.com/rownd/ios/issues/21)) ([44279c4](https://github.com/rownd/ios/commit/44279c40b192c0a8c362512e024e9de02ed235a7))
+
 ## [1.12.2](https://github.com/rownd/ios/compare/1.12.1...1.12.2) (2022-10-18)
 
 
