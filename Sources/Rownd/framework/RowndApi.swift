@@ -32,12 +32,13 @@ class RowndApi {
 class RowndApiClientDelegate : APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
-        request.setValue(Rownd.config.appKey, forHTTPHeaderField: "x-rownd-app-key")
+        request.setValue(Rownd.config.appKey, forHTTPHeaderField: "X-Rownd-App-Key")
 
         if store.state.auth.isAuthenticated, let accessToken = await Rownd.getAccessToken() {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
 
-        print("request url: \(String(describing: request.url))")
+        var localRequest = request
+        logger.debug("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
     }
 }

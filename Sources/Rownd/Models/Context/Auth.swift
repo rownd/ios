@@ -79,7 +79,7 @@ extension AuthState: Codable {
 
     func onReceiveAuthTokens(_ newAuthState: AuthState) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
+            guard let _ = getState() else { return }
 
             dispatch(SetAuthState(payload: newAuthState))
             dispatch(UserData.fetch())

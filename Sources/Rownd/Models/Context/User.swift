@@ -153,7 +153,13 @@ struct UserDataResource: APIResource {
 }
 
 class UserData {
-    //    private var req: APIRequest<AppConfigResource>?
+    static func onReceiveUserData(_ newUserState: UserState) -> Thunk<RowndState> {
+        return Thunk<RowndState> { dispatch, getState in
+            guard let _ = getState() else { return }
+
+            dispatch(SetUserState(payload: newUserState))
+        }
+    }
     
     static func fetch() -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
