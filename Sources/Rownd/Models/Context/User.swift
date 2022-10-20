@@ -190,8 +190,8 @@ class UserData {
                     logger.debug("Decoded user response: \(String(describing: userResp))")
 
                     DispatchQueue.main.async {
-                        dispatch(SetUserLoading(isLoading: false))
                         dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
+                        dispatch(SetUserLoading(isLoading: false))
                     }
                 }
             }
