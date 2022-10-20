@@ -81,11 +81,16 @@ extension AuthState: Codable {
         return Thunk<RowndState> { dispatch, getState in
             guard let _ = getState() else { return }
 
-            dispatch(SetAuthState(payload: newAuthState))
-            dispatch(UserData.fetch())
+            Task {
+                // This is a special case to get the new auth state over
+                // to the authenticator as quickly as possible without
+                // waiting for the store update flow to complete
+                await authenticator.setAuthState(newAuthState)
 
-            DispatchQueue.main.async {
-
+                DispatchQueue.main.async {
+                    dispatch(SetAuthState(payload: newAuthState))
+                    dispatch(UserData.fetch())
+                }
             }
 
         }

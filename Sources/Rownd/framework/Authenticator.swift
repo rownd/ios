@@ -36,6 +36,10 @@ actor Authenticator {
             .store(in: &stateListeners)
     }
 
+    func setAuthState(_ newAuthState: AuthState) {
+        currentAuthState = newAuthState
+    }
+
     func getValidToken() async throws -> AuthState {
         if let handle = refreshTask {
             return try await handle.value
