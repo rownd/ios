@@ -19,6 +19,7 @@ actor Authenticator {
     private var refreshTask: Task<AuthState, Error>?
 
     private var stateListeners = Set<AnyCancellable>()
+    @Published private var authState = store.subscribe { $0.auth }
 
     init() {
         Task {
@@ -27,8 +28,7 @@ actor Authenticator {
     }
 
     private func subscribeToAuthState() {
-        store
-            .subscribe { $0.auth }
+        authState
             .$current
             .sink { authState in
                 self.currentAuthState = authState

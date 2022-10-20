@@ -57,7 +57,7 @@ class EncryptionTests: XCTestCase {
     func testEncryptingData() throws {
         let keyId = "test-key"
         let key = Array(Data(base64Encoded: "4f4a6IInDuSga0wyQQQpMSrDHIZ/ryoc9w6s5xVF/VQ=")!)
-        try RowndEncryption.storeKey(key: key, keyId: keyId)
+        RowndEncryption.storeKey(key: key, keyId: keyId)
 
         let plainText = "This super secret string will never be known."
         let cipherText: String = try RowndEncryption.encrypt(plaintext: plainText, withKeyId: keyId)
@@ -70,7 +70,7 @@ class EncryptionTests: XCTestCase {
     func testDecryptingData() throws {
         let keyId = "test-key"
         let key = Array(Data(base64Encoded: "4f4a6IInDuSga0wyQQQpMSrDHIZ/ryoc9w6s5xVF/VQ=")!)
-        try RowndEncryption.storeKey(key: key, keyId: keyId)
+        RowndEncryption.storeKey(key: key, keyId: keyId)
 
         let expectedPlainText = "This super secret string will never be known."
         let cipherText = "Di0IyYbC141WIPKzFnlsQc0BIi1AWKSpLf6Th9TcDDJiidPfkVazXtFibnsqJyKFaQf7SaF68yihnqJXidodfKqKzjM2MnbHbh+O8wpxFO3gO6OhVg=="
