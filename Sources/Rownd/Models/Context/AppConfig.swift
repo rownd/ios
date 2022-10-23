@@ -62,11 +62,12 @@ public enum AppSchemaEncryptionState: String, Codable {
 
 public struct AppHubConfigState: Hashable {
     public var auth: AppHubAuthConfigState?
+    public var customizations: AppHubCustomizationsConfigState?
 }
 
 extension AppHubConfigState: Codable {
     enum CodingKeys: String, CodingKey {
-        case auth
+        case auth, customizations
     }
 }
 
@@ -80,6 +81,15 @@ extension AppHubAuthConfigState: Codable {
     }
 }
 
+public struct AppHubCustomizationsConfigState: Hashable {
+    public var fontFamily: String?
+}
+
+extension AppHubCustomizationsConfigState: Codable {
+    enum CodingKeys: String, CodingKey {
+        case fontFamily = "font_family"
+    }
+}
 
 public struct SignInMethods: Hashable {
     public var google: GoogleSignInMethodConfig?
