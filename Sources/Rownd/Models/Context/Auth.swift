@@ -69,7 +69,7 @@ extension AuthState: Codable {
     
     func getAccessToken() async -> String? {
         do {
-            let authState = try await authenticator.getValidToken()
+            let authState = try await Rownd.authenticator.getValidToken()
             return authState.accessToken
         } catch {
             logger.warning("Failed to retrieve access token: \(String(describing: error))")
@@ -85,7 +85,7 @@ extension AuthState: Codable {
                 // This is a special case to get the new auth state over
                 // to the authenticator as quickly as possible without
                 // waiting for the store update flow to complete
-                await authenticator.setAuthState(newAuthState)
+                await Rownd.authenticator.setAuthState(newAuthState)
 
                 DispatchQueue.main.async {
                     dispatch(SetAuthState(payload: newAuthState))

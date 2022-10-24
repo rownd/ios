@@ -14,27 +14,32 @@ enum AuthenticationError: Error {
     case refreshTokenFailed
 }
 
+// This class exists for the sole purpose of subscribing the Authenticator to the
+// global state. Data races can occur when using subscribers within the actor itself,
+// which leads to memmory corruption and weird app crashes.
+class AuthenticatorSubscription: NSObject {
+    private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
+    private var stateListeners = Set<AnyCancellable>()
+
+    @Published private var authState: ObservableState<AuthState> = store.subscribe { $0.auth }
+
+    private override init() {}
+
+    internal static func subscribeToAuthState() {
+        inst.authState
+            .$current
+            .sink { authState in
+                Task {
+                    await Rownd.authenticator.setAuthState(authState)
+                }
+            }
+            .store(in: &inst.stateListeners)
+    }
+}
+
 actor Authenticator {
     private var currentAuthState: AuthState? = store.state.auth
     private var refreshTask: Task<AuthState, Error>?
-
-    private var stateListeners = Set<AnyCancellable>()
-    @Published private var authState = store.subscribe { $0.auth }
-
-    init() {
-        Task {
-            await subscribeToAuthState()
-        }
-    }
-
-    private func subscribeToAuthState() {
-        authState
-            .$current
-            .sink { authState in
-                self.currentAuthState = authState
-            }
-            .store(in: &stateListeners)
-    }
 
     func setAuthState(_ newAuthState: AuthState) {
         currentAuthState = newAuthState
@@ -105,5 +110,3 @@ actor Authenticator {
         return try await task.value
     }
 }
-
-let authenticator = Authenticator()

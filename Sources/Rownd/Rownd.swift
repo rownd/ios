@@ -22,8 +22,13 @@ public class Rownd: NSObject {
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
     internal static var apiClient = RowndApi().client
+    internal static var authenticator = Authenticator()
+//    private static let authenticatorSubscription = AuthenticatorSubscription()
     
-    private override init() {}
+    private override init() {
+        super.init()
+        AuthenticatorSubscription.subscribeToAuthState()
+    }
     
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
         if let _appKey = appKey {

@@ -76,7 +76,9 @@ extension BottomSheetController {
     @objc func keyboardWillShow(notification: NSNotification) {
         // Get required info out of the notification
         if let sheetController = sheetController {
-            sheetController.grow(toMaximumHeight: true)
+            DispatchQueue.main.async {
+                sheetController.grow(toMaximumHeight: true)
+            }
         }
     }
 }
