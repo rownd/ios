@@ -49,6 +49,7 @@ open class RowndCustomizations: Encodable {
         case sheetCornerBorderRadius
         case defaultFontSize
         case fontFamily
+        case customStylesFlag
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -57,6 +58,7 @@ open class RowndCustomizations: Encodable {
         try container.encode(defaultFontSize, forKey: .defaultFontSize)
         try container.encode(uiColorToRgbaString(color: sheetBackgroundColor), forKey: .sheetBackgroundColor)
         try container.encode(store.state.appConfig.config?.hub?.customizations?.fontFamily, forKey: .fontFamily)
+        try container.encode(store.state.appConfig.config?.hub?.customStyles?[0].content.count ?? 0 > 0, forKey: .customStylesFlag)
     }
 }
 

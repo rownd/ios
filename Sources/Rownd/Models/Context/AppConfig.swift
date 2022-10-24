@@ -63,11 +63,13 @@ public enum AppSchemaEncryptionState: String, Codable {
 public struct AppHubConfigState: Hashable {
     public var auth: AppHubAuthConfigState?
     public var customizations: AppHubCustomizationsConfigState?
+    public var customStyles: [AppHubCustomStylesConfigState]?
 }
 
 extension AppHubConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case auth, customizations
+        case customStyles = "custom_styles"
     }
 }
 
@@ -81,6 +83,7 @@ extension AppHubAuthConfigState: Codable {
     }
 }
 
+
 public struct AppHubCustomizationsConfigState: Hashable {
     public var fontFamily: String?
 }
@@ -88,6 +91,16 @@ public struct AppHubCustomizationsConfigState: Hashable {
 extension AppHubCustomizationsConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case fontFamily = "font_family"
+    }
+}
+
+public struct AppHubCustomStylesConfigState: Hashable {
+    public var content: String
+}
+
+extension AppHubCustomStylesConfigState: Codable {
+    enum CodingKeys: String, CodingKey {
+        case content
     }
 }
 
