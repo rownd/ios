@@ -28,6 +28,7 @@ extension NetworkRequest {
         let task = URLSession.shared.dataTask(with: request) { [weak self] (data, resp, error) -> Void in
             guard error == nil else {
                 logger.error("Network request failed: \(String(describing: error))")
+                DispatchQueue.main.async { completion(nil) }
                 return
             }
             

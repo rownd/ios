@@ -24,9 +24,11 @@ extension RowndState {
     }
 
     static func save(state: RowndState) {
-        if let encoded = try? state.toJson() {
-//            logger.trace("storing: \(encoded)")
-            Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
+        Task {
+            if let encoded = try? state.toJson() {
+                //            logger.trace("storing: \(encoded)")
+                Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
+            }
         }
     }
     

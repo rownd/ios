@@ -213,9 +213,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             case .userDataUpdate:
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
+                guard hubViewController?.targetPage == .manageAccount else { return }
                 DispatchQueue.main.async {
                     store.dispatch(SetUserData(payload: userDataMessage.data))
-                    store.dispatch(UserData.fetch())
+//                    store.dispatch(UserData.fetch())
                 }
                 
             case .triggerSignInWithApple:

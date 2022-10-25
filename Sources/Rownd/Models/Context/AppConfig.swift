@@ -152,7 +152,7 @@ class AppConfig {
             guard !state.appConfig.isLoading else { return }
             dispatch(SetAppLoading(isLoading: true))
 
-            Task.init {
+            Task {
                 let appConfig = await AppConfig.fetch()
 
                 DispatchQueue.main.async {

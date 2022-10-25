@@ -33,7 +33,7 @@ class AuthTests: XCTestCase {
 
         let expectation = self.expectation(description: "Refreshing token")
         Task {
-            let authState = try! await authenticator.refreshToken()
+            let authState = try! await Rownd.authenticator.refreshToken()
 
             XCTAssertNotNil(authState, "Returned resource should not be nil")
             XCTAssertNotNil(authState.accessToken, "Access token should be present")
