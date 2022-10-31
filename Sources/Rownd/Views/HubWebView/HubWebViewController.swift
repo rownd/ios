@@ -119,11 +119,14 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
     private func evaluateJavaScript(code: String, webView: WKWebView) {
+        let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
         let wrappedJs = """
             if (typeof rownd !== 'undefined') {
+                rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
                 \(code)
             } else {
                 _rphConfig.push(['onLoaded', () => {
+                    rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
                     \(code)
                 }]);
             }
@@ -145,13 +148,18 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         //This function is called whenever the Webview attempts to navigate to a different url
-            if navigationAction.targetFrame == nil {
-                let url = navigationAction.request.url
-                if UIApplication.shared.canOpenURL(url!) {
+        if navigationAction.targetFrame == nil {
+            let url = navigationAction.request.url
+            if UIApplication.shared.canOpenURL(url!) {
+                if (url?.absoluteString == "mailto:") {
+                    //Opens inbox to default email
+                    UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
+                } else {
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                 }
             }
-            return nil
+        }
+        return nil
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
