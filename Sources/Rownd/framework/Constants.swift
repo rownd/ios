@@ -21,6 +21,27 @@ func getFrameworkVersion() -> String {
     return bundleVersion
 }
 
+struct FrameworkFeature: Codable {
+    var name: String
+    var enabled: String
+}
+
+func getFrameowrkFeatures() -> String {
+    var frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
+    
+    let encoder = JSONEncoder()
+    encoder.dataEncodingStrategy = .base64
+    
+    do {
+        let encodedData = try encoder.encode(frameworkFeatures)
+        return String(data: encodedData, encoding: .utf8) ?? "{}"
+    } catch {
+        print("ROWND: Couldn't encode Framework Features")
+        return "[]"
+    }
+}
+
+
 
 let DEFAULT_API_USER_AGENT = "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
 
