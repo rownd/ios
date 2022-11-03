@@ -27,7 +27,7 @@ struct FrameworkFeature: Codable {
 }
 
 func getFrameowrkFeatures() -> String {
-    var frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
+    let frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
     
     let encoder = JSONEncoder()
     encoder.dataEncodingStrategy = .base64
@@ -36,7 +36,7 @@ func getFrameowrkFeatures() -> String {
         let encodedData = try encoder.encode(frameworkFeatures)
         return String(data: encodedData, encoding: .utf8) ?? "{}"
     } catch {
-        print("ROWND: Couldn't encode Framework Features")
+        logger.warning("Failed to encode framework features: \(String(describing: error)))")
         return "[]"
     }
 }
