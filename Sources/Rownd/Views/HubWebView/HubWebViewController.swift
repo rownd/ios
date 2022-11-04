@@ -120,14 +120,20 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
     private func evaluateJavaScript(code: String, webView: WKWebView) {
         let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
+        
+        let rowndJS = """
+            if (rownd?.setSessionStorage) {
+                rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
+            }
+            \(code)
+        """
+        
         let wrappedJs = """
             if (typeof rownd !== 'undefined') {
-                rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
-                \(code)
+                \(rowndJS)
             } else {
                 _rphConfig.push(['onLoaded', () => {
-                    rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
-                    \(code)
+                    \(rowndJS)
                 }]);
             }
         """
