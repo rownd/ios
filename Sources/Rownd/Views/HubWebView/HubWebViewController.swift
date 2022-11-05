@@ -119,14 +119,12 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
     private func evaluateJavaScript(code: String, webView: WKWebView) {
-        let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
+        
         let wrappedJs = """
             if (typeof rownd !== 'undefined') {
-                rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
                 \(code)
             } else {
                 _rphConfig.push(['onLoaded', () => {
-                    rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
                     \(code)
                 }]);
             }
@@ -172,6 +170,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         
         hubViewController?.setLoading(false)
         
+        setFeatureFlagsJS()
+
         switch (hubViewController?.targetPage) {
         case .signOut:
             evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
@@ -185,6 +185,16 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         case .none:
             return
         }
+    }
+    
+    private func setFeatureFlagsJS() {
+        let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
+        let code = """
+            if (rownd?.setSessionStorage) {
+                rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
+            }
+        """
+        evaluateJavaScript(code: code, webView: webView)
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
