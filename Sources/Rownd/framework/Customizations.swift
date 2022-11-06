@@ -23,9 +23,13 @@ open class RowndCustomizations: Encodable {
         }
     }
 
-    open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
+    open var sheetCornerBorderRadius: CGFloat {
+        return CGFloat(25.0)
+    }
 
-    open var loadingAnimation: Lottie.Animation? = nil
+    open var loadingAnimation: Lottie.Animation? {
+        return nil
+    }
 
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
