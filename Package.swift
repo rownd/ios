@@ -109,7 +109,7 @@ let package = Package(
                 "Factory"
             ],
             resources: [
-                .process("Resources/")
+                .process("Resources")
             ]
         ),
         .testTarget(

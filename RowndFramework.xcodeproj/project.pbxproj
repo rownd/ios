@@ -35,10 +35,10 @@
 		B349906628CFCED9004ADF3F /* Customizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B349906528CFCED9004ADF3F /* Customizations.swift */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
 		B36AA90B291D7273002B3B60 /* Mocker in Frameworks */ = {isa = PBXBuildFile; productRef = B36AA90A291D7273002B3B60 /* Mocker */; };
-		B36AA90E291D7296002B3B60 /* Shock in Frameworks */ = {isa = PBXBuildFile; productRef = B36AA90D291D7296002B3B60 /* Shock */; };
 		B36AA911291D9C52002B3B60 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA910291D9C52002B3B60 /* Helpers.swift */; };
 		B36AA914291DF829002B3B60 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = B36AA913291DF829002B3B60 /* Factory */; };
 		B36AA917291DF8F7002B3B60 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA915291DF8F1002B3B60 /* Container.swift */; };
+		B36AA91C291EFB2F002B3B60 /* NoInternet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA91B291EFB2F002B3B60 /* NoInternet.swift */; };
 		B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430C28B4077F0038CF16 /* MagicLink.swift */; };
 		B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -118,6 +118,7 @@
 		B36AA90F291D753C002B3B60 /* RowndFrameworkTestApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RowndFrameworkTestApp.entitlements; sourceTree = "<group>"; };
 		B36AA910291D9C52002B3B60 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		B36AA915291DF8F1002B3B60 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		B36AA91B291EFB2F002B3B60 /* NoInternet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoInternet.swift; sourceTree = "<group>"; };
 		B36D430C28B4077F0038CF16 /* MagicLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicLink.swift; sourceTree = "<group>"; };
 		B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferProgress.swift; sourceTree = "<group>"; };
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -177,7 +178,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B36AA90E291D7296002B3B60 /* Shock in Frameworks */,
 				B38A40AB2882020900FD0813 /* Rownd.framework in Frameworks */,
 				B36AA90B291D7273002B3B60 /* Mocker in Frameworks */,
 			);
@@ -262,6 +262,14 @@
 			path = Rownd;
 			sourceTree = "<group>";
 		};
+		B36AA91A291EFB2F002B3B60 /* Html */ = {
+			isa = PBXGroup;
+			children = (
+				B36AA91B291EFB2F002B3B60 /* NoInternet.swift */,
+			);
+			path = Html;
+			sourceTree = "<group>";
+		};
 		B374E54E28545A1C00955719 = {
 			isa = PBXGroup;
 			children = (
@@ -311,6 +319,7 @@
 		B374E56228545A2900955719 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B36AA91A291EFB2F002B3B60 /* Html */,
 				B3F01B0128A8A53000EE764B /* KeyTransfer */,
 				B38A4095287FC0DC00FD0813 /* HubWebView */,
 				B35E1ED02874C9C9007E989F /* HubViewController.swift */,
@@ -456,7 +465,6 @@
 			name = RowndTests;
 			packageProductDependencies = (
 				B36AA90A291D7273002B3B60 /* Mocker */,
-				B36AA90D291D7296002B3B60 /* Shock */,
 			);
 			productName = RowndTests;
 			productReference = B38A40A72882020800FD0813 /* RowndTests.xctest */;
@@ -486,6 +494,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1340;
 				TargetAttributes = {
@@ -525,7 +536,6 @@
 				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */,
 				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */,
-				B36AA90C291D7296002B3B60 /* XCRemoteSwiftPackageReference "Shock" */,
 				B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
@@ -593,6 +603,7 @@
 				B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */,
 				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
+				B36AA91C291EFB2F002B3B60 /* NoInternet.swift in Sources */,
 				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
 				B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */,
 				B302E2C928650C1D005FD927 /* APIClient.swift in Sources */,
@@ -1026,14 +1037,6 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		B36AA90C291D7296002B3B60 /* XCRemoteSwiftPackageReference "Shock" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/justeat/Shock";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
-			};
-		};
 		B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hmlongco/Factory";
@@ -1135,11 +1138,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */;
 			productName = Mocker;
-		};
-		B36AA90D291D7296002B3B60 /* Shock */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B36AA90C291D7296002B3B60 /* XCRemoteSwiftPackageReference "Shock" */;
-			productName = Shock;
 		};
 		B36AA913291DF829002B3B60 /* Factory */ = {
 			isa = XCSwiftPackageProductDependency;

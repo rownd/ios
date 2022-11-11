@@ -151,10 +151,7 @@ actor Authenticator {
                 }
 
                 // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
-                DispatchQueue.main.async {
-                    store.dispatch(SetAuthState(payload: AuthState()))
-                    store.dispatch(SetUserData(payload: [:]))
-                }
+                Rownd.signOut()
 
                 throw AuthenticationError.refreshTokenAlreadyConsumed
             }

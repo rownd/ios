@@ -39,14 +39,6 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
-
-        if ((try? await Rownd.getAccessToken() != nil) != nil) {
-            DispatchQueue.main.async {
-                store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
-                store.dispatch(UserData.fetch())
-            }
-        }
-
         if !store.state.auth.isAuthenticated {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
@@ -177,11 +169,9 @@ public class Rownd: NSObject {
     }
     
     public static func signOut() {
-        let _ = inst.displayHub(.signOut)
-
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState()))
-            store.dispatch(SetUserState(payload: UserState()))
+            store.dispatch(SetUserData(payload: [:]))
         }
     }
 
