@@ -1,5 +1,13 @@
 
 
+# [2.0.0](https://github.com/rownd/ios/compare/1.13.0...2.0.0) (2022-11-11)
+
+
+### Features
+
+* **auth:** prevent sign-outs during poor network conditions ([#28](https://github.com/rownd/ios/issues/28)) ([a605b84](https://github.com/rownd/ios/commit/a605b844c79e651fb46317df6e001b3f2cc709b1))
+* **email:** enable button to open email from app ([#25](https://github.com/rownd/ios/issues/25)) ([1d3c963](https://github.com/rownd/ios/commit/1d3c9635a64d3f3fc7071a4433b3f22138b1271b))
+
 # [1.13.0](https://github.com/rownd/ios/compare/1.12.4...1.13.0) (2022-11-02)
 
 ## [1.12.4](https://github.com/rownd/ios/compare/1.12.3...1.12.4) (2022-10-25)
