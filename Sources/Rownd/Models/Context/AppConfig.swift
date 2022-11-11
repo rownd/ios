@@ -28,11 +28,12 @@ extension AppConfigState: Codable {
 
 public struct AppConfigConfig: Hashable {
     public var hub: AppHubConfigState?
+    public var customizations: AppCustomizationsConfigState?
 }
 
 extension AppConfigConfig: Codable {
     enum CodingKeys: String, CodingKey {
-        case hub
+        case hub, customizations
     }
 }
 
@@ -83,14 +84,25 @@ extension AppHubAuthConfigState: Codable {
     }
 }
 
+public struct AppCustomizationsConfigState: Hashable {
+    public var primaryColor: String?
+}
+
+extension AppCustomizationsConfigState: Codable {
+    enum CodingKeys: String, CodingKey {
+        case primaryColor = "primary_color"
+    }
+}
 
 public struct AppHubCustomizationsConfigState: Hashable {
     public var fontFamily: String?
+    public var darkMode: String?
 }
 
 extension AppHubCustomizationsConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case fontFamily = "font_family"
+        case darkMode = "dark_mode"
     }
 }
 

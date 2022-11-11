@@ -70,7 +70,8 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         // Skip loading if already begun
         if webView.isLoading { return }
 
-        let hubRequest = URLRequest(url: url)
+        var hubRequest = URLRequest(url: url)
+        hubRequest.timeoutInterval = 10
         webView.load(hubRequest)
     }
     
@@ -187,6 +188,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         }
     }
     
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
+    }
+
     private func setFeatureFlagsJS() {
         let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
         let code = """
@@ -195,10 +200,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         """
         evaluateJavaScript(code: code, webView: webView)
-    }
-    
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        hubViewController?.setLoading(false)
     }
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -255,6 +256,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     store.dispatch(SetAuthState(payload: AuthState()))
                     store.dispatch(SetUserData(payload: [:]))
                 }
+            case .tryAgain:
+                startLoading()
             case .unknown:
                 break
             }
