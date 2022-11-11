@@ -32,8 +32,24 @@ fileprivate class TokenApiClientDelegate : APIClientDelegate {
 
     // Handle refresh token non-400 response codes
     func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
-        if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode != 400, attempts <= 5 {
+        if
+            case .unacceptableStatusCode(let statusCode) = error as? APIError,
+            statusCode != 400,
+            attempts <= 5 {
             return true
+        }
+
+        switch (error as? URLError)?.code {
+        case
+            .some(.timedOut),
+            .some(.cannotFindHost),
+            .some(.cannotConnectToHost),
+            .some(.networkConnectionLost),
+            .some(.dnsLookupFailed):
+            if attempts <= 5 {
+                return true
+            }
+        default: break
         }
 
         return false
@@ -124,8 +140,8 @@ actor Authenticator {
 
                 switch (error as? URLError)?.code {
                 case
-                    .some(.timedOut),
                     .some(.notConnectedToInternet),
+                    .some(.timedOut),
                     .some(.cannotFindHost),
                     .some(.cannotConnectToHost),
                     .some(.networkConnectionLost),
