@@ -38,8 +38,9 @@ public class Rownd: NSObject {
         inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
-        
-        if await Rownd.getAccessToken() != nil {
+
+
+        if ((try? await Rownd.getAccessToken() != nil) != nil) {
             DispatchQueue.main.async {
                 store.dispatch(SetUserLoading(isLoading: false)) // Make sure user is not in loading state during initial bootstrap
                 store.dispatch(UserData.fetch())
@@ -194,8 +195,8 @@ public class Rownd: NSObject {
         let _ = inst.displayHub(.manageAccount)
     }
     
-    @discardableResult public static func getAccessToken() async -> String? {
-        return await store.state.auth.getAccessToken()
+    @discardableResult public static func getAccessToken() async throws -> String? {
+        return try await store.state.auth.getAccessToken()
     }
     
     public func state() -> Store<RowndState> {
@@ -208,7 +209,7 @@ public class Rownd: NSObject {
     public static func _refreshToken() {
         Task {
             do {
-                var refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await authenticator.refreshToken()
                 print("refresh 1: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 1: \(String(describing: error))")
@@ -217,7 +218,7 @@ public class Rownd: NSObject {
 
         Task {
             do {
-                var refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await authenticator.refreshToken()
                 print("refresh 2: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 2: \(String(describing: error))")
@@ -226,7 +227,7 @@ public class Rownd: NSObject {
 
         Task {
             do {
-                var refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await authenticator.refreshToken()
                 print("refresh 3: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 3: \(String(describing: error))")

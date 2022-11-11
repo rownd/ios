@@ -58,7 +58,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
 
-        var hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
+        let hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
 
         view = UIView()
         view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
@@ -68,7 +68,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         if store.state.auth.isAuthenticated {
             Task { [hubLoaderUrl] in
                 var hubLoaderUrl = hubLoaderUrl // Capture local copy of var to prevent compiler mutation issues
-                await Rownd.getAccessToken()
+                let _ = try? await Rownd.getAccessToken()
                 let rphInit = store.state.auth.toRphInitHash()
                 if let rphInit = rphInit {
                     hubLoaderUrl?.fragment = "rph_init=\(rphInit)"

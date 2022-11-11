@@ -34,11 +34,15 @@ class RowndApiClientDelegate : APIClientDelegate {
         request.setValue(DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
         request.setValue(Rownd.config.appKey, forHTTPHeaderField: "X-Rownd-App-Key")
 
-        if store.state.auth.isAuthenticated, let accessToken = await Rownd.getAccessToken() {
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        do {
+            if store.state.auth.isAuthenticated, let accessToken = try await Rownd.getAccessToken() {
+                request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        } catch {
+            // no-op
         }
 
-        var localRequest = request
+        let localRequest = request
         logger.debug("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
     }
 }
