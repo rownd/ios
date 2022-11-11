@@ -188,6 +188,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         }
     }
     
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
+    }
+
     private func setFeatureFlagsJS() {
         let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
         let code = """
@@ -196,10 +200,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         """
         evaluateJavaScript(code: code, webView: webView)
-    }
-    
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
     }
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
