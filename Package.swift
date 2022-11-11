@@ -78,6 +78,16 @@ let package = Package(
             name: "Lottie",
             url: "https://github.com/airbnb/lottie-ios",
             .upToNextMajor(from: "3.4.3")
+        ),
+        .package(
+            name: "Factory",
+            url: "https://github.com/hmlongco/Factory",
+            .upToNextMajor(from: "1.2.8")
+        ),
+        .package(
+            name: "Mocker",
+            url: "https://github.com/WeTransfer/Mocker",
+            .upToNextMajor(from: "3.0.1")
         )
     ],
     
@@ -95,10 +105,17 @@ let package = Package(
                 "CodeScanner_Rownd",
                 "Get",
                 "GoogleSignIn",
-                "Lottie"
+                "Lottie",
+                "Factory"
             ],
             resources: [
-                .process("Resources/")
+                .process("Resources")
+            ]
+        ),
+        .testTarget(
+            name: "RowndTests",
+            dependencies: [
+                "Mocker"
             ]
         )
     ],

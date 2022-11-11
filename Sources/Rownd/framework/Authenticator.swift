@@ -8,10 +8,52 @@
 import Foundation
 import Combine
 import Get
+import Factory
 
 enum AuthenticationError: Error {
     case noAccessTokenPresent
-    case refreshTokenFailed
+    case refreshTokenAlreadyConsumed
+    case networkConnectionFailure
+}
+
+internal let tokenApiConfig = APIClient.Configuration(
+    baseURL: URL(string: Rownd.config.apiUrl),
+    delegate: TokenApiClientDelegate()
+)
+
+internal func tokenApiFactory() -> APIClient {
+    return Get.APIClient(configuration: tokenApiConfig)
+}
+
+fileprivate class TokenApiClientDelegate : APIClientDelegate {
+    func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
+        request.setValue(DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
+    }
+
+    // Handle refresh token non-400 response codes
+    func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+        if
+            case .unacceptableStatusCode(let statusCode) = error as? APIError,
+            statusCode != 400,
+            attempts <= 5 {
+            return true
+        }
+
+        switch (error as? URLError)?.code {
+        case
+            .some(.timedOut),
+            .some(.cannotFindHost),
+            .some(.cannotConnectToHost),
+            .some(.networkConnectionLost),
+            .some(.dnsLookupFailed):
+            if attempts <= 5 {
+                return true
+            }
+        default: break
+        }
+
+        return false
+    }
 }
 
 // This class exists for the sole purpose of subscribing the Authenticator to the
@@ -38,6 +80,7 @@ class AuthenticatorSubscription: NSObject {
 }
 
 actor Authenticator {
+    private let tokenApi = Container.tokenApi()
     private var currentAuthState: AuthState? = store.state.auth
     private var refreshTask: Task<AuthState, Error>?
 
@@ -70,7 +113,7 @@ actor Authenticator {
             defer { refreshTask = nil }
 
             do {
-                let newAuthState: AuthState = try await rowndApi.send(
+                let newAuthState: AuthState = try await tokenApi.send(
                     Request(
                         path: "/hub/auth/token",
                         method: .post,
@@ -95,13 +138,22 @@ actor Authenticator {
             } catch {
                 logger.error("Token refresh failed: \(String(describing: error))")
 
-                // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
-                DispatchQueue.main.async {
-                    store.dispatch(SetAuthState(payload: AuthState()))
-                    store.dispatch(SetUserData(payload: [:]))
+                switch (error as? URLError)?.code {
+                case
+                    .some(.notConnectedToInternet),
+                    .some(.timedOut),
+                    .some(.cannotFindHost),
+                    .some(.cannotConnectToHost),
+                    .some(.networkConnectionLost),
+                    .some(.dnsLookupFailed):
+                        throw AuthenticationError.networkConnectionFailure
+                default: break
                 }
 
-                throw AuthenticationError.refreshTokenFailed
+                // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
+                Rownd.signOut()
+
+                throw AuthenticationError.refreshTokenAlreadyConsumed
             }
         }
 
