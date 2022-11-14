@@ -62,40 +62,16 @@ fileprivate class TokenApiClientDelegate : APIClientDelegate {
 // which leads to memmory corruption and weird app crashes.
 class AuthenticatorSubscription: NSObject {
     private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
-    private var stateListeners = Set<AnyCancellable>()
-
-    @Published private var authState: ObservableState<AuthState> = store.subscribe { $0.auth }
 
     private override init() {}
 
-    internal static func subscribeToAuthState() {
-//        inst.authState
-//            .$current
-//            .sink { authState in
-//                Task {
-//                    await Rownd.authenticator.setAuthState(authState)
-//                }
-//            }
-//            .store(in: &inst.stateListeners)
-    }
-
+    /// This checks the incoming action to determine whether it contains an AuthState payload and pushes that
+    /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
+    /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
     internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
         return { dispatch, getState in
             return { next in
                 return { action in
-//                    let prevState = getState() as? RowndState
-//                    next(action)
-//                    let nextState = getState() as? RowndState
-//
-//                    guard let prevState = prevState, let nextState = nextState else { return }
-//
-//                    if prevState.auth != nextState.auth {
-//                        Task {
-//                            logger.debug("Updating authenticator state...")
-//                            await Rownd.authenticator.setAuthState(nextState.auth)
-//                            logger.debug("Updating authenticator state...DONE")
-//                        }
-//                    }
                     var authState: AuthState?
 
                     switch(action) {
@@ -117,17 +93,6 @@ class AuthenticatorSubscription: NSObject {
                         logger.debug("Updating authenticator state...DONE")
                         next(action)
                     }
-
-
-
-//                    Task {
-//                        next(action)
-//                        guard let currState = getState() as? RowndState else { return }
-//                        logger.debug("Updating authenticator state...")
-//                        await Rownd.authenticator.setAuthState(currState.auth)
-//                        logger.debug("Updating authenticator state...DONE")
-//
-//                    }
                 }
             }
         }
