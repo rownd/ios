@@ -83,18 +83,51 @@ class AuthenticatorSubscription: NSObject {
         return { dispatch, getState in
             return { next in
                 return { action in
+                    let prevState = getState() as? RowndState
+                    next(action)
+                    let nextState = getState() as? RowndState
+
+                    guard let prevState = prevState, let nextState = nextState else { return }
+
+                    if prevState.auth != nextState.auth {
+                        Task {
+                            logger.debug("Updating authenticator state...")
+                            await Rownd.authenticator.setAuthState(nextState.auth)
+                            logger.debug("Updating authenticator state...DONE")
+                        }
+                    }
+//                    var authState: AuthState?
+//
 //                    switch(action) {
-//                    case let action as? SetAuthState:
+//                    case let action as SetAuthState:
+//                        authState = action.payload
+//                    case let action as InitializeRowndState:
+//                        authState = action.payload.auth
+//                    default:
+//                        break
+//                    }
+//
+//                    guard let authState = authState else {
+//                        return next(action)
+//                    }
+//
+//                    Task {
+//                        logger.debug("Updating authenticator state...")
+//                        await Rownd.authenticator.setAuthState(authState)
+//                        logger.debug("Updating authenticator state...DONE")
+//                        next(action)
+//                    }
+
+
+
+//                    Task {
+//                        next(action)
+//                        guard let currState = getState() as? RowndState else { return }
+//                        logger.debug("Updating authenticator state...")
+//                        await Rownd.authenticator.setAuthState(currState.auth)
+//                        logger.debug("Updating authenticator state...DONE")
 //
 //                    }
-                    Task {
-                        next(action)
-                        guard let currState = getState() as? RowndState else { return }
-                        logger.debug("Updating authenticator state...")
-                        await Rownd.authenticator.setAuthState(currState.auth)
-                        logger.debug("Updating authenticator state...DONE")
-
-                    }
                 }
             }
         }
