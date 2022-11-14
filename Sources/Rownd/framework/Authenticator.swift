@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import Get
 import Factory
+import ReSwift
 
 enum AuthenticationError: Error {
     case noAccessTokenPresent
@@ -68,14 +69,30 @@ class AuthenticatorSubscription: NSObject {
     private override init() {}
 
     internal static func subscribeToAuthState() {
-        inst.authState
-            .$current
-            .sink { authState in
-                Task {
-                    await Rownd.authenticator.setAuthState(authState)
+//        inst.authState
+//            .$current
+//            .sink { authState in
+//                Task {
+//                    await Rownd.authenticator.setAuthState(authState)
+//                }
+//            }
+//            .store(in: &inst.stateListeners)
+    }
+
+    internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
+        return { dispatch, getState in
+            return { next in
+                return { action in
+                    guard let currState = getState() as? RowndState else { return }
+                    Task {
+                        logger.debug("Updating authenticator state...")
+                        await Rownd.authenticator.setAuthState(currState.auth)
+                        logger.debug("Updating authenticator state...DONE")
+                        next(action)
+                    }
                 }
             }
-            .store(in: &inst.stateListeners)
+        }
     }
 }
 
