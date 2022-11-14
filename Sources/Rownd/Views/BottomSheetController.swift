@@ -35,7 +35,7 @@ class BottomSheetController: UIViewController {
         if let controller = controller as? BottomSheetControllerProtocol {
             behavior.heightMode = .specific(values: controller.detents, heightLimit: .statusBar)
         } else {
-            behavior.heightMode = .specific(values: [.screenRatio(value: 0.5), .screenRatio(value: 0.9)], heightLimit: .statusBar)
+            behavior.heightMode = .specific(values: [.screenRatio(value: 0.7), .screenRatio(value: 1)], heightLimit: .statusBar)
         }
 
         
