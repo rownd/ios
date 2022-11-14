@@ -83,12 +83,17 @@ class AuthenticatorSubscription: NSObject {
         return { dispatch, getState in
             return { next in
                 return { action in
-                    guard let currState = getState() as? RowndState else { return }
+//                    switch(action) {
+//                    case let action as? SetAuthState:
+//
+//                    }
                     Task {
+                        next(action)
+                        guard let currState = getState() as? RowndState else { return }
                         logger.debug("Updating authenticator state...")
                         await Rownd.authenticator.setAuthState(currState.auth)
                         logger.debug("Updating authenticator state...DONE")
-                        next(action)
+
                     }
                 }
             }
