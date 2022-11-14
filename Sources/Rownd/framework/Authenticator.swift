@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import Combine
 import Get
 import Factory
+import ReSwift
 
 enum AuthenticationError: Error {
     case noAccessTokenPresent
@@ -61,21 +61,38 @@ fileprivate class TokenApiClientDelegate : APIClientDelegate {
 // which leads to memmory corruption and weird app crashes.
 class AuthenticatorSubscription: NSObject {
     private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
-    private var stateListeners = Set<AnyCancellable>()
-
-    @Published private var authState: ObservableState<AuthState> = store.subscribe { $0.auth }
 
     private override init() {}
 
-    internal static func subscribeToAuthState() {
-        inst.authState
-            .$current
-            .sink { authState in
-                Task {
-                    await Rownd.authenticator.setAuthState(authState)
+    /// This checks the incoming action to determine whether it contains an AuthState payload and pushes that
+    /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
+    /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
+    internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
+        return { dispatch, getState in
+            return { next in
+                return { action in
+                    var authState: AuthState?
+
+                    switch(action) {
+                    case let action as SetAuthState:
+                        authState = action.payload
+                    case let action as InitializeRowndState:
+                        authState = action.payload.auth
+                    default:
+                        break
+                    }
+
+                    guard let authState = authState else {
+                        return next(action)
+                    }
+
+                    Task {
+                        await Rownd.authenticator.setAuthState(authState)
+                        next(action)
+                    }
                 }
             }
-            .store(in: &inst.stateListeners)
+        }
     }
 }
 

@@ -77,19 +77,23 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
             auth: authReducer(action: action, state: state?.auth),
             user: userReducer(action: action, state: state?.user)
         )
-        
+
         RowndState.save(state: newState)
     }
-    
+
     return newState
 }
 
 let thunkMiddleware: Middleware<RowndState> = createThunkMiddleware()
+let authenticatorMiddleware: Middleware<RowndState> = AuthenticatorSubscription.createAuthenticatorMiddleware()
 
 let store = Store(
     reducer: rowndStateReducer,
     state: RowndState(),
-    middleware: [thunkMiddleware]
+    middleware: [
+        thunkMiddleware,
+        authenticatorMiddleware
+    ]
 )
 
 struct StateError: Error, CustomStringConvertible {
