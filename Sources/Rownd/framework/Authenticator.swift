@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 import Get
 import Factory
 import ReSwift
@@ -88,9 +87,7 @@ class AuthenticatorSubscription: NSObject {
                     }
 
                     Task {
-                        logger.debug("Updating authenticator state...")
                         await Rownd.authenticator.setAuthState(authState)
-                        logger.debug("Updating authenticator state...DONE")
                         next(action)
                     }
                 }
