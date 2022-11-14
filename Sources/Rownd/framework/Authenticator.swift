@@ -83,40 +83,40 @@ class AuthenticatorSubscription: NSObject {
         return { dispatch, getState in
             return { next in
                 return { action in
-                    let prevState = getState() as? RowndState
-                    next(action)
-                    let nextState = getState() as? RowndState
+//                    let prevState = getState() as? RowndState
+//                    next(action)
+//                    let nextState = getState() as? RowndState
+//
+//                    guard let prevState = prevState, let nextState = nextState else { return }
+//
+//                    if prevState.auth != nextState.auth {
+//                        Task {
+//                            logger.debug("Updating authenticator state...")
+//                            await Rownd.authenticator.setAuthState(nextState.auth)
+//                            logger.debug("Updating authenticator state...DONE")
+//                        }
+//                    }
+                    var authState: AuthState?
 
-                    guard let prevState = prevState, let nextState = nextState else { return }
-
-                    if prevState.auth != nextState.auth {
-                        Task {
-                            logger.debug("Updating authenticator state...")
-                            await Rownd.authenticator.setAuthState(nextState.auth)
-                            logger.debug("Updating authenticator state...DONE")
-                        }
+                    switch(action) {
+                    case let action as SetAuthState:
+                        authState = action.payload
+                    case let action as InitializeRowndState:
+                        authState = action.payload.auth
+                    default:
+                        break
                     }
-//                    var authState: AuthState?
-//
-//                    switch(action) {
-//                    case let action as SetAuthState:
-//                        authState = action.payload
-//                    case let action as InitializeRowndState:
-//                        authState = action.payload.auth
-//                    default:
-//                        break
-//                    }
-//
-//                    guard let authState = authState else {
-//                        return next(action)
-//                    }
-//
-//                    Task {
-//                        logger.debug("Updating authenticator state...")
-//                        await Rownd.authenticator.setAuthState(authState)
-//                        logger.debug("Updating authenticator state...DONE")
-//                        next(action)
-//                    }
+
+                    guard let authState = authState else {
+                        return next(action)
+                    }
+
+                    Task {
+                        logger.debug("Updating authenticator state...")
+                        await Rownd.authenticator.setAuthState(authState)
+                        logger.debug("Updating authenticator state...DONE")
+                        next(action)
+                    }
 
 
 
