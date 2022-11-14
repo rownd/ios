@@ -1,5 +1,12 @@
 
 
+## [2.0.1](https://github.com/rownd/ios/compare/2.0.0...2.0.1) (2022-11-14)
+
+
+### Bug Fixes
+
+* **refresh:** ensure authenticator always reflects current state ([#30](https://github.com/rownd/ios/issues/30)) ([e3a9856](https://github.com/rownd/ios/commit/e3a98564fea1a655be8bc554949a403cc46b7021))
+
 # [2.0.0](https://github.com/rownd/ios/compare/1.13.0...2.0.0) (2022-11-11)
 
 
