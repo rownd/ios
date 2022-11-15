@@ -88,7 +88,9 @@ class AuthenticatorSubscription: NSObject {
 
                     Task {
                         await Rownd.authenticator.setAuthState(authState)
-                        next(action)
+                        DispatchQueue.main.async {
+                            next(action)
+                        }
                     }
                 }
             }
