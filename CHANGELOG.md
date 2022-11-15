@@ -1,5 +1,17 @@
 
 
+## [2.0.2](https://github.com/rownd/ios/compare/2.0.1...2.0.2) (2022-11-15)
+
+
+### Bug Fixes
+
+* **state:** crash during auth state sync ([c02ded4](https://github.com/rownd/ios/commit/c02ded4d0713efc8ae2280ba29d988da09529cb8))
+
+
+### Features
+
+* **ui:** increase initial bottomsheet height ([adeadb9](https://github.com/rownd/ios/commit/adeadb936e07c21003597f183cdf4761ce01d7c4))
+
 ## [2.0.1](https://github.com/rownd/ios/compare/2.0.0...2.0.1) (2022-11-14)
 
 
