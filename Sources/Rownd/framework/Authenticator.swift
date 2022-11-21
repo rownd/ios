@@ -157,6 +157,12 @@ actor Authenticator {
             } catch {
                 logger.error("Token refresh failed: \(String(describing: error))")
 
+                if
+                    case .unacceptableStatusCode(let statusCode) = error as? APIError,
+                    statusCode != 400 {
+                    throw AuthenticationError.networkConnectionFailure
+                }
+
                 switch (error as? URLError)?.code {
                 case
                     .some(.notConnectedToInternet),

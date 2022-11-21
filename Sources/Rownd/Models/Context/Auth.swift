@@ -156,10 +156,6 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-//    static func fetchToken(refreshToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
-//        let tokenRequest = TokenRequest(refreshToken: refreshToken)
-//        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
-//    }
     
     static func fetchToken(idToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         guard let appId = store.state.appConfig.id else { return completion(nil) }
