@@ -1,5 +1,12 @@
 
 
+## [2.0.3](https://github.com/rownd/ios/compare/2.0.2...2.0.3) (2022-11-21)
+
+
+### Bug Fixes
+
+* **refresh:** prevent sign-outs on non-400 http statuses ([8af36fb](https://github.com/rownd/ios/commit/8af36fb04d62429632be1a9ee7f4c68744469193))
+
 ## [2.0.2](https://github.com/rownd/ios/compare/2.0.1...2.0.2) (2022-11-15)
 
 
