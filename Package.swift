@@ -115,7 +115,20 @@ let package = Package(
         .testTarget(
             name: "RowndTests",
             dependencies: [
-                "Mocker"
+                "Mocker",
+                "AnyCodable",
+                "ReSwift",
+                "ReSwiftThunk",
+                "JWTDecode",
+                "LBBottomSheet",
+                "SwiftKeychainWrapper",
+                "Sodium",
+                "CodeScanner_Rownd",
+                "Get",
+                "GoogleSignIn",
+                "Lottie",
+                "Factory",
+                "Rownd"
             ]
         )
     ],
