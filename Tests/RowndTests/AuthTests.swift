@@ -12,6 +12,7 @@ import Factory
 import Get
 import ReSwiftThunk
 import Combine
+import JWTDecode
 import XCTest
 
 @testable import Rownd
@@ -319,6 +320,34 @@ class AuthTests: XCTestCase {
         
         waitForExpectations(timeout: 10, handler: nil)
     }
+    func testAccessTokeValidWithMargin() throws {
+        let accessTokenNew = AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        )
+        
+        let accessToken65secs = AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 65).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        )
+
+        let accessTokenOld = AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        )
+
+        let accessToken55secs = AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 55).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        )
+    
+    
+        XCTAssertTrue(accessTokenNew.isAccessTokenValid)
+        XCTAssertTrue(accessToken65secs.isAccessTokenValid)
+
+        XCTAssertFalse(accessTokenOld.isAccessTokenValid)
+        XCTAssertFalse(accessToken55secs.isAccessTokenValid)
+    }
 }
 
 struct Header: Encodable {
@@ -342,7 +371,7 @@ fileprivate func generateJwt(expires: TimeInterval) -> String {
     
     var payload = Payload()
     payload.exp = Int(expires)
-    let payloadJSONData = try! JSONEncoder().encode(Payload())
+    let payloadJSONData = try! JSONEncoder().encode(payload)
     let payloadBase64String = payloadJSONData.urlSafeBase64EncodedString()
     
     let toSign = Data((headerBase64String + "." + payloadBase64String).utf8)
