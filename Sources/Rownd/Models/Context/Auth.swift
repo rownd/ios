@@ -33,8 +33,13 @@ extension AuthState: Codable {
 
         do {
             let jwt = try decode(jwt: accessToken)
+            
+            let currentDate = Date()
+            guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
+                return false
+            }
 
-            return !jwt.expired
+            return !jwt.expired && (currentDateWithMargin < expiresAt)
         } catch {
             return false
         }
