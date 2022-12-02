@@ -27,6 +27,7 @@
 
 import Foundation
 import AnyCodable
+import UIKit
 
 struct RowndHubInteropMessage: Decodable {
     var type: MessageType
@@ -46,6 +47,7 @@ enum MessageType: String, Codable {
     case closeHubViewController = "close_hub_view_controller"
     case triggerSignInWithApple = "trigger_sign_in_with_apple"
     case triggerSignInWithGoogle = "trigger_sign_in_with_google"
+    case connectSignInWithPasskey = "connect_sign_in_with_passkey"
     case userDataUpdate = "user_data_update"
     case tryAgain = "try_again"
     case unknown
@@ -73,6 +75,7 @@ enum MessagePayload: Decodable {
     case unknown
     case triggerSignInWithApple
     case triggerSignInWithGoogle
+    case connectSignInWithPasskey
     case tryAgain
     
     enum CodingKeys: String, CodingKey {
@@ -95,6 +98,9 @@ enum MessagePayload: Decodable {
         
         case .triggerSignInWithGoogle:
             self = .triggerSignInWithGoogle
+        
+        case .connectSignInWithPasskey:
+            self = .connectSignInWithPasskey
             
         case .authentication:
             let payload = try objectContainer.decode(AuthenticationMessage.self)

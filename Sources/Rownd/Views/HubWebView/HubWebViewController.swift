@@ -15,6 +15,7 @@ let logger = Logger(subsystem: "io.rownd.sdk", category: "HubView")
 
 public enum HubPageSelector {
     case signIn
+    case connectPasskey
     case signOut
     case qrCode
     case manageAccount
@@ -118,6 +119,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 }
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
+    private static var passkeyCoordinator: PasskeyCoordinator? = PasskeyCoordinator()
 
     private func evaluateJavaScript(code: String, webView: WKWebView) {
         
@@ -176,7 +178,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         switch (hubViewController?.targetPage) {
         case .signOut:
             evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
-            
+        case .connectPasskey:
+            evaluateJavaScript(code: "rownd.passkeyPrompt(\(jsFunctionArgsAsJson))", webView: webView)
         case .signIn, .unknown:
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
         case .qrCode:
@@ -246,6 +249,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .googleId) {
                     self.hubViewController?.hide()
                 }
+            case .connectSignInWithPasskey:
+                HubWebViewController.passkeyCoordinator?.signUpWith()
 
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
