@@ -320,7 +320,7 @@ class AuthTests: XCTestCase {
         
         waitForExpectations(timeout: 10, handler: nil)
     }
-    func testAccessTokeValidWithMargin() throws {
+    func testAccessTokenValidWithMargin() throws {
         let accessTokenNew = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 3600).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)

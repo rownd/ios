@@ -10,6 +10,7 @@ import UIKit
 import ReSwift
 import ReSwiftThunk
 import JWTDecode
+import Kronos
 
 fileprivate let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
 
@@ -34,12 +35,12 @@ extension AuthState: Codable {
         do {
             let jwt = try decode(jwt: accessToken)
             
-            let currentDate = Date()
+            let currentDate = Clock.now ?? Date()
             guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
                 return false
             }
 
-            return !jwt.expired && (currentDateWithMargin < expiresAt)
+            return !jwt.ntpExpired && (currentDateWithMargin < expiresAt)
         } catch {
             return false
         }
@@ -194,5 +195,23 @@ class Auth {
             
             completion(tokenResp)
         }
+    }
+}
+
+extension JWT {
+    var ntpExpired: Bool {
+        guard let date = self.expiresAt else {
+            return false
+        }
+        
+        let ntpDate = Clock.now
+        
+        guard let ntpDate = ntpDate else {
+            print("JWT: returning regular expiry")
+            return self.expired
+        }
+        
+        print("JWT: returning NTP expiry")
+        return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
 }

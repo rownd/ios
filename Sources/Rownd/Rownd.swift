@@ -14,6 +14,7 @@ import AnyCodable
 import AuthenticationServices
 import LBBottomSheet
 import GoogleSignIn
+import Kronos
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -26,6 +27,9 @@ public class Rownd: NSObject {
     
     private override init() {
         super.init()
+        
+        // Start NTP sync
+        Clock.sync()
     }
     
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
