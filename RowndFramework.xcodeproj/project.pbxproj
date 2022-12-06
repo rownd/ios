@@ -23,8 +23,6 @@
 		B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD8E28E780BF00216034 /* GoogleSignIn */; };
 		B30FBD9128E780BF00216034 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9028E780BF00216034 /* GoogleSignInSwift */; };
 		B30FBD9428E7811D00216034 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9328E7811D00216034 /* CodeScanner_Rownd */; };
-		B34490FE28DB9EEC00A992E9 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34490FD28DB9EEC00A992E9 /* AuthTests.swift */; };
-		B344910228DBA36200A992E9 /* MockedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B344910128DBA36200A992E9 /* MockedData.swift */; };
 		B344910928DBA72600A992E9 /* auth_refresh_response.json in Resources */ = {isa = PBXBuildFile; fileRef = B344910828DBA49E00A992E9 /* auth_refresh_response.json */; };
 		B344910A28DBA93800A992E9 /* auth_refresh_response.json in Resources */ = {isa = PBXBuildFile; fileRef = B344910828DBA49E00A992E9 /* auth_refresh_response.json */; };
 		B347C24F2877DAB600935115 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B347C24E2877DAB600935115 /* Encryption.swift */; };
@@ -34,7 +32,6 @@
 		B349906628CFCED9004ADF3F /* Customizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B349906528CFCED9004ADF3F /* Customizations.swift */; };
 		B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35E1ED02874C9C9007E989F /* HubViewController.swift */; };
 		B36AA90B291D7273002B3B60 /* Mocker in Frameworks */ = {isa = PBXBuildFile; productRef = B36AA90A291D7273002B3B60 /* Mocker */; };
-		B36AA911291D9C52002B3B60 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA910291D9C52002B3B60 /* Helpers.swift */; };
 		B36AA914291DF829002B3B60 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = B36AA913291DF829002B3B60 /* Factory */; };
 		B36AA917291DF8F7002B3B60 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA915291DF8F1002B3B60 /* Container.swift */; };
 		B36AA91C291EFB2F002B3B60 /* NoInternet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36AA91B291EFB2F002B3B60 /* NoInternet.swift */; };
@@ -42,6 +39,11 @@
 		B36D430F28B5CCD20038CF16 /* KeyTransferProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */; };
 		B374E55C28545A1C00955719 /* framework.h in Headers */ = {isa = PBXBuildFile; fileRef = B374E55B28545A1C00955719 /* framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B374E5662855873100955719 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B374E5652855872F00955719 /* Color.swift */; };
+		B377184A293FD5220055B4A5 /* RowndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771845293FD5220055B4A5 /* RowndTests.swift */; };
+		B377184B293FD5220055B4A5 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771846293FD5220055B4A5 /* Helpers.swift */; };
+		B377184C293FD5220055B4A5 /* MockedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771847293FD5220055B4A5 /* MockedData.swift */; };
+		B377184D293FD5220055B4A5 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771848293FD5220055B4A5 /* AuthTests.swift */; };
+		B377184E293FD5220055B4A5 /* EncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771849293FD5220055B4A5 /* EncryptionTests.swift */; };
 		B385D49428FD0507005B67C3 /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B385D49328FD0507005B67C3 /* Authenticator.swift */; };
 		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
 		B38A4087287E720E00FD0813 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4086287E720E00FD0813 /* Constants.swift */; };
@@ -50,9 +52,7 @@
 		B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */; };
 		B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A409D288111F200FD0813 /* BottomSheetController.swift */; };
 		B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40A02881157D00FD0813 /* LBBottomSheet */; };
-		B38A40AA2882020900FD0813 /* RowndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40A92882020900FD0813 /* RowndTests.swift */; };
 		B38A40AB2882020900FD0813 /* Rownd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B374E55828545A1C00955719 /* Rownd.framework */; };
-		B38A40B22882024400FD0813 /* EncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40B12882024400FD0813 /* EncryptionTests.swift */; };
 		B38A40BA2882185800FD0813 /* RowndFrameworkTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40B92882185800FD0813 /* RowndFrameworkTestAppApp.swift */; };
 		B38A40BC2882185800FD0813 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40BB2882185800FD0813 /* ContentView.swift */; };
 		B38A40BE2882185B00FD0813 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B38A40BD2882185B00FD0813 /* Assets.xcassets */; };
@@ -106,8 +106,6 @@
 		B302E2CC2866C75A005FD927 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSwiftObserver.swift; sourceTree = "<group>"; };
 		B302E2D0286A452F005FD927 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
-		B34490FD28DB9EEC00A992E9 /* AuthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTests.swift; sourceTree = "<group>"; };
-		B344910128DBA36200A992E9 /* MockedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedData.swift; sourceTree = "<group>"; };
 		B344910828DBA49E00A992E9 /* auth_refresh_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = auth_refresh_response.json; sourceTree = "<group>"; };
 		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
@@ -117,7 +115,6 @@
 		B349906528CFCED9004ADF3F /* Customizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Customizations.swift; sourceTree = "<group>"; };
 		B35E1ED02874C9C9007E989F /* HubViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewController.swift; sourceTree = "<group>"; };
 		B36AA90F291D753C002B3B60 /* RowndFrameworkTestApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RowndFrameworkTestApp.entitlements; sourceTree = "<group>"; };
-		B36AA910291D9C52002B3B60 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		B36AA915291DF8F1002B3B60 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		B36AA91B291EFB2F002B3B60 /* NoInternet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoInternet.swift; sourceTree = "<group>"; };
 		B36D430C28B4077F0038CF16 /* MagicLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicLink.swift; sourceTree = "<group>"; };
@@ -125,6 +122,11 @@
 		B374E55828545A1C00955719 /* Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B374E55B28545A1C00955719 /* framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framework.h; sourceTree = "<group>"; };
 		B374E5652855872F00955719 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = SOURCE_ROOT; };
+		B3771845293FD5220055B4A5 /* RowndTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowndTests.swift; sourceTree = "<group>"; };
+		B3771846293FD5220055B4A5 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		B3771847293FD5220055B4A5 /* MockedData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockedData.swift; sourceTree = "<group>"; };
+		B3771848293FD5220055B4A5 /* AuthTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthTests.swift; sourceTree = "<group>"; };
+		B3771849293FD5220055B4A5 /* EncryptionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptionTests.swift; sourceTree = "<group>"; };
 		B385D49328FD0507005B67C3 /* Authenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingExcluded.swift; sourceTree = "<group>"; };
 		B38A4086287E720E00FD0813 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -133,8 +135,6 @@
 		B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerViewController.swift; sourceTree = "<group>"; };
 		B38A409D288111F200FD0813 /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
 		B38A40A72882020800FD0813 /* RowndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RowndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B38A40A92882020900FD0813 /* RowndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndTests.swift; sourceTree = "<group>"; };
-		B38A40B12882024400FD0813 /* EncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionTests.swift; sourceTree = "<group>"; };
 		B38A40B72882185800FD0813 /* RowndFrameworkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RowndFrameworkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B38A40B92882185800FD0813 /* RowndFrameworkTestAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndFrameworkTestAppApp.swift; sourceTree = "<group>"; };
 		B38A40BB2882185800FD0813 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -275,12 +275,12 @@
 		B374E54E28545A1C00955719 = {
 			isa = PBXGroup;
 			children = (
+				B3771843293FD5220055B4A5 /* Tests */,
 				B347C25528786D8B00935115 /* LICENSE.txt */,
 				B347C25328786C5C00935115 /* Rownd.podspec */,
 				B347C25228786AE300935115 /* Sources */,
 				B347C25028786A8800935115 /* Package.swift */,
 				B3F08945286FD85300057DC2 /* README.md */,
-				B38A40A82882020900FD0813 /* RowndTests */,
 				B38A40B82882185800FD0813 /* RowndFrameworkTestApp */,
 				B374E55928545A1C00955719 /* Products */,
 				B38A40D628873F9B00FD0813 /* Frameworks */,
@@ -332,6 +332,26 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		B3771843293FD5220055B4A5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				B3771844293FD5220055B4A5 /* RowndTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		B3771844293FD5220055B4A5 /* RowndTests */ = {
+			isa = PBXGroup;
+			children = (
+				B3771845293FD5220055B4A5 /* RowndTests.swift */,
+				B3771846293FD5220055B4A5 /* Helpers.swift */,
+				B3771847293FD5220055B4A5 /* MockedData.swift */,
+				B3771848293FD5220055B4A5 /* AuthTests.swift */,
+				B3771849293FD5220055B4A5 /* EncryptionTests.swift */,
+			);
+			path = RowndTests;
+			sourceTree = "<group>";
+		};
 		B38A4094287FC0CA00FD0813 /* AccountManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -347,18 +367,6 @@
 				B302E2812863A8D0005FD927 /* HubWebViewController.swift */,
 			);
 			path = HubWebView;
-			sourceTree = "<group>";
-		};
-		B38A40A82882020900FD0813 /* RowndTests */ = {
-			isa = PBXGroup;
-			children = (
-				B38A40A92882020900FD0813 /* RowndTests.swift */,
-				B38A40B12882024400FD0813 /* EncryptionTests.swift */,
-				B34490FD28DB9EEC00A992E9 /* AuthTests.swift */,
-				B344910128DBA36200A992E9 /* MockedData.swift */,
-				B36AA910291D9C52002B3B60 /* Helpers.swift */,
-			);
-			path = RowndTests;
 			sourceTree = "<group>";
 		};
 		B38A40B82882185800FD0813 /* RowndFrameworkTestApp */ = {
@@ -632,11 +640,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B344910228DBA36200A992E9 /* MockedData.swift in Sources */,
-				B38A40B22882024400FD0813 /* EncryptionTests.swift in Sources */,
-				B34490FE28DB9EEC00A992E9 /* AuthTests.swift in Sources */,
-				B36AA911291D9C52002B3B60 /* Helpers.swift in Sources */,
-				B38A40AA2882020900FD0813 /* RowndTests.swift in Sources */,
+				B377184A293FD5220055B4A5 /* RowndTests.swift in Sources */,
+				B377184E293FD5220055B4A5 /* EncryptionTests.swift in Sources */,
+				B377184B293FD5220055B4A5 /* Helpers.swift in Sources */,
+				B377184C293FD5220055B4A5 /* MockedData.swift in Sources */,
+				B377184D293FD5220055B4A5 /* AuthTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
