@@ -341,7 +341,6 @@ class AuthTests: XCTestCase {
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
     
-    
         XCTAssertTrue(accessTokenNew.isAccessTokenValid)
         XCTAssertTrue(accessToken65secs.isAccessTokenValid)
 
