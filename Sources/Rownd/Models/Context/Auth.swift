@@ -207,11 +207,9 @@ extension JWT {
         let ntpDate = Clock.now
         
         guard let ntpDate = ntpDate else {
-            print("JWT: returning regular expiry")
             return self.expired
         }
         
-        print("JWT: returning NTP expiry")
         return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
 }
