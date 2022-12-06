@@ -44,6 +44,7 @@
 		B377184C293FD5220055B4A5 /* MockedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771847293FD5220055B4A5 /* MockedData.swift */; };
 		B377184D293FD5220055B4A5 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771848293FD5220055B4A5 /* AuthTests.swift */; };
 		B377184E293FD5220055B4A5 /* EncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3771849293FD5220055B4A5 /* EncryptionTests.swift */; };
+		B3771834293FC39C0055B4A5 /* Kronos in Frameworks */ = {isa = PBXBuildFile; productRef = B3771833293FC39C0055B4A5 /* Kronos */; };
 		B385D49428FD0507005B67C3 /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B385D49328FD0507005B67C3 /* Authenticator.swift */; };
 		B38A4085287E16EE00FD0813 /* LoggingExcluded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4084287E16EE00FD0813 /* LoggingExcluded.swift */; };
 		B38A4087287E720E00FD0813 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4086287E720E00FD0813 /* Constants.swift */; };
@@ -158,6 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3771834293FC39C0055B4A5 /* Kronos in Frameworks */,
 				B38A40C92882727F00FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B30FBD9428E7811D00216034 /* CodeScanner_Rownd in Frameworks */,
 				B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */,
@@ -453,6 +455,7 @@
 				B30FBD9328E7811D00216034 /* CodeScanner_Rownd */,
 				B36AA913291DF829002B3B60 /* Factory */,
 				B3B164FC292C1567002129A7 /* ReSwiftThunk */,
+				B3771833293FC39C0055B4A5 /* Kronos */,
 			);
 			productName = framework;
 			productReference = B374E55828545A1C00955719 /* Rownd.framework */;
@@ -550,6 +553,7 @@
 				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */,
 				B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */,
 				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
+				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -1050,6 +1054,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MobileNativeFoundation/Kronos.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LunabeeStudio/LBBottomSheet.git";
@@ -1151,6 +1163,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */;
 			productName = Factory;
+		};
+		B3771833293FC39C0055B4A5 /* Kronos */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */;
+			productName = Kronos;
 		};
 		B38A40A02881157D00FD0813 /* LBBottomSheet */ = {
 			isa = XCSwiftPackageProductDependency;
