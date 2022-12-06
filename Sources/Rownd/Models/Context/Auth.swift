@@ -203,13 +203,13 @@ extension JWT {
         guard let date = self.expiresAt else {
             return false
         }
-        
+
         let ntpDate = Clock.now
-        
+
         guard let ntpDate = ntpDate else {
             return self.expired
         }
-        
+
         return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
 }

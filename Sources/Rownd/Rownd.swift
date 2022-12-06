@@ -29,7 +29,7 @@ public class Rownd: NSObject {
         super.init()
         
         // Start NTP sync
-        Clock.sync()
+        Clock.sync(from: "time.cloudflare.com")
     }
     
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
