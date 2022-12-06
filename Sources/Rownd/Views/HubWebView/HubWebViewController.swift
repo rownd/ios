@@ -10,11 +10,13 @@ import UIKit
 import WebKit
 import SwiftUI
 import OSLog
+import LocalAuthentication
 
 let logger = Logger(subsystem: "io.rownd.sdk", category: "HubView")
 
 public enum HubPageSelector {
     case signIn
+    case connectPasskey
     case signOut
     case qrCode
     case manageAccount
@@ -118,6 +120,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 }
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
+    private static var passkeyCoordinator: PasskeyCoordinator? = PasskeyCoordinator()
 
     private func evaluateJavaScript(code: String, webView: WKWebView) {
         
@@ -165,6 +168,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
 
+        webViewOnLoad(webView: webView, targetPage: nil, jsFnOptions: nil)
+    }
+    
+    public func webViewOnLoad(webView: WKWebView, targetPage: HubPageSelector?, jsFnOptions: Encodable?) {
         webView.isOpaque = false
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
@@ -172,11 +179,20 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         hubViewController?.setLoading(false)
         
         setFeatureFlagsJS()
+        
+        if let jsFnOptions = jsFnOptions {
+            do {
+                jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
+            } catch {
+                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+            }
+        }
 
-        switch (hubViewController?.targetPage) {
+        switch (targetPage ?? hubViewController?.targetPage) {
         case .signOut:
             evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
-            
+        case .connectPasskey:
+            evaluateJavaScript(code: "rownd.connectPasskey(\(jsFunctionArgsAsJson))", webView: webView)
         case .signIn, .unknown:
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
         case .qrCode:
@@ -246,6 +262,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .googleId) {
                     self.hubViewController?.hide()
                 }
+            case .triggerSignUpWithPasskey:
+                HubWebViewController.passkeyCoordinator?.signUpWith()
 
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
