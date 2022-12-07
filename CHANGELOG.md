@@ -1,5 +1,12 @@
 
 
+# [2.1.0](https://github.com/rownd/ios/compare/2.0.3...2.1.0) (2022-12-07)
+
+
+### Features
+
+* **auth:** try to use ntp for time checking token exp ([#33](https://github.com/rownd/ios/issues/33)) ([16cfcd9](https://github.com/rownd/ios/commit/16cfcd9faf8f1f1d7045ee46586524739af4d92b))
+
 ## [2.0.3](https://github.com/rownd/ios/compare/2.0.2...2.0.3) (2022-11-21)
 
 
