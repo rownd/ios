@@ -141,6 +141,10 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
+        guard #available(iOS 15.0, *) else {
+            logger.trace("iOS 15.0 is required to sign in with Passkey")
+            return
+        }
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension)
 
         let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
@@ -164,6 +168,10 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
+        guard #available(iOS 15.0, *) else {
+            logger.trace("iOS 15.0 is required to sign in with Passkey")
+            return
+        }
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension)
         
         let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
@@ -178,6 +186,10 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        guard #available(iOS 15.0, *) else {
+            logger.trace("iOS 15.0 is required to sign in with Passkey")
+            return
+        }
         switch authorization.credential {
         case let credentialRegistration as ASAuthorizationPlatformPublicKeyCredentialRegistration:
 
