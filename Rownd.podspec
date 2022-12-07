@@ -31,6 +31,7 @@ Pod::Spec.new do |s|
   s.dependency 'GoogleSignIn', '~> 6.2.4'
   s.dependency 'lottie-ios', '~> 3.4.3'
   s.dependency 'Factory', '~> 1.2.8'
+  s.dependency 'Kronos', '~> 4.2.1'
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'

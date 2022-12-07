@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import ReSwift
 import ReSwiftThunk
+import Get
 
 public struct AppConfigState: Hashable {
     public var isLoading: Bool = false
@@ -165,21 +166,11 @@ func appConfigReducer(action: Action, state: AppConfigState?) -> AppConfigState 
     return state
 }
 
-/* API / side-effecty things */
+// MARK: API / side-effecty things
 
 // Easily unwrap the main payload from the `app` key
 struct AppConfigResponse: Decodable {
     var app: AppConfigState
-}
-
-struct AppConfigResource: APIResource {
-    var headers: Dictionary<String, String>?
-    
-    typealias ModelType = AppConfigResponse
-    
-    var methodPath: String {
-        return "/hub/app-config"
-    }
 }
 
 class AppConfig {
@@ -201,20 +192,13 @@ class AppConfig {
     }
 
     static func fetch() async -> AppConfigResponse? {
-        let resource = AppConfigResource()
-        let request = APIRequest(resource: resource)
+        do {
+            let appConfig: AppConfigResponse = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/hub/app-config")!, method: "get")).value
 
-        return await withCheckedContinuation { continuation in
-            request.execute { appConfig in
-                // This guard ensures that the resource allocator doesn't clean up the request object before
-                // the parsing closure in request.execute() is finished with it.
-                guard request.decode != nil else {
-                    continuation.resume(returning: nil)
-                    return
-                }
-                logger.trace("fetched app_config \(String(describing: appConfig))")
-                continuation.resume(returning: appConfig)
-            }
+            return appConfig
+        } catch {
+            logger.error("Failed to fetch app config: \(String(describing: error))")
+            return nil
         }
     }
 }

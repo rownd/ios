@@ -85,10 +85,16 @@ let package = Package(
             .upToNextMajor(from: "1.2.8")
         ),
         .package(
+            name: "Kronos",
+            url: "https://github.com/MobileNativeFoundation/Kronos",
+            .upToNextMajor(from: "4.2.1")
+        ),
+        .package(
             name: "Mocker",
             url: "https://github.com/WeTransfer/Mocker",
             .upToNextMajor(from: "3.0.1")
         )
+        
     ],
     
     targets: [
@@ -106,7 +112,8 @@ let package = Package(
                 "Get",
                 "GoogleSignIn",
                 "Lottie",
-                "Factory"
+                "Factory",
+                "Kronos"
             ],
             resources: [
                 .process("Resources")
@@ -115,7 +122,21 @@ let package = Package(
         .testTarget(
             name: "RowndTests",
             dependencies: [
-                "Mocker"
+                "Mocker",
+                "AnyCodable",
+                "ReSwift",
+                "ReSwiftThunk",
+                "JWTDecode",
+                "LBBottomSheet",
+                "SwiftKeychainWrapper",
+                "Sodium",
+                "CodeScanner_Rownd",
+                "Get",
+                "GoogleSignIn",
+                "Lottie",
+                "Factory",
+                "Rownd",
+                "Kronos"
             ]
         )
     ],
