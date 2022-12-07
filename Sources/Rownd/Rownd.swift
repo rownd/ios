@@ -23,7 +23,8 @@ public class Rownd: NSObject {
 
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
-    private static var passkeyCoordinator: PasskeyCoordinator? = PasskeyCoordinator()
+    internal var bottomSheetController: BottomSheetController = BottomSheetController()
+    private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
     
@@ -110,7 +111,7 @@ public class Rownd: NSObject {
         case .appleId:
             appleSignUpCoordinator?.didTapButton()
         case .passkey:
-            passkeyCoordinator?.signInWith()
+            passkeyCoordinator.signInWith()
         case .googleId:
             let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
             guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
@@ -305,12 +306,11 @@ public class Rownd: NSObject {
         
         // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
         // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
-        let bottomSheetController = BottomSheetController()
         bottomSheetController.controller = viewController
         bottomSheetController.modalPresentationStyle = .overFullScreen
 
         DispatchQueue.main.async {
-            rootViewController?.present(bottomSheetController, animated: true, completion: nil)
+            rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
         }
     }
     
