@@ -151,12 +151,8 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
 
         let assertionRequest = publicKeyCredentialProvider.createCredentialAssertionRequest(challenge: challenge)
 
-        // Also allow the user to use a saved password, if they have one.
-        let passwordCredentialProvider = ASAuthorizationPasswordProvider()
-        let passwordRequest = passwordCredentialProvider.createRequest()
-
         // Pass in any mix of supported sign-in request types.
-        let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest, passwordRequest ] )
+        let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest ] )
         authController.delegate = self
         authController.presentationContextProvider = self
         authController.performRequests()
@@ -231,17 +227,8 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     logger.error("Failed passkey POST registration: \(String(describing: error))")
                 }
             }
-            
-        case let passwordCredential as ASPasswordCredential:
-            logger.log("A password was provided: \(passwordCredential)")
-            // Verify the userName and password with your service.
-            // let userName = passwordCredential.user
-            // let password = passwordCredential.password
-
-            // After the server verifies the userName and password, sign in the user.
-            // didFinishSignIn()
         default:
-            fatalError("Received unknown authorization type.")
+            logger.error("Failed: Unsupported authorization type")
         }
 
     }
