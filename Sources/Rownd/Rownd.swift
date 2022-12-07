@@ -175,7 +175,7 @@ public class Rownd: NSObject {
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
-    public static func connectSignIn(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
+    public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         switch with {
         case .passkey:
             if (store.state.auth.accessToken != nil) {
@@ -426,9 +426,10 @@ public struct RowndSignInOptions: Encodable {
 public struct RowndConnectPasskeySignInOptions: Encodable {
     public var status: Status? = nil
     public var biometricType: String? = ""
+    public var type: String = "passkey"
     
     enum CodingKeys: String, CodingKey {
-        case status
+        case status, type
         case biometricType = "biometric_type"
     }
 }

@@ -192,7 +192,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         case .signOut:
             evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
         case .connectPasskey:
-            evaluateJavaScript(code: "rownd.connectPasskey(\(jsFunctionArgsAsJson))", webView: webView)
+            evaluateJavaScript(code: "rownd.connectAuthenticator(\(jsFunctionArgsAsJson))", webView: webView)
         case .signIn, .unknown:
             evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
         case .qrCode:
