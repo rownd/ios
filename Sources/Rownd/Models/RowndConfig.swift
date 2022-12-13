@@ -12,6 +12,7 @@ public struct RowndConfig: Encodable {
 
     public var apiUrl = "https://api.rownd.io"
     public var baseUrl = "https://hub.rownd.io"
+    public var subdomainExtension = ".rownd.link"
     public var appKey = ""
     public var forceDarkMode = false
     public var postSignInRedirect: String? = "NATIVE_APP"

@@ -15,6 +15,7 @@ public struct AppConfigState: Hashable {
     public var isLoading: Bool = false
     public var id: String?
     public var icon: String?
+    public var name: String?
     public var userVerificationFields: [String]?
     public var schema: Dictionary<String, AppSchemaField>?
     public var config: AppConfigConfig?
@@ -22,7 +23,7 @@ public struct AppConfigState: Hashable {
 
 extension AppConfigState: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, icon, schema, config
+        case id, icon, schema, config, name
         case userVerificationFields = "user_verification_fields"
     }
 }
@@ -30,11 +31,12 @@ extension AppConfigState: Codable {
 public struct AppConfigConfig: Hashable {
     public var hub: AppHubConfigState?
     public var customizations: AppCustomizationsConfigState?
+    public var subdomain: String?
 }
 
 extension AppConfigConfig: Codable {
     enum CodingKeys: String, CodingKey {
-        case hub, customizations
+        case hub, customizations, subdomain
     }
 }
 

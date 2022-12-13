@@ -51,6 +51,10 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         hubWebController.view.autoresizingMask = .flexibleHeight
     }
     
+    public func loadNewPage(targetPage: HubPageSelector, jsFnOptions: Encodable?) {
+        hubWebController.webViewOnLoad(webView: hubWebController.webView, targetPage: targetPage, jsFnOptions: jsFnOptions)
+    }
+    
     public override func loadView() {
         hubWebController.hubViewController = self
         

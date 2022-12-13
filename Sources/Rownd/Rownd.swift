@@ -14,6 +14,7 @@ import AnyCodable
 import AuthenticationServices
 import LBBottomSheet
 import GoogleSignIn
+import LocalAuthentication
 import Kronos
 
 public class Rownd: NSObject {
@@ -22,6 +23,8 @@ public class Rownd: NSObject {
 
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
+    internal var bottomSheetController: BottomSheetController = BottomSheetController()
+    private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
     
@@ -107,6 +110,8 @@ public class Rownd: NSObject {
         switch with {
         case .appleId:
             appleSignUpCoordinator?.didTapButton()
+        case .passkey:
+            passkeyCoordinator.signInWith()
         case .googleId:
             let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
             guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
@@ -168,6 +173,20 @@ public class Rownd: NSObject {
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
+    }
+    
+    public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
+        switch with {
+        case .passkey:
+            if (store.state.auth.accessToken != nil) {
+                let _ = inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue))
+            } else {
+                requestSignIn()
+            }
+            
+        default:
+            logger.debug("Connect Sign in Method was not selected")
+        }
     }
     
     public static func signOut() {
@@ -287,12 +306,11 @@ public class Rownd: NSObject {
         
         // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
         // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
-        let bottomSheetController = BottomSheetController()
         bottomSheetController.controller = viewController
         bottomSheetController.modalPresentationStyle = .overFullScreen
 
         DispatchQueue.main.async {
-            rootViewController?.present(bottomSheetController, animated: true, completion: nil)
+            rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
         }
     }
     
@@ -386,7 +404,11 @@ public enum UserFieldAccessType {
 }
 
 public enum RowndSignInHint {
-    case appleId, googleId
+    case appleId, googleId, passkey
+}
+
+public enum RowndConnectSignInHint {
+    case passkey
 }
 
 public struct RowndSignInOptions: Encodable {
@@ -399,6 +421,23 @@ public struct RowndSignInOptions: Encodable {
     enum CodingKeys: String, CodingKey {
         case postSignInRedirect = "post_login_redirect"
     }
+}
+
+public struct RowndConnectPasskeySignInOptions: Encodable {
+    public var status: Status? = nil
+    public var biometricType: String? = ""
+    public var type: String = "passkey"
+    
+    enum CodingKeys: String, CodingKey {
+        case status, type
+        case biometricType = "biometric_type"
+    }
+}
+
+public enum Status: String, Codable {
+    case loading
+    case success
+    case failed
 }
 
 struct RowndError: Error, CustomStringConvertible {
