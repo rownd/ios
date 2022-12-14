@@ -184,6 +184,7 @@ class UserData {
                     
                     // If the user doesn't exist, sign out (user may have been deleted)
                     if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode == 404 {
+                        logger.warning("This user was not found (likely deleted), so they will be signed out.")
                         Rownd.signOut()
                     }
 
