@@ -44,7 +44,7 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
-        if !store.state.auth.isAuthenticated {
+        if store.state.isInitialized && !store.state.auth.isAuthenticated {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
                 launchUrl = _launchUrl
@@ -65,6 +65,13 @@ public class Rownd: NSObject {
                         logger.debug("Successfully restored previous Google Sign-in")
                     }
                 }
+            }
+        }
+        
+        // Fetch user if authenticated and app is in foreground
+        DispatchQueue.main.async {
+            if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
+                store.dispatch(UserData.fetch())
             }
         }
     }

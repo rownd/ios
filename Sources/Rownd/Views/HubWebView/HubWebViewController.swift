@@ -9,10 +9,7 @@ import Foundation
 import UIKit
 import WebKit
 import SwiftUI
-import OSLog
 import LocalAuthentication
-
-let logger = Logger(subsystem: "io.rownd.sdk", category: "HubView")
 
 public enum HubPageSelector {
     case signIn
@@ -251,7 +248,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 guard hubViewController?.targetPage == .manageAccount else { return }
                 DispatchQueue.main.async {
                     store.dispatch(SetUserData(payload: userDataMessage.data))
-//                    store.dispatch(UserData.fetch())
                 }
                 
             case .triggerSignInWithApple:
