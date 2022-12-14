@@ -10,6 +10,7 @@ import UIKit
 import ReSwift
 import ReSwiftThunk
 import AnyCodable
+import Get
 
 public struct UserState: Hashable {
     public var isLoading: Bool = false
@@ -141,17 +142,6 @@ struct UserDataPayload: Codable {
     var redacted: [String]?
 }
 
-struct UserDataResource: APIResource {
-    typealias ModelType = UserState
-    
-    var methodPath: String {
-        guard let appId = store.state.appConfig.id else { return "/me/applications/unknown/data" }
-        return "/me/applications/\(appId)/data"
-    }
-    
-    var headers: Dictionary<String, String>? = Dictionary<String, String>()
-}
-
 class UserData {
     static func onReceiveUserData(_ newUserState: UserState) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
@@ -167,32 +157,36 @@ class UserData {
             guard !state.user.isLoading else { return }
             
             Task {
-                guard let accessToken = try? await Rownd.getAccessToken() else {
+                guard state.auth.isAuthenticated else {
                     return
                 }
 
                 DispatchQueue.main.async {
                     dispatch(SetUserLoading(isLoading: true))
                 }
-                var resource = UserDataResource()
-                resource.headers = ["Authorization": "Bearer \(accessToken)"]
-                let request = APIRequest(resource: resource)
                 
-                request.execute { userResp in
-                    // This guard ensures that the resource allocator doesn't clean up the request object before
-                    // the parsing closure in request.execute() is finished with it.
-                    guard request.decode != nil else {
-                        DispatchQueue.main.async {
-                            dispatch(SetUserLoading(isLoading: false))
-                        }
-                        return
-                    }
-                    logger.debug("Decoded user response: \(String(describing: userResp))")
-
+                defer {
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
                         dispatch(SetUserLoading(isLoading: false))
                     }
+                }
+                
+                do {
+                    let user = try await Rownd.apiClient.send(Request<UserState?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+                    
+                    logger.debug("Decoded user response: \(String(describing: user))")
+
+                    DispatchQueue.main.async {
+                        dispatch(SetUserData(payload: user?.dataAsDecrypted() ?? [:]))
+                    }
+                } catch {
+                    logger.error("Failed to retrieve user: \(String(describing: error))")
+                    
+                    // If the user doesn't exist, sign out (user may have been deleted)
+                    if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode == 404 {
+                        Rownd.signOut()
+                    }
+
                 }
             }
         }
@@ -211,46 +205,43 @@ class UserData {
                 dispatch(SetUserData(payload: data))
             }
             
-            Task.init {
-                guard let accessToken = try? await Rownd.getAccessToken() else {
+            Task {
+                guard state.auth.isAuthenticated else {
                     return
                 }
 
                 DispatchQueue.main.async {
                     dispatch(SetUserLoading(isLoading: true))
                 }
-                var resource = UserDataResource()
-                resource.headers = [
-                    "Authorization": "Bearer \(accessToken)",
-                    "Content-Type": "application/json"
-                ]
-                let request = APIRequest(resource: resource)
+                
+                defer {
+                    DispatchQueue.main.async {
+                        dispatch(SetUserLoading(isLoading: false))
+                    }
+                }
 
                 // Handle data that should be encrypted
                 var updatedUserState = UserState()
                 updatedUserState.data = data
                 
-                // TODO: Do we need to current user state as json string for body and merge?
-                let encoder = JSONEncoder()
                 let userDataPayload = UserDataPayload(data: updatedUserState.dataAsEncrypted())
-
-                var body: Data? = nil
+                
                 do {
-                    body = try encoder.encode(userDataPayload)
-                } catch {
+                    let user = try await Rownd.apiClient.send(Request<UserState?>(
+                        path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
+                        method: .put,
+                        body: userDataPayload
+                    )).value
+                    
+                    logger.debug("Decoded user response: \(String(describing: user))")
+                    
                     DispatchQueue.main.async {
-                        dispatch(SetUserError(errorMessage: "The user profile could not be encoded: \(error)"))
+                        dispatch(SetUserData(payload: user?.dataAsDecrypted() ?? [:]))
                     }
-                }
-                request.execute(method: "PUT", body: body) { userResp in
-                    // This guard ensures that the resource allocator doesn't clean up the request object before
-                    // the parsing closure in request.execute() is finished with it.
-                    guard request.decode != nil else { return }
-                    logger.debug("Decoded user response: \(String(describing: userResp))")
-
+                } catch {
+                    logger.error("Failed to save user profile: \(String(describing: error))")
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(payload: userResp?.dataAsDecrypted() ?? [:]))
-                        dispatch(SetUserLoading(isLoading: false))
+                        dispatch(SetUserError(errorMessage: "The user profile could not be saved: \(String(describing: error))"))
                     }
                 }
             }
