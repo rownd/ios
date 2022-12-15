@@ -1,5 +1,12 @@
 
 
+# [2.2.0](https://github.com/rownd/ios/compare/2.1.0...2.2.0) (2022-12-15)
+
+
+### Features
+
+* **users:** auto sign out if account is not found ([#36](https://github.com/rownd/ios/issues/36)) ([f9f1717](https://github.com/rownd/ios/commit/f9f1717e2d796bc65b1d2f17b488988cdd686abd))
+
 # [2.1.0](https://github.com/rownd/ios/compare/2.0.3...2.1.0) (2022-12-07)
 
 
