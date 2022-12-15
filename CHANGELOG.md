@@ -6,6 +6,7 @@
 ### Features
 
 * **users:** auto sign out if account is not found ([#36](https://github.com/rownd/ios/issues/36)) ([f9f1717](https://github.com/rownd/ios/commit/f9f1717e2d796bc65b1d2f17b488988cdd686abd))
+* **auth:** support signing in using Passkeys ([#34](https://github.com/rownd/ios/pull/34)) ([7e3943c](https://github.com/rownd/ios/commit/7e3943ca86ab6e2fdec279944dace917dd64234d))
 
 # [2.1.0](https://github.com/rownd/ios/compare/2.0.3...2.1.0) (2022-12-07)
 
