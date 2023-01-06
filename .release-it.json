@@ -12,5 +12,12 @@
       "preset": "angular",
       "infile": "CHANGELOG.md"
     }
+  },
+  "hooks": {
+    "after:bump": [
+      "npx podspec-bump -w -i ${version} -p Rownd.podspec",
+      "pod lib lint --allow-warnings"
+    ],
+    "after:release": "pod trunk push . --allow-warnings"
   }
 }
