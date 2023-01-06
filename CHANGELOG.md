@@ -1,5 +1,12 @@
 
 
+## [2.2.1](https://github.com/rownd/ios/compare/2.2.0...2.2.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* **test:** intermittently failing auth test ([bbb4a90](https://github.com/rownd/ios/commit/bbb4a903e5534a5040f68b7f8d2a491e025fe3f3))
+
 # [2.2.0](https://github.com/rownd/ios/compare/2.1.0...2.2.0) (2022-12-15)
 
 
