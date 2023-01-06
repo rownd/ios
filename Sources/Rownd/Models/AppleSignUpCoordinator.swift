@@ -9,6 +9,7 @@ import SwiftUI
 import AuthenticationServices
 import UIKit
 import AnyCodable
+import ReSwiftThunk
 
 fileprivate let appleSignInDataKey = "userAppleSignInData"
 
@@ -86,31 +87,38 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                 let idToken = urlContent as String
                 Auth.fetchToken(idToken: idToken) { authState in
                     DispatchQueue.main.async {
-                        store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
-                    }
-                    var userData = store.state.user.data
-                    
-                    let defaults = UserDefaults.standard
-                    //use UserDefault values for Email and fullName if available
-                    if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
-                        let decoder = JSONDecoder()
-                        if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
-                            userData["email"] = AnyCodable.init(loadedAppleSignInData.email)
-                            userData["first_name"] = AnyCodable.init(loadedAppleSignInData.firstName)
-                            userData["last_name"] = AnyCodable.init(loadedAppleSignInData.lastName)
-                            userData["full_name"] = AnyCodable.init(loadedAppleSignInData.fullName)
-                        }
-                    } else {
-                        if let email = email {
-                            userData["email"] = AnyCodable.init(email)
-                            userData["first_name"] = AnyCodable.init(fullName?.givenName)
-                            userData["last_name"] = AnyCodable.init(fullName?.familyName)
-                            userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
-                        }
-                    }
-
-                    DispatchQueue.main.async {
-                        store.dispatch(UserData.save(userData))
+                        store.dispatch(store.state.auth.onReceiveAuthTokens(
+                            AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)
+                        ))
+                        
+                        store.dispatch(Thunk<RowndState> { dispatch, getState in
+                            guard let state = getState() else { return }
+                            
+                            var userData = state.user.data
+                            
+                            let defaults = UserDefaults.standard
+                            //use UserDefault values for Email and fullName if available
+                            if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
+                                let decoder = JSONDecoder()
+                                if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
+                                    userData["email"] = AnyCodable.init(loadedAppleSignInData.email)
+                                    userData["first_name"] = AnyCodable.init(loadedAppleSignInData.firstName)
+                                    userData["last_name"] = AnyCodable.init(loadedAppleSignInData.lastName)
+                                    userData["full_name"] = AnyCodable.init(loadedAppleSignInData.fullName)
+                                }
+                            } else {
+                                if let email = email {
+                                    userData["email"] = AnyCodable.init(email)
+                                    userData["first_name"] = AnyCodable.init(fullName?.givenName)
+                                    userData["last_name"] = AnyCodable.init(fullName?.familyName)
+                                    userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
+                                }
+                            }
+                            
+                            if (!userData.isEmpty) {
+                                dispatch(UserData.save(userData))
+                            }
+                        })
                     }
                 }
             } else {

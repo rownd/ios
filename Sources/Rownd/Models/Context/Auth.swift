@@ -98,7 +98,6 @@ extension AuthState: Codable {
                 // This is a special case to get the new auth state over
                 // to the authenticator as quickly as possible without
                 // waiting for the store update flow to complete
-                await Rownd.authenticator.setAuthState(newAuthState)
 
                 DispatchQueue.main.async {
                     dispatch(SetAuthState(payload: newAuthState))

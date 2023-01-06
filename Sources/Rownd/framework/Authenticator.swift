@@ -61,6 +61,7 @@ fileprivate class TokenApiClientDelegate : APIClientDelegate {
 // which leads to memmory corruption and weird app crashes.
 class AuthenticatorSubscription: NSObject {
     private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
+    internal static var currentAuthState: AuthState? = store.state.auth
 
     private override init() {}
 
@@ -85,13 +86,8 @@ class AuthenticatorSubscription: NSObject {
                     guard let authState = authState else {
                         return next(action)
                     }
-
-                    Task {
-                        await Rownd.authenticator.setAuthState(authState)
-                        DispatchQueue.main.async {
-                            next(action)
-                        }
-                    }
+                    AuthenticatorSubscription.currentAuthState = authState
+                    next(action)
                 }
             }
         }
@@ -100,19 +96,15 @@ class AuthenticatorSubscription: NSObject {
 
 actor Authenticator {
     private let tokenApi = Container.tokenApi()
-    private var currentAuthState: AuthState? = store.state.auth
     private var refreshTask: Task<AuthState, Error>?
 
-    func setAuthState(_ newAuthState: AuthState) {
-        currentAuthState = newAuthState
-    }
 
     func getValidToken() async throws -> AuthState {
         if let handle = refreshTask {
             return try await handle.value
         }
 
-        guard let authState = currentAuthState, let _ = authState.accessToken else {
+        guard let authState = AuthenticatorSubscription.currentAuthState, let _ = authState.accessToken else {
             throw AuthenticationError.noAccessTokenPresent
         }
 
@@ -136,12 +128,12 @@ actor Authenticator {
                     Request(
                         path: "/hub/auth/token",
                         method: .post,
-                        body: TokenRequest(refreshToken: currentAuthState?.refreshToken)
+                        body: TokenRequest(refreshToken: AuthenticatorSubscription.currentAuthState?.refreshToken)
                     )
                 ).value
 
                 // Store the new token response here for immediate use outside of the state lifecycle
-                currentAuthState = newAuthState
+                AuthenticatorSubscription.currentAuthState = newAuthState
 
                 // Update the auth state - this really should be abstracted out elsewhere
                 DispatchQueue.main.async {
