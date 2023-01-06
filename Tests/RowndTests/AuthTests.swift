@@ -245,41 +245,26 @@ class AuthTests: XCTestCase {
         
         let accessToken = generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970) // this will be expired
         
-        var subscription: [AnyCancellable] = []
-        let authSub = store.subscribe { $0.auth }
-                
-        var numStateUpdateTriggers = 0
-        authSub
-            .$current
-            .removeDuplicates()
-            .dropFirst()
-            .sink { authState in
-                // TODO: This is a rather kludgy way of writing these assertions, but due to the Authenticator middleware, it's the simplest way for the moment. We should find a better flow eventually. It also might not always pass when run with the other tests due to concurrency, etc.
-                numStateUpdateTriggers += 1
-                if numStateUpdateTriggers >= 3 {
-                    return
-                }
-                
-                if numStateUpdateTriggers == 2 {
-                    XCTAssertFalse(authState.isAuthenticated, "User should no longer be authenticated")
-                    expectation.fulfill()
-                    return
-                }
-                
-                XCTAssertTrue(authState.isAuthenticated, "User should be authenticated initially")
-                
-                Task {
-                    let accessToken = try! await Rownd.getAccessToken()
-                    
-                    XCTAssertNil(accessToken, "Returned token should be nil")
-                }
-            }
-            .store(in: &subscription)
-        
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: accessToken,
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
         )))
+        
+        // Dispatch a Thunk to test after the previous state change
+        store.dispatch(Thunk<RowndState> { dispatch, getState in
+            guard let state = getState() else { return }
+            
+            XCTAssertTrue(state.auth.isAuthenticated, "User should be authenticated initially")
+            Task {
+                let accessToken = try! await Rownd.getAccessToken()
+                XCTAssertNil(accessToken, "Returned token should be nil")
+
+                guard let state = getState() else { return }
+                XCTAssertFalse(state.auth.isAuthenticated, "User should no longer be authenticated")
+                
+                expectation.fulfill()
+            }
+        })
         
         waitForExpectations(timeout: 10, handler: nil)
     }
