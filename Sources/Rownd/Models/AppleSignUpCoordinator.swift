@@ -116,7 +116,9 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             }
                             
                             if (!userData.isEmpty) {
-                                dispatch(UserData.save(userData))
+                                DispatchQueue.main.async {
+                                    dispatch(UserData.save(userData))
+                                }
                             }
                         })
                     }
