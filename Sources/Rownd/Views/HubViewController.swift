@@ -62,7 +62,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
 
-        let hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)")
+        let hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)&login=\(store.state.login.toLoginHash() ?? "")")
 
         view = UIView()
         view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
