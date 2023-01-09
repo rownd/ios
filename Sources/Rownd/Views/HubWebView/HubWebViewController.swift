@@ -235,6 +235,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     store.dispatch(store.state.auth.onReceiveAuthTokens(
                         AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
                     ))
+                    store.dispatch(ResetLoginState())
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
