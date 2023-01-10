@@ -22,23 +22,23 @@ extension Date {
     }
 }
 
-public enum LoginMethods: String, Codable {
+public enum SignInMethodTypes: String, Codable {
     case apple, google
 }
 
-public struct LoginState: Hashable, Codable {
-    public var lastLogin: LoginMethods?
-    public var lastLoginDate: String?
+public struct SignInState: Hashable, Codable {
+    public var lastSignIn: SignInMethodTypes?
+    public var lastSignInDate: String?
     
-    func toLoginHash() -> String? {
-        let loginInit = [
-            "last_login": store.state.login.lastLogin?.rawValue,
-            "last_login_date": store.state.login.lastLoginDate
+    func toSignInHash() -> String? {
+        let signInInit = [
+            "last_sign_in": store.state.signIn.lastSignIn?.rawValue,
+            "last_sign_in_date": store.state.signIn.lastSignInDate
         ]
 
         do {
             let encoder = JSONEncoder()
-            let encoded = try encoder.encode(loginInit)
+            let encoded = try encoder.encode(signInInit)
             return encoded.base64EncodedString()
         } catch {
             logger.error("Failed to build login hash string: \(String(describing: error))")
@@ -47,28 +47,28 @@ public struct LoginState: Hashable, Codable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case lastLogin = "last_login"
-        case lastLoginDate = "last_login_date"
+        case lastSignIn = "last_sign_in"
+        case lastSignInDate = "last_sign_in_date"
     }
 }
 
 
 // MARK: Reducers
-struct SetLoginMethod: Action {
-    var payload: LoginMethods
+struct SetSignInMethod: Action {
+    var payload: SignInMethodTypes
 }
 
 struct ResetLoginState: Action {}
 
-func loginReducer(action: Action, state: LoginState?) -> LoginState {
-    var state = state ?? LoginState()
+func signInReducer(action: Action, state: SignInState?) -> SignInState {
+    var state = state ?? SignInState()
     
     switch action {
     case let action as ResetLoginState:
-        state = LoginState()
-    case let action as SetLoginMethod:
-        state.lastLogin = action.payload
-        state.lastLoginDate = Date.ISOStringFromDate(date: Clock.now ?? Date())
+        state = SignInState()
+    case let action as SetSignInMethod:
+        state.lastSignIn = action.payload
+        state.lastSignInDate = Date.ISOStringFromDate(date: Clock.now ?? Date())
     default:
         break
     }

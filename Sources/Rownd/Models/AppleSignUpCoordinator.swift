@@ -91,7 +91,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)
                         ))
                         
-                        store.dispatch(SetLoginMethod(payload: LoginMethods.apple))
+                        store.dispatch(SetSignInMethod(payload: SignInMethodTypes.apple))
                         
                         store.dispatch(Thunk<RowndState> { dispatch, getState in
                             guard let state = getState() else { return }
