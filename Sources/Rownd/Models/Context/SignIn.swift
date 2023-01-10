@@ -58,13 +58,13 @@ struct SetSignInMethod: Action {
     var payload: SignInMethodTypes
 }
 
-struct ResetLoginState: Action {}
+struct ResetSignInState: Action {}
 
 func signInReducer(action: Action, state: SignInState?) -> SignInState {
     var state = state ?? SignInState()
     
     switch action {
-    case let action as ResetLoginState:
+    case let action as ResetSignInState:
         state = SignInState()
     case let action as SetSignInMethod:
         state.lastSignIn = action.payload
