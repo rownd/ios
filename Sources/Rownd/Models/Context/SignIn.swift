@@ -54,7 +54,7 @@ public struct SignInState: Hashable, Codable {
 
 
 // MARK: Reducers
-struct SetSignInMethod: Action {
+struct SetLastSignInMethod: Action {
     var payload: SignInMethodTypes
 }
 
@@ -66,7 +66,7 @@ func signInReducer(action: Action, state: SignInState?) -> SignInState {
     switch action {
     case let action as ResetSignInState:
         state = SignInState()
-    case let action as SetSignInMethod:
+    case let action as SetLastSignInMethod:
         state.lastSignIn = action.payload
         state.lastSignInDate = Date.ISOStringFromDate(date: Clock.now ?? Date())
     default:

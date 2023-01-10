@@ -161,7 +161,7 @@ public class Rownd: NSObject {
                             DispatchQueue.main.async {
                                 store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
                                 store.dispatch(UserData.fetch())
-                                store.dispatch(SetSignInMethod(payload: SignInMethodTypes.google))
+                                store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
                             }
                         }
 
