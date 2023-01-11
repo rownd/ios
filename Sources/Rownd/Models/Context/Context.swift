@@ -16,11 +16,12 @@ public struct RowndState: Codable, Hashable {
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
+    public var signIn = SignInState()
 }
 
 extension RowndState {
     enum CodingKeys: String, CodingKey {
-        case appConfig, auth, user
+        case appConfig, auth, user, signIn
     }
 
     static func save(state: RowndState) {
@@ -75,7 +76,8 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
             isInitialized: true,
             appConfig: appConfigReducer(action: action, state: state?.appConfig),
             auth: authReducer(action: action, state: state?.auth),
-            user: userReducer(action: action, state: state?.user)
+            user: userReducer(action: action, state: state?.user),
+            signIn: signInReducer(action: action, state: state?.signIn)
         )
 
         RowndState.save(state: newState)
