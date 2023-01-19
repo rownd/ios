@@ -136,22 +136,45 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
 
 // MARK: Token / auth API calls
 
+public enum UserType: String, Codable {
+    case NewUser = "new_user"
+    case ExistingUser = "existing_user"
+}
+
 struct TokenRequest: Codable {
     var refreshToken: String?
     var idToken: String?
     var appId: String?
+    var intent: RowndSignInIntent?
     
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
         case idToken = "id_token"
         case appId = "app_id"
+        case intent
     }
 }
 
+struct TokenResponse: Codable {
+    var refreshToken: String?
+    var accessToken: String?
+    var userType: UserType?
+    var token: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case refreshToken = "refresh_token"
+        case accessToken = "access_token"
+        case userType = "user_type"
+        case token
+    }
+}
+
+
 struct TokenResource: APIResource {
+    
     var headers: Dictionary<String, String>?
     
-    typealias ModelType = AuthState
+    typealias ModelType = TokenResponse
     
     var methodPath: String {
         return "/hub/auth/token"
@@ -162,13 +185,13 @@ struct TokenResource: APIResource {
 
 class Auth {
     
-    static func fetchToken(idToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+    static func fetchToken(idToken: String, intent: RowndSignInIntent?, withCompletion completion: @escaping (TokenResponse?) -> Void) -> Void {
         guard let appId = store.state.appConfig.id else { return completion(nil) }
-        let tokenRequest = TokenRequest(idToken: idToken, appId: appId)
+        let tokenRequest = TokenRequest(idToken: idToken, appId: appId, intent: intent)
         return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
     }
     
-    static func fetchToken(tokenRequest: TokenRequest, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
+    static func fetchToken(tokenRequest: TokenRequest, withCompletion completion: @escaping (TokenResponse?) -> Void) -> Void {
         var resource = TokenResource()
         resource.headers = [
             "Content-Type": "application/json"
