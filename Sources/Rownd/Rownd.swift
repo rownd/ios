@@ -114,9 +114,13 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(with: RowndSignInHint, completion: (() -> Void)? = nil) {
+        requestSignIn(with: with, signInOptions: RowndSignInOptions(), completion: completion)
+    }
+    
+    public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
         switch with {
         case .appleId:
-            appleSignUpCoordinator?.didTapButton()
+            appleSignUpCoordinator?.signIn(signInOptions?.intent)
         case .passkey:
             passkeyCoordinator.signInWith()
         case .googleId:
@@ -157,11 +161,17 @@ public class Rownd: NSObject {
 
                     if let idToken = authentication.idToken {
                         logger.debug("Successully completed Google sign-in")
-                        Auth.fetchToken(idToken: idToken) { authState in
-                            DispatchQueue.main.async {
-                                store.dispatch(SetAuthState(payload: AuthState(accessToken: authState?.accessToken, refreshToken: authState?.refreshToken)))
-                                store.dispatch(UserData.fetch())
-                                store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
+                        Auth.fetchToken(idToken: idToken, intent: signInOptions?.intent) { tokenResponse in
+                            if (tokenResponse?.userType == UserType.NewUser && tokenResponse?.token != nil && signInOptions?.intent == RowndSignInIntent.signIn) {
+                                requestSignIn(jsFnOptions: RowndSignInJsOptions(token: tokenResponse?.token, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn ))
+                            } else {
+                                DispatchQueue.main.async {
+                                    store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse?.accessToken, refreshToken: tokenResponse?.refreshToken)))
+                                    store.dispatch(UserData.fetch())
+                                    store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
+                                    
+                                    requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Success,intent: signInOptions?.intent, userType: tokenResponse?.userType))
+                                }
                             }
                         }
 
@@ -181,6 +191,10 @@ public class Rownd: NSObject {
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
+    }
+    
+    internal static func requestSignIn(jsFnOptions: Encodable?) {
+        let _ = inst.displayHub(.signIn, jsFnOptions: jsFnOptions)
     }
     
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
@@ -420,14 +434,41 @@ public enum RowndConnectSignInHint {
 }
 
 public struct RowndSignInOptions: Encodable {
-    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect) {
+    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect, intent: RowndSignInIntent? = nil) {
         self.postSignInRedirect = postSignInRedirect
+        self.intent = intent
     }
     
     public var postSignInRedirect: String? = Rownd.config.postSignInRedirect
+    public var intent: RowndSignInIntent? = nil
     
     enum CodingKeys: String, CodingKey {
+        case intent
         case postSignInRedirect = "post_login_redirect"
+    }
+}
+
+public enum RowndSignInIntent: String, Codable {
+    case signIn = "sign_in"
+    case signUp = "sign_up"
+}
+
+internal enum RowndSignInLoginStep: String, Codable {
+    case Init = "init"
+    case NoAccount = "no_account"
+    case Success = "success"
+}
+
+internal struct RowndSignInJsOptions: Encodable {
+    public var token: String? = nil
+    public var loginStep: RowndSignInLoginStep? = nil
+    public var intent: RowndSignInIntent? = nil
+    public var userType: UserType? = nil
+    
+    enum CodingKeys: String, CodingKey {
+        case token, intent
+        case loginStep = "login_step"
+        case userType = "user_type"
     }
 }
 
