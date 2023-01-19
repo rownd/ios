@@ -118,6 +118,13 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
+        var signInOptions = signInOptions
+        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
+            if (store.state.appConfig.config?.hub?.auth?.signInUpFlow != true) {
+                signInOptions?.intent = nil
+                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
+            }
+        }
         switch with {
         case .appleId:
             appleSignUpCoordinator?.signIn(signInOptions?.intent)
@@ -190,6 +197,13 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
+        var signInOptions = signInOptions
+        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
+            if (store.state.appConfig.config?.hub?.auth?.signInUpFlow != true) {
+                signInOptions?.intent = nil
+                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
+            }
+        }
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
