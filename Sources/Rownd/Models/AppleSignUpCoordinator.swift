@@ -88,8 +88,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
                 Auth.fetchToken(idToken: idToken, intent: intent) { [self] tokenResponse in
-                    if (tokenResponse?.userType == UserType.NewUser && tokenResponse?.token != nil && intent == RowndSignInIntent.signIn) {
-                        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(token: tokenResponse?.token, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn  ))
+                    if (tokenResponse?.userType == UserType.NewUser && intent == RowndSignInIntent.signIn) {
+                        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(token: idToken, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn  ))
                     } else {
                         DispatchQueue.main.async {
                             store.dispatch(store.state.auth.onReceiveAuthTokens(

@@ -120,7 +120,7 @@ public class Rownd: NSObject {
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
         var signInOptions = signInOptions
         if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
-            if (store.state.appConfig.config?.hub?.auth?.signInUpFlow != true) {
+            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
                 signInOptions?.intent = nil
                 logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
             }
@@ -169,8 +169,8 @@ public class Rownd: NSObject {
                     if let idToken = authentication.idToken {
                         logger.debug("Successully completed Google sign-in")
                         Auth.fetchToken(idToken: idToken, intent: signInOptions?.intent) { tokenResponse in
-                            if (tokenResponse?.userType == UserType.NewUser && tokenResponse?.token != nil && signInOptions?.intent == RowndSignInIntent.signIn) {
-                                requestSignIn(jsFnOptions: RowndSignInJsOptions(token: tokenResponse?.token, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn ))
+                            if (tokenResponse?.userType == UserType.NewUser && signInOptions?.intent == RowndSignInIntent.signIn) {
+                                requestSignIn(jsFnOptions: RowndSignInJsOptions(token: idToken, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn ))
                             } else {
                                 DispatchQueue.main.async {
                                     store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse?.accessToken, refreshToken: tokenResponse?.refreshToken)))
@@ -199,7 +199,7 @@ public class Rownd: NSObject {
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         var signInOptions = signInOptions
         if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
-            if (store.state.appConfig.config?.hub?.auth?.signInUpFlow != true) {
+            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
                 signInOptions?.intent = nil
                 logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
             }
