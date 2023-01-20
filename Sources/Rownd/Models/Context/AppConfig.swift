@@ -79,13 +79,13 @@ extension AppHubConfigState: Codable {
 
 public struct AppHubAuthConfigState: Hashable {
     public var signInMethods: SignInMethods?
-    public var signInUpFlow: Bool?
+    public var useExplicitSignUpFlow: Bool?
 }
 
 extension AppHubAuthConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case signInMethods = "sign_in_methods"
-        case signInUpFlow = "sign_in_up_flow"
+        case useExplicitSignUpFlow = "use_explicit_sign_up_flow"
     }
 }
 
