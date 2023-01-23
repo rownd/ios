@@ -161,13 +161,20 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-    
+    static func fetchToken(_ token: String) async -> String? {
+        await withCheckedContinuation { continuation in
+            fetchToken(idToken: token) { tokenResp in
+                continuation.resume(returning: tokenResp?.accessToken)
+            }
+        }
+    }
+
     static func fetchToken(idToken: String, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         guard let appId = store.state.appConfig.id else { return completion(nil) }
         let tokenRequest = TokenRequest(idToken: idToken, appId: appId)
         return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
     }
-    
+
     static func fetchToken(tokenRequest: TokenRequest, withCompletion completion: @escaping (AuthState?) -> Void) -> Void {
         var resource = TokenResource()
         resource.headers = [
