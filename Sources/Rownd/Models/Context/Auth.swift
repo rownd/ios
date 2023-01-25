@@ -182,7 +182,14 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-    
+    static func fetchToken(_ token: String) async -> String? {
+        await withCheckedContinuation { continuation in
+            fetchToken(idToken: token) { tokenResp in
+                continuation.resume(returning: tokenResp?.accessToken)
+            }
+        }
+    }
+
     static func fetchToken(idToken: String, intent: RowndSignInIntent?, withCompletion completion: @escaping (TokenResponse?) -> Void) -> Void {
         guard let appId = store.state.appConfig.id else { return completion(nil) }
         let tokenRequest = TokenRequest(idToken: idToken, appId: appId, intent: intent)

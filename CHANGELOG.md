@@ -1,5 +1,12 @@
 
 
+# [2.3.0](https://github.com/rownd/ios/compare/2.2.2...2.3.0) (2023-01-23)
+
+
+### Features
+
+* **auth:** support third-party token exchange ([#41](https://github.com/rownd/ios/issues/41)) ([bd8ff45](https://github.com/rownd/ios/commit/bd8ff4584d5744b31a78e923afa65de7365b15a7))
+
 ## [2.2.2](https://github.com/rownd/ios/compare/2.2.1...2.2.2) (2023-01-06)
 
 ## [2.2.1](https://github.com/rownd/ios/compare/2.2.0...2.2.1) (2023-01-06)

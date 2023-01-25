@@ -245,7 +245,11 @@ public class Rownd: NSObject {
     @discardableResult public static func getAccessToken() async throws -> String? {
         return try await store.state.auth.getAccessToken()
     }
-    
+
+    @discardableResult public static func getAccessToken(token: String) async -> String? {
+        return await Auth.fetchToken(token)
+    }
+
     public func state() -> Store<RowndState> {
         return store
     }
