@@ -118,13 +118,7 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
-        var signInOptions = signInOptions
-        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
-            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
-                signInOptions?.intent = nil
-                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
-            }
-        }
+        var signInOptions = determineSignInOptions(signInOptions)
         switch with {
         case .appleId:
             appleSignUpCoordinator?.signIn(signInOptions?.intent)
@@ -197,13 +191,7 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
-        var signInOptions = signInOptions
-        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
-            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
-                signInOptions?.intent = nil
-                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
-            }
-        }
+        var signInOptions = determineSignInOptions(signInOptions)
         let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
@@ -284,6 +272,17 @@ public class Rownd: NSObject {
                 print("Error refreshing token 3: \(String(describing: error))")
             }
         }
+    }
+    
+    internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
+        var signInOptions = signInOptions
+        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
+            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
+                signInOptions?.intent = nil
+                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
+            }
+        }
+        return signInOptions
     }
     
     // MARK: Internal methods
