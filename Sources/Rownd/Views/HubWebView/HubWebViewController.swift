@@ -252,11 +252,13 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
                 
             case .triggerSignInWithApple:
+                guard case .triggerSignInWithApple(let signInWithAppleMessage) = hubMessage.payload else { return }
                 self.hubViewController?.hide()
-                Rownd.requestSignIn(with: .appleId)
+                Rownd.requestSignIn(with: .appleId, signInOptions: RowndSignInOptions(intent: signInWithAppleMessage.intent))
                 
             case .triggerSignInWithGoogle:
-                Rownd.requestSignIn(with: .googleId) {
+                guard case .triggerSignInWithGoogle(let signInWithGoogleMessage) = hubMessage.payload else { return }
+                Rownd.requestSignIn(with: .googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage.intent)) {
                     self.hubViewController?.hide()
                 }
             case .triggerSignUpWithPasskey:
