@@ -50,6 +50,7 @@ enum MessageType: String, Codable {
     case triggerSignUpWithPasskey = "trigger_sign_up_with_passkey"
     case userDataUpdate = "user_data_update"
     case tryAgain = "try_again"
+    case hubLoaded = "hub_loaded"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -76,6 +77,7 @@ enum MessagePayload: Decodable {
     case triggerSignInWithApple(TriggerSignInWithAppleMessage)
     case triggerSignInWithGoogle(TriggerSignInWithGoogleMessage)
     case triggerSignUpWithPasskey
+    case hubLoaded
     case tryAgain
     
     enum CodingKeys: String, CodingKey {
@@ -120,6 +122,9 @@ enum MessagePayload: Decodable {
         
         case .tryAgain:
             self = .tryAgain
+            
+        case .hubLoaded:
+            self = .hubLoaded
             
         case .unknown:
             self = .unknown

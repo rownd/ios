@@ -173,7 +173,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         
-        hubViewController?.setLoading(false)
+        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
+        if (webViewOrigin != Rownd.config.baseUrl) {
+            // Only disable loading if webView is not from hub
+            hubViewController?.setLoading(false)
+        }
         
         setFeatureFlagsJS()
         
@@ -280,6 +284,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             case .tryAgain:
                 startLoading()
+            case .hubLoaded:
+                hubViewController?.setLoading(false)
             case .unknown:
                 break
             }
