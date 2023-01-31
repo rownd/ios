@@ -235,7 +235,15 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
-        return await Auth.fetchToken(token)
+        guard let tokenResponse = await Auth.fetchToken(token) else { return nil }
+        
+        DispatchQueue.main.async {
+            store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
+            store.dispatch(UserData.fetch())
+        }
+        
+        return tokenResponse.accessToken
+        
     }
 
     public func state() -> Store<RowndState> {

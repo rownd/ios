@@ -182,10 +182,10 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-    static func fetchToken(_ token: String) async -> String? {
+    static func fetchToken(_ token: String) async -> TokenResponse? {
         await withCheckedContinuation { continuation in
             fetchToken(idToken: token, intent: nil) { tokenResp in
-                continuation.resume(returning: tokenResp?.accessToken)
+                continuation.resume(returning: tokenResp)
             }
         }
     }
