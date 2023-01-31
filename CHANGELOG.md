@@ -1,5 +1,17 @@
 
 
+# [2.4.0](https://github.com/rownd/ios/compare/2.3.0...2.4.0) (2023-01-31)
+
+
+### Bug Fixes
+
+* **auth:** token sign-in may not work ([ebe593d](https://github.com/rownd/ios/commit/ebe593da95be008294dd0e097bc03e3a68c86e62))
+
+
+### Features
+
+* support split sign in/up flow ([#40](https://github.com/rownd/ios/issues/40)) ([282544c](https://github.com/rownd/ios/commit/282544cac330ecfa0b5222c4a9b717db4826d507))
+
 # [2.3.0](https://github.com/rownd/ios/compare/2.2.2...2.3.0) (2023-01-23)
 
 
