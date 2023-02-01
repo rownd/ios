@@ -98,6 +98,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         
         // Init WebView
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         webView.customUserAgent = DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -114,6 +115,19 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     public override func viewDidLoad() {
         super.viewDidLoad()
         startLoading()
+    }
+    
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            print("Estimated progress: \(Float(webView.estimatedProgress))")
+//            if webView.estimatedProgress == 1.0 {
+//                UIView.animate(withDuration: 1.0) {
+//                    self.webView.alpha = 1.0
+//                    self.hubViewController?.setLoading(false)
+//                }
+////                hubViewController?.setLoading(false)
+//            }
+        }
     }
 }
 
@@ -174,16 +188,16 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         
-        UIView.animate(withDuration: 1.0) {
-            self.webView.alpha = 1.0
-        }
-        hubViewController?.setLoading(false)
-        
-//        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
-//        if (webViewOrigin != Rownd.config.baseUrl) {
-//            // Only disable loading if webView is not from hub
-//            hubViewController?.setLoading(false)
+//        UIView.animate(withDuration: 1.0) {
+//            self.webView.alpha = 1.0
 //        }
+//        hubViewController?.setLoading(false)
+        
+        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
+        if (webViewOrigin != Rownd.config.baseUrl) {
+            // Only disable loading if webView is not from hub
+            hubViewController?.setLoading(false)
+        }
         
         setFeatureFlagsJS()
         
@@ -291,12 +305,19 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .tryAgain:
                 startLoading()
             case .hubLoaded:
-                hubViewController?.setLoading(false)
+                self.animateInContent()
             case .unknown:
                 break
             }
         } catch {
             logger.error("Failed to decode incoming interop message: \(String(describing: error))")
+        }
+    }
+    
+    private func animateInContent() {
+        UIView.animate(withDuration: 1.0) {
+            self.webView.alpha = 1.0
+            self.hubViewController?.setLoading(false)
         }
     }
 }
