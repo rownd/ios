@@ -74,8 +74,8 @@ enum MessagePayload: Decodable {
     case signOut
     case closeHubViewController
     case unknown
-    case triggerSignInWithApple
-    case triggerSignInWithGoogle
+    case triggerSignInWithApple(TriggerSignInWithAppleMessage)
+    case triggerSignInWithGoogle(TriggerSignInWithGoogleMessage)
     case triggerSignUpWithPasskey
     case hubLoaded
     case tryAgain
@@ -96,10 +96,12 @@ enum MessagePayload: Decodable {
         
         switch type {
         case .triggerSignInWithApple:
-            self = .triggerSignInWithApple
+            let payload = try objectContainer.decode(TriggerSignInWithAppleMessage.self)
+            self = .triggerSignInWithApple(payload)
         
         case .triggerSignInWithGoogle:
-            self = .triggerSignInWithGoogle
+            let payload = try objectContainer.decode(TriggerSignInWithGoogleMessage.self)
+            self = .triggerSignInWithGoogle(payload)
         
         case .triggerSignUpWithPasskey:
             self = .triggerSignUpWithPasskey
@@ -136,6 +138,22 @@ enum MessagePayload: Decodable {
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
             case refreshToken = "refresh_token"
+        }
+    }
+    
+    public struct TriggerSignInWithGoogleMessage: Codable {
+        var intent: RowndSignInIntent? = nil
+        
+        enum CodingKeys: String, CodingKey {
+            case intent
+        }
+    }
+    
+    public struct TriggerSignInWithAppleMessage: Codable {
+        var intent: RowndSignInIntent? = nil
+        
+        enum CodingKeys: String, CodingKey {
+            case intent
         }
     }
     
