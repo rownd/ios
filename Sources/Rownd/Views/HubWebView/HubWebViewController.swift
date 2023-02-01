@@ -177,7 +177,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
         if (webViewOrigin != Rownd.config.baseUrl) {
             // Only disable loading if webView is not from hub
-            hubViewController?.setLoading(false)
+            self.animateInContent()
         }
         
         setFeatureFlagsJS()
