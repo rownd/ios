@@ -120,12 +120,13 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             print("Estimated progress: \(Float(webView.estimatedProgress))")
-            if webView.estimatedProgress == 1.0 {
-                UIView.animate(withDuration: 1.0) {
-                    self.webView.alpha = 1.0
-                    self.hubViewController?.setLoading(false)
-                }
-            }
+//            if webView.estimatedProgress == 1.0 {
+//                UIView.animate(withDuration: 1.0) {
+//                    self.webView.alpha = 1.0
+//                    self.hubViewController?.setLoading(false)
+//                }
+////                hubViewController?.setLoading(false)
+//            }
         }
     }
 }
@@ -192,11 +193,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 //        }
 //        hubViewController?.setLoading(false)
         
-//        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
-//        if (webViewOrigin != Rownd.config.baseUrl) {
-//            // Only disable loading if webView is not from hub
-//            hubViewController?.setLoading(false)
-//        }
+        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
+        if (webViewOrigin != Rownd.config.baseUrl) {
+            // Only disable loading if webView is not from hub
+            hubViewController?.setLoading(false)
+        }
         
         setFeatureFlagsJS()
         
@@ -304,8 +305,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .tryAgain:
                 startLoading()
             case .hubLoaded:
-//                self.animateInContent()
-                break
+                self.animateInContent()
             case .unknown:
                 break
             }
