@@ -106,6 +106,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         webView.hack_removeInputAccessory()
+        webView.alpha = 0
         self.modalPresentationStyle = .pageSheet
         view = webView
     }
@@ -285,12 +286,19 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .tryAgain:
                 startLoading()
             case .hubLoaded:
-                hubViewController?.setLoading(false)
+                self.animateInContent()
             case .unknown:
                 break
             }
         } catch {
             logger.error("Failed to decode incoming interop message: \(String(describing: error))")
+        }
+    }
+    
+    private func animateInContent() {
+        UIView.animate(withDuration: 1.0) {
+            self.webView.alpha = 1.0
+            self.hubViewController?.setLoading(false)
         }
     }
 }
