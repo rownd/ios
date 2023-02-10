@@ -1,5 +1,12 @@
 
 
+## [2.4.1](https://github.com/rownd/ios/compare/2.4.0...2.4.1) (2023-02-10)
+
+
+### Bug Fixes
+
+* pass down intent from hub to apple/google sign-in ([#42](https://github.com/rownd/ios/issues/42)) ([54c0def](https://github.com/rownd/ios/commit/54c0defe585c5d1549e77ceaae6433ffdf2f0ccd))
+
 # [2.4.0](https://github.com/rownd/ios/compare/2.3.0...2.4.0) (2023-01-31)
 
 
