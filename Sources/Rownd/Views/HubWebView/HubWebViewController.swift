@@ -178,8 +178,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         if (webViewOrigin != Rownd.config.baseUrl) {
             // Only disable loading if webView is not from hub
             self.animateInContent()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+                self.animateInContent()
+            }
         }
-        
         setFeatureFlagsJS()
         
         if let jsFnOptions = jsFnOptions {
