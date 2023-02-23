@@ -85,9 +85,21 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         let hubViewController = getHubViewController()
         
+        guard let subdomain = store.state.appConfig.config?.subdomain else {
+            logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
+            return
+        }
+        
         Task {
             do {
-                let challengeResponse: PasskeyRegisterResponse = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/hub/auth/passkeys/registration")!)).value
+                let challengeResponse: PasskeyRegisterResponse = try await Rownd.apiClient.send(
+                    Get.Request(
+                        url: URL(string: "/hub/auth/passkeys/registration")!,
+                        headers: [
+                            "origin": "https://\(subdomain + Rownd.config.subdomainExtension)"
+                        ]
+                    )
+                ).value
                 
                 await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.loading, biometricType: LAContext().biometricType.rawValue))
                 
@@ -117,9 +129,22 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         //Use passkey to sign in as a Rownd user
         method = PasskeyCoordinatorMethods.SignIn
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
+        
+        guard let subdomain = store.state.appConfig.config?.subdomain else {
+            logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
+            return
+        }
+        
         Task {
             do {
-                let challengeResponse: PasskeyAuthenticationResponse = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/hub/auth/passkeys/authentication")!)).value
+                let challengeResponse: PasskeyAuthenticationResponse = try await Rownd.apiClient.send(
+                    Get.Request(
+                        url: URL(string: "/hub/auth/passkeys/authentication")!,
+                        headers: [
+                            "origin": "https://\(subdomain + Rownd.config.subdomainExtension)"
+                        ]
+                    )
+                ).value
                 signInWith(anchor: anchor, preferImmediatelyAvailableCredentials: false, challengeResponse: challengeResponse)
             }
             catch {
@@ -188,10 +213,23 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             let hubViewController = getHubViewController()
 
             Task {
-                let body: PasskeyRegisterPayload = PasskeyRegisterPayload(response: PasskeyRegisterPayloadResponse(attestationObject: attestationObject?.base64URLEncodedString() ?? "", clientDataJSON: clientDataJSON.base64URLEncodedString()), id: credentialID, rawId: credentialID)
+                let body: PasskeyRegisterPayload = PasskeyRegisterPayload(
+                    response: PasskeyRegisterPayloadResponse(
+                    attestationObject: attestationObject?.base64URLEncodedString() ?? "",
+                    clientDataJSON: clientDataJSON.base64URLEncodedString()),
+                    id: credentialID,
+                    rawId: credentialID
+                )
 
                 do {
-                    let _ = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/hub/auth/passkeys/registration")!, method: "post", body: body, headers: ["content-type":"application/json"] )).value
+                    let _ = try await Rownd.apiClient.send(Get.Request(
+                        url: URL(string: "/hub/auth/passkeys/registration")!,
+                        method: "post",
+                        body: body,
+                        headers: [
+                            "content-type":"application/json"
+                        ]
+                    )).value
                     await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.success, biometricType: LAContext().biometricType.rawValue))
                 } catch {
                     logger.error("Failed passkey POST registration: \(String(describing: error))")
@@ -205,18 +243,53 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             let credentialID = credentialAssertion.credentialID.base64URLEncodedString()
             let authenticatorData = credentialAssertion.rawAuthenticatorData
             
+            let hubViewController = getHubViewController()
+            
             Task {
-                let body: PasskeyAuthenticationPayload = PasskeyAuthenticationPayload(response: PasskeyAuthenticationPayloadResponse(clientDataJSON: clientDataJSON.base64URLEncodedString(), signature: signature?.base64URLEncodedString() ?? "", userHandle: userId?.base64URLEncodedString() ?? "", authenticatorData: authenticatorData?.base64URLEncodedString() ?? ""), rawId: credentialID, id: credentialID)
+                let body: PasskeyAuthenticationPayload = PasskeyAuthenticationPayload(
+                    response: PasskeyAuthenticationPayloadResponse(
+                        clientDataJSON: clientDataJSON.base64URLEncodedString(),
+                        signature: signature?.base64URLEncodedString() ?? "",
+                        userHandle: userId?.base64URLEncodedString() ?? "",
+                        authenticatorData: authenticatorData?.base64URLEncodedString() ?? ""
+                    ),
+                    rawId: credentialID,
+                    id: credentialID
+                )
 
                 do {
-                    let challengeAuthenticationCompleteResponse: PasskeyAuthenticationCompleteResponse = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/hub/auth/passkeys/authentication")!, method: "post", body: body, headers: ["content-type":"application/json"] )).value
+                    let challengeAuthenticationCompleteResponse: PasskeyAuthenticationCompleteResponse = try await Rownd.apiClient.send(
+                        Get.Request(
+                            url: URL(string: "/hub/auth/passkeys/authentication")!,
+                            method: "post",
+                            body: body,
+                            headers: ["content-type":"application/json"]
+                        )
+                    ).value
                     
                     DispatchQueue.main.async {
                         store.dispatch(SetAuthState(payload: AuthState(accessToken: challengeAuthenticationCompleteResponse.access_token, refreshToken: challengeAuthenticationCompleteResponse.refresh_token)))
                         store.dispatch(UserData.fetch())
                     }
+                    
+                    await hubViewController?.loadNewPage(
+                        targetPage: .signIn,
+                        jsFnOptions: RowndSignInJsOptions(
+                            loginStep: RowndSignInLoginStep.Success,
+                            intent: .signIn,
+                            userType: .ExistingUser
+                        )
+                    )
                 } catch {
                     logger.error("Failed passkey POST registration: \(String(describing: error))")
+                    await hubViewController?.loadNewPage(
+                        targetPage: .signIn,
+                        jsFnOptions: RowndSignInJsOptions(
+                            loginStep: RowndSignInLoginStep.Init,
+                            intent: .signIn,
+                            userType: .ExistingUser
+                        )
+                    )
                 }
             }
         default:

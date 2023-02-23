@@ -118,7 +118,7 @@ public class Rownd: NSObject {
     }
     
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
-        var signInOptions = determineSignInOptions(signInOptions)
+        let signInOptions = determineSignInOptions(signInOptions)
         switch with {
         case .appleId:
             appleSignUpCoordinator?.signIn(signInOptions?.intent)
@@ -171,7 +171,13 @@ public class Rownd: NSObject {
                                     store.dispatch(UserData.fetch())
                                     store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
                                     
-                                    requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Success,intent: signInOptions?.intent, userType: tokenResponse?.userType))
+                                    requestSignIn(
+                                        jsFnOptions: RowndSignInJsOptions(
+                                            loginStep: RowndSignInLoginStep.Success,
+                                            intent: signInOptions?.intent,
+                                            userType: tokenResponse?.userType
+                                        )
+                                    )
                                 }
                             }
                         }

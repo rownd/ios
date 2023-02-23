@@ -276,6 +276,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage?.intent))
             case .triggerSignUpWithPasskey:
                 HubWebViewController.passkeyCoordinator?.signUpWith()
+                
+            case .triggerSignInWithPasskey:
+                Rownd.requestSignIn(with: .passkey)
 
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
