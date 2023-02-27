@@ -40,6 +40,7 @@ open class RowndCustomizations: Encodable {
             height: 100
         )
 
+        aniView.loopMode = .loop
         aniView.startAnimating()
         return aniView
     }

@@ -106,6 +106,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         webView.hack_removeInputAccessory()
+        webView.alpha = 0
         self.modalPresentationStyle = .pageSheet
         view = webView
     }
@@ -173,8 +174,15 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         
-        hubViewController?.setLoading(false)
-        
+        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
+        if (webViewOrigin != Rownd.config.baseUrl) {
+            // Only disable loading if webView is not from hub
+            self.animateInContent()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+                self.animateInContent()
+            }
+        }
         setFeatureFlagsJS()
         
         if let jsFnOptions = jsFnOptions {
@@ -280,11 +288,20 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             case .tryAgain:
                 startLoading()
+            case .hubLoaded:
+                self.animateInContent()
             case .unknown:
                 break
             }
         } catch {
             logger.error("Failed to decode incoming interop message: \(String(describing: error))")
+        }
+    }
+    
+    private func animateInContent() {
+        UIView.animate(withDuration: 1.0) {
+            self.webView.alpha = 1.0
+            self.hubViewController?.setLoading(false)
         }
     }
 }
