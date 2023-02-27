@@ -48,6 +48,7 @@ enum MessageType: String, Codable {
     case triggerSignInWithApple = "trigger_sign_in_with_apple"
     case triggerSignInWithGoogle = "trigger_sign_in_with_google"
     case triggerSignUpWithPasskey = "trigger_sign_up_with_passkey"
+    case triggerSignInWithPasskey = "trigger_sign_in_with_passkey"
     case userDataUpdate = "user_data_update"
     case tryAgain = "try_again"
     case hubLoaded = "hub_loaded"
@@ -78,6 +79,7 @@ enum MessagePayload: Decodable {
     case triggerSignInWithGoogle(TriggerSignInWithGoogleMessage)
     case triggerSignUpWithPasskey
     case hubLoaded
+    case triggerSignInWithPasskey
     case tryAgain
     
     enum CodingKeys: String, CodingKey {
@@ -105,6 +107,9 @@ enum MessagePayload: Decodable {
         
         case .triggerSignUpWithPasskey:
             self = .triggerSignUpWithPasskey
+            
+        case .triggerSignInWithPasskey:
+            self = .triggerSignInWithPasskey
             
         case .authentication:
             let payload = try objectContainer.decode(AuthenticationMessage.self)
