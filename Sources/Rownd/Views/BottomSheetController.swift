@@ -37,7 +37,8 @@ class BottomSheetController: UIViewController {
         } else {
             behavior.heightMode = .specific(values: [.screenRatio(value: 0.7), .screenRatio(value: 1)], heightLimit: .statusBar)
         }
-
+        
+        subscribeToNotification(UIResponder.keyboardWillShowNotification, selector: #selector(keyboardWillShow))
         
         var theme: LBBottomSheet.BottomSheetController.Theme = .init()
         theme.cornerRadius = Rownd.config.customizations.sheetCornerBorderRadius
@@ -53,8 +54,6 @@ class BottomSheetController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        subscribeToNotification(UIResponder.keyboardWillShowNotification, selector: #selector(keyboardWillShow))
     }
     
     override func viewWillDisappear(_ animated: Bool) {
