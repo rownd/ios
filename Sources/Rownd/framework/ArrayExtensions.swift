@@ -9,7 +9,7 @@ import Foundation
 
 extension Array {
     subscript(safe index: Index) -> Element? {
-        let isValidIndex = index >= 0 && index <= endIndex
+        let isValidIndex = index >= 0 && index < endIndex
         return isValidIndex ? self[index] : nil
     }
 }
