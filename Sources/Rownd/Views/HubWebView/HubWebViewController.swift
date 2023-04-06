@@ -53,10 +53,39 @@ extension WKWebView {
 
 public class HubWebViewController: UIViewController, WKUIDelegate {
     
-    var webView: WKWebView!
+    let webConfiguration = WKWebViewConfiguration()
+    let userController = WKUserContentController()
+    lazy var webView: WKWebView = WKWebView(frame: .zero, configuration: webConfiguration)
+    
     var url: URL? = nil
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(nibName: nil, bundle: nil)
+        setup()
+    }
+    
+    private func setup() {
+        userController.add(self, name: "rowndIosSDK")
+        webConfiguration.userContentController = userController
+        
+        // Request mobile view
+        let pref = WKWebpagePreferences.init()
+        pref.preferredContentMode = .mobile
+        webConfiguration.defaultWebpagePreferences = pref
+        
+        webView.customUserAgent = DEFAULT_WEB_USER_AGENT
+        webView.uiDelegate = self
+        webView.navigationDelegate = self
+        webView.scrollView.isScrollEnabled = false
+        webView.isOpaque = false
+    }
     
     func setUrl(url: URL) {
         self.url = url
@@ -64,7 +93,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     }
 
     private func startLoading() {
-        guard let webView = self.webView, let url = self.url else { return }
+        guard let url = self.url else { return }
 
         // Skip loading if already begun
         if webView.isLoading { return }
@@ -84,25 +113,14 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     }
     
     public override func loadView() {
-        let webConfiguration = WKWebViewConfiguration()
+//        let webConfiguration = WKWebViewConfiguration()
         
         // Receive messages from Hub JS
-        let userController = WKUserContentController()
-        userController.add(self, name: "rowndIosSDK")
-        webConfiguration.userContentController = userController
-        
-        // Request mobile view
-        let pref = WKWebpagePreferences.init()
-        pref.preferredContentMode = .mobile
-        webConfiguration.defaultWebpagePreferences = pref
+//        let userController = WKUserContentController()
         
         // Init WebView
-        webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        webView.customUserAgent = DEFAULT_WEB_USER_AGENT
-        webView.uiDelegate = self
-        webView.navigationDelegate = self
-        webView.scrollView.isScrollEnabled = false
-        webView.isOpaque = false
+//        webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         webView.hack_removeInputAccessory()
@@ -264,18 +282,29 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 if case .triggerSignInWithApple(let message) = hubMessage.payload {
                     signInWithAppleMessage = message
                 }
-                self.hubViewController?.hide()
-                Rownd.requestSignIn(with: .appleId, signInOptions: RowndSignInOptions(intent: signInWithAppleMessage?.intent))
+//                self.hubViewController?.hide()
+                Rownd.requestSignIn(
+                    with: .appleId,
+                    signInOptions: RowndSignInOptions(
+                        intent: signInWithAppleMessage?.intent
+                    )
+                )
                 
             case .triggerSignInWithGoogle:
                 var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage? = nil
                 if case .triggerSignInWithGoogle(let message) = hubMessage.payload {
                     signInWithGoogleMessage = message
                 }
-                self.hubViewController?.hide()
-                Rownd.requestSignIn(with: .googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage?.intent))
+//                self.hubViewController?.hide()
+                Rownd.requestSignIn(
+                    with: .googleId,
+                    signInOptions: RowndSignInOptions(
+                        intent: signInWithGoogleMessage?.intent
+                    )
+                )
             case .triggerSignUpWithPasskey:
-                HubWebViewController.passkeyCoordinator?.signUpWith()
+                HubWebViewController.passkeyCoordinator?.registerPasskey()
+                break
                 
             case .triggerSignInWithPasskey:
                 Rownd.requestSignIn(with: .passkey)

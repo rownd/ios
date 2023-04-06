@@ -82,11 +82,12 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                     defaults.set(encoded, forKey: appleSignInDataKey)
                 }
             }
-            
+
             
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
+                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Completing, intent: self.intent))
                 Auth.fetchToken(idToken: idToken, intent: intent) { [self] tokenResponse in
                     if (tokenResponse?.userType == UserType.NewUser && intent == RowndSignInIntent.signIn) {
                         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(token: idToken, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn  ))
@@ -149,6 +150,10 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         
         //If there is any error will get it here
         logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
+        
+        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+            loginStep: .Error
+        ))
     }
 }
 

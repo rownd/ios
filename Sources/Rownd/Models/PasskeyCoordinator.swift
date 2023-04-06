@@ -58,8 +58,8 @@ extension LAContext {
 }
 
 enum PasskeyCoordinatorMethods {
-    case SignIn
-    case SignUp
+    case Register
+    case Authenticate
 }
 
 class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
@@ -79,9 +79,9 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         return nil
     }
     
-    func signUpWith() {
+    func registerPasskey() {
         //Add passkey to the Rownd user
-        method = PasskeyCoordinatorMethods.SignUp
+        method = PasskeyCoordinatorMethods.Register
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         let hubViewController = getHubViewController()
         
@@ -101,7 +101,13 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     )
                 ).value
                 
-                await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.loading, biometricType: LAContext().biometricType.rawValue))
+                await hubViewController?.loadNewPage(
+                    targetPage: .connectPasskey,
+                    jsFnOptions: RowndConnectPasskeySignInOptions(
+                        status: Status.loading,
+                        biometricType: LAContext().biometricType.rawValue
+                    )
+                )
                 
                 let appName = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
                 // Username priority in order First Name, Email, App name
@@ -116,18 +122,24 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     userName = firstName
                 }
 
-                signUpWith(userName: userName, anchor: anchor, challengeResponse: challengeResponse)
+                registerPasskey(userName: userName, anchor: anchor, challengeResponse: challengeResponse)
             }
             catch {
                 logger.error("Failed to fetch passkey registration challenge: \(String(describing: error))")
-                await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.failed, biometricType: LAContext().biometricType.rawValue))
+                await hubViewController?.loadNewPage(
+                    targetPage: .connectPasskey,
+                    jsFnOptions: RowndConnectPasskeySignInOptions(
+                        status: Status.failed,
+                        biometricType: LAContext().biometricType.rawValue
+                    )
+                )
             }
         }
     }
     
     func signInWith() {
         //Use passkey to sign in as a Rownd user
-        method = PasskeyCoordinatorMethods.SignIn
+        method = PasskeyCoordinatorMethods.Authenticate
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         
         guard let subdomain = store.state.appConfig.config?.subdomain else {
@@ -176,7 +188,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
 
     }
     
-    func signUpWith(userName: String, anchor: ASPresentationAnchor, challengeResponse: PasskeyRegisterResponse) {
+    func registerPasskey(userName: String, anchor: ASPresentationAnchor, challengeResponse: PasskeyRegisterResponse) {
         guard let subdomain = store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
@@ -185,12 +197,18 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             logger.trace("iOS 15.0 is required to sign in with Passkey")
             return
         }
-        let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension)
+        let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+            relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension
+        )
         
         let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
         let userID = Data(challengeResponse.user.id.utf8)
 
-        let registrationRequest = publicKeyCredentialProvider.createCredentialRegistrationRequest(challenge: challenge, name: userName, userID: userID)
+        let registrationRequest = publicKeyCredentialProvider.createCredentialRegistrationRequest(
+            challenge: challenge,
+            name: userName,
+            userID: userID
+        )
 
         let authController = ASAuthorizationController(authorizationRequests: [ registrationRequest ] )
         authController.delegate = self
@@ -233,7 +251,13 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.success, biometricType: LAContext().biometricType.rawValue))
                 } catch {
                     logger.error("Failed passkey POST registration: \(String(describing: error))")
-                    await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.failed, biometricType: LAContext().biometricType.rawValue))
+                    await hubViewController?.loadNewPage(
+                        targetPage: .connectPasskey,
+                        jsFnOptions: RowndConnectPasskeySignInOptions(
+                            status: Status.failed,
+                            biometricType: LAContext().biometricType.rawValue
+                        )
+                    )
                 }
             }
         case let credentialAssertion as ASAuthorizationPlatformPublicKeyCredentialAssertion:
@@ -268,7 +292,12 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     ).value
                     
                     DispatchQueue.main.async {
-                        store.dispatch(SetAuthState(payload: AuthState(accessToken: challengeAuthenticationCompleteResponse.access_token, refreshToken: challengeAuthenticationCompleteResponse.refresh_token)))
+                        store.dispatch(SetAuthState(
+                            payload: AuthState(
+                                accessToken: challengeAuthenticationCompleteResponse.access_token,
+                                refreshToken: challengeAuthenticationCompleteResponse.refresh_token
+                            )
+                        ))
                         store.dispatch(UserData.fetch())
                     }
                     
@@ -281,11 +310,11 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         )
                     )
                 } catch {
-                    logger.error("Failed passkey POST registration: \(String(describing: error))")
+                    logger.error("Failed passkey POST authentication: \(String(describing: error))")
                     await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
-                            loginStep: RowndSignInLoginStep.Init,
+                            loginStep: .Error,
                             intent: .signIn,
                             userType: .ExistingUser
                         )
@@ -294,33 +323,91 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             }
         default:
             logger.error("Failed: Unsupported authorization type")
+            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                loginStep: .Error,
+                intent: .signIn,
+                userType: .ExistingUser
+            ))
         }
 
     }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    
+    private func handleRegistrationError(_ controller: ASAuthorizationController, _ error: Error) {
         let hubViewController = getHubViewController()
         
-        guard let authorizationError = error as? ASAuthorizationError else {
-            logger.error("Unexpected authorization error: \(error.localizedDescription)")
-            if (method == PasskeyCoordinatorMethods.SignUp) {
-                hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.failed, biometricType: LAContext().biometricType.rawValue))
-            }
-            return
-        }
+        logger.error("Passkey registration error: \(error.localizedDescription)")
 
-        if authorizationError.code == .canceled {
-            // Either the system doesn't find any credentials and the request ends silently, or the user cancels the request.
-            // This is a good time to show a traditional login form, or ask the user to create an account.
-            logger.log("Request canceled.")
-            hubViewController?.dismiss(animated: true)
+        hubViewController?.loadNewPage(
+            targetPage: .connectPasskey,
+            jsFnOptions: RowndConnectPasskeySignInOptions(
+                status: Status.failed,
+                biometricType: LAContext().biometricType.rawValue
+            )
+        )
+    }
+    
+    private func handleAuthenticationError(_ controller: ASAuthorizationController, _ error: Error) {        
+        logger.error("Passkey authentication error: \(error.localizedDescription)")
 
+        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+            loginStep: .Error,
+            intent: .signIn,
+            userType: .ExistingUser
+        ))
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        
+        if method == .Register {
+            handleRegistrationError(controller, error)
         } else {
-            logger.error("Error: \((error as NSError).userInfo)")
-            if (method == PasskeyCoordinatorMethods.SignUp) {
-                hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.failed, biometricType: LAContext().biometricType.rawValue))
-            }
+            handleAuthenticationError(controller, error)
         }
+        
+//        let hubViewController = getHubViewController()
+//
+//        guard let authorizationError = error as? ASAuthorizationError else {
+//            logger.error("Unexpected passkey registration error: \(error.localizedDescription)")
+//            if (method == PasskeyCoordinatorMethods.Authenticate) {
+//                hubViewController?.loadNewPage(
+//                    targetPage: .connectPasskey,
+//                    jsFnOptions: RowndConnectPasskeySignInOptions(
+//                        status: Status.failed,
+//                        biometricType: LAContext().biometricType.rawValue
+//                    )
+//                )
+//            }
+//            return
+//        }
+//
+//        if authorizationError.code == .canceled {
+//            // Either the system doesn't find any credentials and the request ends silently, or the user cancels the request.
+//            // This is a good time to show a traditional login form, or ask the user to create an account.
+//            logger.log("Request canceled.")
+//            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+//                loginStep: .Error,
+//                intent: .signIn,
+//                userType: .ExistingUser
+//            ))
+//
+//        } else {
+//            logger.error("Error: \((error as NSError).userInfo)")
+//            if (method == PasskeyCoordinatorMethods.Authenticate) {
+//                hubViewController?.loadNewPage(
+//                    targetPage: .connectPasskey,
+//                    jsFnOptions: RowndConnectPasskeySignInOptions(
+//                        status: Status.failed,
+//                        biometricType: LAContext().biometricType.rawValue
+//                    )
+//                )
+//            } else {
+//                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+//                    loginStep: .Error,
+//                    intent: .signIn,
+//                    userType: .ExistingUser
+//                ))
+//            }
+//        }
 
     }
 
