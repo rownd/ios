@@ -128,7 +128,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                     }
                                 }
                                 
-                                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Success,intent: self.intent, userType: tokenResponse?.userType))
+//                                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Success,intent: self.intent, userType: tokenResponse?.userType))
                             })
                         }
                     }

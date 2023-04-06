@@ -171,13 +171,13 @@ public class Rownd: NSObject {
                                     store.dispatch(UserData.fetch())
                                     store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
                                     
-                                    requestSignIn(
-                                        jsFnOptions: RowndSignInJsOptions(
-                                            loginStep: RowndSignInLoginStep.Success,
-                                            intent: signInOptions?.intent,
-                                            userType: tokenResponse?.userType
-                                        )
-                                    )
+//                                    requestSignIn(
+//                                        jsFnOptions: RowndSignInJsOptions(
+//                                            loginStep: RowndSignInLoginStep.Success,
+//                                            intent: signInOptions?.intent,
+//                                            userType: tokenResponse?.userType
+//                                        )
+//                                    )
                                 }
                             }
                         }
