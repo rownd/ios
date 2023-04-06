@@ -1,5 +1,19 @@
 
 
+# [2.5.0](https://github.com/rownd/ios/compare/2.4.1...2.5.0) (2023-04-06)
+
+
+### Bug Fixes
+
+* **auth:** social sign-in can block touch input ([#48](https://github.com/rownd/ios/issues/48)) ([50d132b](https://github.com/rownd/ios/commit/50d132be7be5a1d14e4391c036faeb954cdf4f3b))
+* keyboardWillShow delegate gets triggered everytime ([#47](https://github.com/rownd/ios/issues/47)) ([d7c3d3c](https://github.com/rownd/ios/commit/d7c3d3c560f0eabd26caf071d33c62e1f861d11e))
+
+
+### Features
+
+* **passkeys:** meet server requirements ([#46](https://github.com/rownd/ios/issues/46)) ([17a2861](https://github.com/rownd/ios/commit/17a2861bca7e4091fc25251e42c4685242ad3599))
+* recieved message from hub to disable webview loading ([#43](https://github.com/rownd/ios/issues/43)) ([c708bed](https://github.com/rownd/ios/commit/c708bed923f1f22d77d32a47a497e08ae69c8061)), closes [#44](https://github.com/rownd/ios/issues/44)
+
 ## [2.4.1](https://github.com/rownd/ios/compare/2.4.0...2.4.1) (2023-02-10)
 
 
