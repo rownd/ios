@@ -1,5 +1,12 @@
 
 
+## [2.5.1](https://github.com/rownd/ios/compare/2.5.0...2.5.1) (2023-04-07)
+
+
+### Bug Fixes
+
+* **store:** failed to decode state after upgrade ([c2631e3](https://github.com/rownd/ios/commit/c2631e3508c317e96cdf75851657958fea68f75b))
+
 # [2.5.0](https://github.com/rownd/ios/compare/2.4.1...2.5.0) (2023-04-06)
 
 
