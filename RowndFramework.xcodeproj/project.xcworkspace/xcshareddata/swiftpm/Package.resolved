@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "factory",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hmlongco/Factory",
+      "state" : {
+        "revision" : "39ff6a675cd0272d833d184d35add0f8fddd63de",
+        "version" : "1.3.7"
+      }
+    },
+    {
       "identity" : "get",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/rownd/get",
@@ -73,6 +82,15 @@
       }
     },
     {
+      "identity" : "kronos",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MobileNativeFoundation/Kronos.git",
+      "state" : {
+        "revision" : "b7f54653a8bb503f42b59ab3160eb11f333b9d3f",
+        "version" : "4.2.1"
+      }
+    },
+    {
       "identity" : "lbbottomsheet",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/LunabeeStudio/LBBottomSheet.git",
@@ -91,12 +109,12 @@
       }
     },
     {
-      "identity" : "mocker#activating-the-mocker",
+      "identity" : "mocker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/WeTransfer/Mocker#activating-the-mocker",
+      "location" : "git@github.com:WeTransfer/Mocker.git",
       "state" : {
-        "revision" : "e7165fb0378193c6784f1d46a9ab2b6184c384fa",
-        "version" : "2.7.0"
+        "revision" : "4384e015cae4916a6828252467a4437173c7ae17",
+        "version" : "3.0.1"
       }
     },
     {
