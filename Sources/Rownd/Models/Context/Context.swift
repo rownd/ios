@@ -24,6 +24,14 @@ extension RowndState {
         case appConfig, auth, user, signIn
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        appConfig = try container.decode(AppConfigState.self, forKey: .appConfig)
+        auth = try container.decode(AuthState.self, forKey: .auth)
+        user = try container.decode(UserState.self, forKey: .user)
+        signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
+    }
+
     static func save(state: RowndState) {
         Task {
             if let encoded = try? state.toJson() {
@@ -37,12 +45,18 @@ extension RowndState {
         let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String ?? String("{}")
 //        logger.trace("initial store state: \(existingStateStr)")
         
-        let decoder = JSONDecoder()
-        if var decoded = try? decoder.decode(RowndState.self, from: (existingStateStr.data(using: .utf8) ?? Data())) {
+        do {
+            let decoder = JSONDecoder()
+            var decoded = try decoder.decode(
+                RowndState.self,
+                from: (existingStateStr.data(using: .utf8) ?? Data())
+            )
             decoded.isInitialized = true
             DispatchQueue.main.async {
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
+        } catch {
+            logger.debug("Failed decoding state from storage (if this is the first time launching the app, this is expected): \(String(describing: error))")
         }
     }
 
