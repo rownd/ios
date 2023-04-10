@@ -197,6 +197,9 @@ class Auth {
         let tokenResp: Response<TokenResponse> = try await rowndApi.send(Request(
             path: "/hub/auth/token",
             method: .post,
+            query: [
+                ("intent_mismatch_behavior", "throw")
+            ],
             body: tokenRequest
         ))
         
