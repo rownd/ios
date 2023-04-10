@@ -11,6 +11,7 @@ import ReSwift
 import ReSwiftThunk
 import JWTDecode
 import Kronos
+import Get
 
 fileprivate let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
 
@@ -182,46 +183,24 @@ struct TokenResource: APIResource {
 
 
 class Auth {
-    static func fetchToken(_ token: String) async -> TokenResponse? {
-        await withCheckedContinuation { continuation in
-            fetchToken(idToken: token, intent: nil) { tokenResp in
-                continuation.resume(returning: tokenResp)
-            }
-        }
-    }
-
-    static func fetchToken(idToken: String, intent: RowndSignInIntent?, withCompletion completion: @escaping (TokenResponse?) -> Void) -> Void {
-        guard let appId = store.state.appConfig.id else { return completion(nil) }
-        let tokenRequest = TokenRequest(idToken: idToken, appId: appId, intent: intent)
-        return fetchToken(tokenRequest: tokenRequest, withCompletion: completion)
+    static func fetchToken(_ token: String) async throws -> TokenResponse? {
+        return try await fetchToken(idToken: token, intent: nil)
     }
     
-    static func fetchToken(tokenRequest: TokenRequest, withCompletion completion: @escaping (TokenResponse?) -> Void) -> Void {
-        var resource = TokenResource()
-        resource.headers = [
-            "Content-Type": "application/json"
-        ]
-
-        let request = APIRequest(resource: resource)
-
-        let encoder = JSONEncoder()
-        var body: Data?
+    static func fetchToken(idToken: String, intent: RowndSignInIntent?) async throws -> TokenResponse? {
+        guard let appId = store.state.appConfig.id else { return nil }
+        let tokenRequest = TokenRequest(idToken: idToken, appId: appId, intent: intent)
+        return try await fetchToken(tokenRequest: tokenRequest)
+    }
+    
+    static func fetchToken(tokenRequest: TokenRequest) async throws -> TokenResponse {
+        let tokenResp: Response<TokenResponse> = try await rowndApi.send(Request(
+            path: "/hub/auth/token",
+            method: .post,
+            body: tokenRequest
+        ))
         
-        do {
-            body = try encoder.encode(tokenRequest)
-        } catch {
-            return completion(nil)
-        }
-        
-        request.execute(method: "POST", body: body) { tokenResp in
-            // This guard ensures that the resource allocator doesn't clean up the request object before
-            // the parsing closure in request.execute() is finished with it.
-            guard request.decode != nil else { return }
-            // Only enable this when debugging API responses, since it could log sensitive info
-            //            logger.trace("Received tokens: \(String(describing: tokenResp))")
-            
-            completion(tokenResp)
-        }
+        return tokenResp.value
     }
 }
 

@@ -152,10 +152,12 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
         logger.trace("Evaluating script: \(code)")
 
-        webView.evaluateJavaScript(wrappedJs) { (result, error) in
-            logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
-            if error != nil {
-                logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
+        Task { @MainActor in
+            webView.evaluateJavaScript(wrappedJs) { (result, error) in
+                logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
+                if error != nil {
+                    logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
+                }
             }
         }
     }
@@ -188,42 +190,44 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     }
     
     public func webViewOnLoad(webView: WKWebView, targetPage: HubPageSelector?, jsFnOptions: Encodable?) {
-        webView.isOpaque = false
-        webView.backgroundColor = UIColor.clear
-        webView.scrollView.backgroundColor = UIColor.clear
-        
-        let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
-        if (webViewOrigin != Rownd.config.baseUrl) {
-            // Only disable loading if webView is not from hub
-            self.animateInContent()
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+        Task { @MainActor in
+            webView.isOpaque = false
+            webView.backgroundColor = UIColor.clear
+            webView.scrollView.backgroundColor = UIColor.clear
+            
+            let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
+            if (webViewOrigin != Rownd.config.baseUrl) {
+                // Only disable loading if webView is not from hub
                 self.animateInContent()
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+                    self.animateInContent()
+                }
             }
-        }
-        setFeatureFlagsJS()
-        
-        if let jsFnOptions = jsFnOptions {
-            do {
-                jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
-            } catch {
-                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+            self.setFeatureFlagsJS()
+            
+            if let jsFnOptions = jsFnOptions {
+                do {
+                    self.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
+                } catch {
+                    logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+                }
             }
-        }
-
-        switch (targetPage ?? hubViewController?.targetPage) {
-        case .signOut:
-            evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
-        case .connectPasskey:
-            evaluateJavaScript(code: "rownd.connectAuthenticator(\(jsFunctionArgsAsJson))", webView: webView)
-        case .signIn, .unknown:
-            evaluateJavaScript(code: "rownd.requestSignIn(\(jsFunctionArgsAsJson))", webView: webView)
-        case .qrCode:
-            evaluateJavaScript(code: "rownd.generateQrCode(\(jsFunctionArgsAsJson))", webView: webView)
-        case .manageAccount:
-            evaluateJavaScript(code: "rownd.user.manageAccount()", webView: webView)
-        case .none:
-            return
+            
+            switch (targetPage ?? self.hubViewController?.targetPage) {
+            case .signOut:
+                self.evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
+            case .connectPasskey:
+                self.evaluateJavaScript(code: "rownd.connectAuthenticator(\(self.jsFunctionArgsAsJson))", webView: webView)
+            case .signIn, .unknown:
+                self.evaluateJavaScript(code: "rownd.requestSignIn(\(self.jsFunctionArgsAsJson))", webView: webView)
+            case .qrCode:
+                self.evaluateJavaScript(code: "rownd.generateQrCode(\(self.jsFunctionArgsAsJson))", webView: webView)
+            case .manageAccount:
+                self.evaluateJavaScript(code: "rownd.user.manageAccount()", webView: webView)
+            case .none:
+                return
+            }
         }
     }
     

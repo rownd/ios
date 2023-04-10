@@ -52,17 +52,19 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     }
     
     public func loadNewPage(targetPage: HubPageSelector, jsFnOptions: Encodable?) {
-        self.targetPage = targetPage
-        if let jsFnOptions = jsFnOptions {
-            do {
-                hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
-            } catch {
-                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+        DispatchQueue.main.async {
+            self.targetPage = targetPage
+            if let jsFnOptions = jsFnOptions {
+                do {
+                    self.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
+                } catch {
+                    logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+                }
             }
-        }
-        
-        if hubWebController.webView.url != nil {
-            hubWebController.webViewOnLoad(webView: hubWebController.webView, targetPage: targetPage, jsFnOptions: jsFnOptions)
+            
+            if self.hubWebController.webView.url != nil {
+                self.hubWebController.webViewOnLoad(webView: self.hubWebController.webView, targetPage: targetPage, jsFnOptions: jsFnOptions)
+            }
         }
     }
     

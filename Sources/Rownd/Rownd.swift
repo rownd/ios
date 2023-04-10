@@ -22,7 +22,7 @@ public class Rownd: NSObject {
     public static var config: RowndConfig = RowndConfig()
 
     public static let user = UserPropAccess()
-    private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
+    private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
     private static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
     internal var bottomSheetController: BottomSheetController = BottomSheetController()
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
@@ -122,14 +122,16 @@ public class Rownd: NSObject {
         let signInOptions = determineSignInOptions(signInOptions)
         switch with {
         case .appleId:
-            appleSignUpCoordinator?.signIn(signInOptions?.intent)
+            appleSignUpCoordinator.signIn(signInOptions?.intent)
         case .passkey:
-            passkeyCoordinator.registerPasskey()
+            passkeyCoordinator.authenticate()
         case .googleId:
-            googleSignInCoordinator.signIn(
-                signInOptions?.intent,
-                completion: completion
-            )
+            Task {
+                await googleSignInCoordinator.signIn(
+                    signInOptions?.intent
+                )
+                completion?()
+            }
         }
     }
     
@@ -177,7 +179,7 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
-        guard let tokenResponse = await Auth.fetchToken(token) else { return nil }
+        guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
         
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
@@ -297,28 +299,34 @@ public class Rownd: NSObject {
     }
 
     internal func getRootViewController() -> UIViewController? {
-        return UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
-            .first?.windows
-            .filter({$0.isKeyWindow}).first?.rootViewController
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let vc = windowScene?.windows.last?.rootViewController
+        return vc
+//        return UIApplication.shared.connectedScenes
+//            .filter({$0.activationState == .foregroundActive})
+//            .compactMap({$0 as? UIWindowScene})
+//            .first?.windows
+//            .filter({$0.isKeyWindow}).first?.rootViewController
     }
     
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
-        let rootViewController = getRootViewController()
-        
-        // Don't try to present again if it's already presented
-        if (bottomSheetController.presentingViewController != nil) {
-            return
-        }
-        
-        // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
-        // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
-        bottomSheetController.controller = viewController
-        bottomSheetController.modalPresentationStyle = .overFullScreen
+        Task { @MainActor in
+            let rootViewController = getRootViewController()
+            
+            // Don't try to present again if it's already presented
+            if (bottomSheetController.presentingViewController != nil) {
+                return
+            }
+            
+            // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
+            // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
+            bottomSheetController.controller = viewController
+            bottomSheetController.modalPresentationStyle = .overFullScreen
 
-        DispatchQueue.main.async {
-            rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
+            DispatchQueue.main.async {
+                rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
+            }
         }
     }
     
@@ -439,6 +447,14 @@ public enum RowndSignInIntent: String, Codable {
     case signUp = "sign_up"
 }
 
+public enum SignInType: String, Codable {
+    case email = "email"
+    case phone = "phone"
+    case apple = "apple"
+    case google = "google"
+    case passkey = "passkey"
+}
+
 internal enum RowndSignInLoginStep: String, Codable {
     case Init = "init"
     case NoAccount = "no_account"
@@ -452,11 +468,13 @@ internal struct RowndSignInJsOptions: Encodable {
     public var loginStep: RowndSignInLoginStep? = nil
     public var intent: RowndSignInIntent? = nil
     public var userType: UserType? = nil
+    public var signInType: SignInType? = nil
     
     enum CodingKeys: String, CodingKey {
         case token, intent
         case loginStep = "login_step"
         case userType = "user_type"
+        case signInType = "sign_in_type"
     }
 }
 
@@ -464,9 +482,10 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
     public var status: Status? = nil
     public var biometricType: String? = ""
     public var type: String = "passkey"
+    public var error: String?
     
     enum CodingKeys: String, CodingKey {
-        case status, type
+        case status, type, error
         case biometricType = "biometric_type"
     }
 }

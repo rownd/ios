@@ -129,15 +129,16 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                 await hubViewController?.loadNewPage(
                     targetPage: .connectPasskey,
                     jsFnOptions: RowndConnectPasskeySignInOptions(
-                        status: Status.failed,
-                        biometricType: LAContext().biometricType.rawValue
+                        status: .failed,
+                        biometricType: LAContext().biometricType.rawValue,
+                        error: error.localizedDescription
                     )
                 )
             }
         }
     }
     
-    func signInWith() {
+    func authenticate() {
         //Use passkey to sign in as a Rownd user
         method = PasskeyCoordinatorMethods.Authenticate
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
@@ -157,7 +158,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         ]
                     )
                 ).value
-                signInWith(anchor: anchor, preferImmediatelyAvailableCredentials: false, challengeResponse: challengeResponse)
+                authenticate(anchor: anchor, preferImmediatelyAvailableCredentials: false, challengeResponse: challengeResponse)
             }
             catch {
                 logger.error("Failed to fetch passkey challenge: \(String(describing: error))")
@@ -165,7 +166,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         }
     }
 
-    func signInWith(anchor: ASPresentationAnchor, preferImmediatelyAvailableCredentials: Bool, challengeResponse: PasskeyAuthenticationResponse) {
+    func authenticate(anchor: ASPresentationAnchor, preferImmediatelyAvailableCredentials: Bool, challengeResponse: PasskeyAuthenticationResponse) {
         guard let subdomain = store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
@@ -255,7 +256,8 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         targetPage: .connectPasskey,
                         jsFnOptions: RowndConnectPasskeySignInOptions(
                             status: Status.failed,
-                            biometricType: LAContext().biometricType.rawValue
+                            biometricType: LAContext().biometricType.rawValue,
+                            error: error.localizedDescription
                         )
                     )
                 }
@@ -335,19 +337,20 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     private func handleRegistrationError(_ controller: ASAuthorizationController, _ error: Error) {
         let hubViewController = getHubViewController()
         
-        logger.error("Passkey registration error: \(error.localizedDescription)")
+        logger.error("Passkey registration error: \(String(describing: error))")
 
         hubViewController?.loadNewPage(
             targetPage: .connectPasskey,
             jsFnOptions: RowndConnectPasskeySignInOptions(
                 status: Status.failed,
-                biometricType: LAContext().biometricType.rawValue
+                biometricType: LAContext().biometricType.rawValue,
+                error: error.localizedDescription
             )
         )
     }
     
     private func handleAuthenticationError(_ controller: ASAuthorizationController, _ error: Error) {        
-        logger.error("Passkey authentication error: \(error.localizedDescription)")
+        logger.error("Passkey authentication error: \(String(describing: error))")
 
         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
             loginStep: .Error,
@@ -357,6 +360,18 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        
+        if let authorizationError = error as? ASAuthorizationError {
+            switch authorizationError.code {
+            case .canceled:
+                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                    loginStep: .Init
+                ))
+                return
+            default:
+                break
+            }
+        }
         
         if method == .Register {
             handleRegistrationError(controller, error)
