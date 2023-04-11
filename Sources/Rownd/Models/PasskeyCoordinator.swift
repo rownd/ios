@@ -110,21 +110,22 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                 )
                 
                 let appName = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
-                // Username priority in order First Name, Email, App name
-                var userName = appName.isEmpty ? "Add app name to Rownd" : appName
+                // Username priority in order Email, phone, or UID
+                var userName = "unknown user"
                 let email = store.state.user.data["email"] != nil ? String(describing: store.state.user.data["email"]!) : ""
-                let firstName = store.state.user.data["first_name"] != nil ? String(describing: store.state.user.data["first_name"]!) : ""
+                let phone = store.state.user.data["phone_number"] != nil ? String(describing: store.state.user.data["phone_number"]!) : ""
+                let uId = store.state.user.data["id"] != nil ? String(describing: store.state.user.data["id"]!) : ""
 
                 if !email.isEmpty {
                     userName = email
-                }
-                if !firstName.isEmpty {
-                    userName = firstName
+                } else if !phone.isEmpty {
+                    userName = phone
+                } else if !uId.isEmpty {
+                    userName = uId
                 }
 
                 registerPasskey(userName: userName, anchor: anchor, challengeResponse: challengeResponse)
-            }
-            catch {
+            } catch {
                 logger.error("Failed to fetch passkey registration challenge: \(String(describing: error))")
                 await hubViewController?.loadNewPage(
                     targetPage: .connectPasskey,
@@ -306,7 +307,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
-                            loginStep: RowndSignInLoginStep.Success,
+                            loginStep: RowndSignInLoginStep.success,
                             intent: .signIn,
                             userType: .ExistingUser
                         )
@@ -316,7 +317,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
-                            loginStep: .Error,
+                            loginStep: .error,
                             intent: .signIn,
                             userType: .ExistingUser
                         )
@@ -326,7 +327,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         default:
             logger.error("Failed: Unsupported authorization type")
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 intent: .signIn,
                 userType: .ExistingUser
             ))
@@ -353,7 +354,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         logger.error("Passkey authentication error: \(String(describing: error))")
 
         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-            loginStep: .Error,
+            loginStep: .error,
             intent: .signIn,
             userType: .ExistingUser
         ))
@@ -365,7 +366,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             switch authorizationError.code {
             case .canceled:
                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .Init
+                    loginStep: .initialize
                 ))
                 return
             default:

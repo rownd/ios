@@ -67,7 +67,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         
         DispatchQueue.main.async {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Completing
+                loginStep: .completing
             ))
         }
         
@@ -105,7 +105,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         
                         Task { @MainActor in
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                loginStep: RowndSignInLoginStep.Success,
+                                loginStep: RowndSignInLoginStep.success,
                                 intent: self.intent,
                                 userType: tokenResponse?.userType
                             ))
@@ -159,13 +159,13 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                                 token: idToken,
-                                loginStep: .NoAccount,
+                                loginStep: .noAccount,
                                 intent: .signIn
                             ))
                         } else {
                             DispatchQueue.main.async {
                                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                    loginStep: .Error,
+                                    loginStep: .error,
                                     signInType: .apple
                                 ))
                             }
@@ -173,7 +173,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                     } catch {
                         DispatchQueue.main.async {
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                loginStep: .Error,
+                                loginStep: .error,
                                 signInType: .apple
                             ))
                         }
@@ -182,7 +182,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             } else {
                 logger.error("Missing data from Apple sign-in response: \(String(describing: appleIDCredential))")
                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .Error,
+                    loginStep: .error,
                     signInType: .apple
                 ))
             }
@@ -190,7 +190,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         default:
             logger.error("Unknown credential type returned from Apple ID sign-in: \(String(describing: authorization.credential))")
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 signInType: .apple
             ))
             break
@@ -205,7 +205,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         
         guard let authorizationError = error as? ASAuthorizationError else {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 signInType: .apple
             ))
             return
@@ -216,7 +216,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             return
         default:
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 signInType: .apple
             ))
         }

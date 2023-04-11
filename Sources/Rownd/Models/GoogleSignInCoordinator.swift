@@ -22,7 +22,7 @@ class GoogleSignInCoordinator: NSObject {
         let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
         guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 signInType: .google
             ))
             return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
@@ -33,7 +33,7 @@ class GoogleSignInCoordinator: NSObject {
             googleConfig.iosClientId == nil ||
             googleConfig.iosClientId == "") {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .Error,
+                loginStep: .error,
                 signInType: .google
             ))
             return logger.error("Cannot sign in with Google. Missing client configuration")
@@ -43,7 +43,7 @@ class GoogleSignInCoordinator: NSObject {
         if let url = NSURL(string: reversedClientId + "://") {
             if (await UIApplication.shared.canOpenURL(url as URL) == false) {
                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .Error,
+                    loginStep: .error,
                     signInType: .google
                 ))
                 return logger.error("Cannot sign in with Google. \(String(describing: reversedClientId)) is not defined in URL schemes")
@@ -68,7 +68,7 @@ class GoogleSignInCoordinator: NSObject {
                         }
                         
                         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                            loginStep: .Error,
+                            loginStep: .error,
                             signInType: .google
                         ))
                         
@@ -79,7 +79,7 @@ class GoogleSignInCoordinator: NSObject {
                     user.authentication.do { authentication, error in
                         guard error == nil, let authentication = authentication, let idToken = authentication.idToken else {
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                loginStep: .Error,
+                                loginStep: .error,
                                 signInType: .google
                             ))
                             logger.error("Google sign-in failed. Either no ID token was present, or an error was thrown. Error:  \(String(describing: error))")
@@ -87,7 +87,7 @@ class GoogleSignInCoordinator: NSObject {
                         }
                         
                         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                            loginStep: .Completing
+                            loginStep: .completing
                         ))
                         
                         logger.debug("Sign-in handshake with Google completed successfully.")
@@ -106,7 +106,7 @@ class GoogleSignInCoordinator: NSObject {
                                     
                                     Rownd.requestSignIn(
                                         jsFnOptions: RowndSignInJsOptions(
-                                            loginStep: .Success,
+                                            loginStep: .success,
                                             intent: intent,
                                             userType: tokenResponse?.userType
                                         )
@@ -117,13 +117,13 @@ class GoogleSignInCoordinator: NSObject {
                                 if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
                                     Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                                         token: idToken,
-                                        loginStep: .NoAccount,
+                                        loginStep: .noAccount,
                                         intent: .signIn
                                     ))
                                 } else {
                                     DispatchQueue.main.async {
                                         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                            loginStep: .Error,
+                                            loginStep: .error,
                                             signInType: .google
                                         ))
                                     }
@@ -132,7 +132,7 @@ class GoogleSignInCoordinator: NSObject {
                                 return continuation.resume()
                             } catch {
                                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                    loginStep: .Error,
+                                    loginStep: .error,
                                     signInType: .google
                                 ))
                                 logger.error("Google sign-in failed during Rownd token exchange. Error: \(String(describing: error))")

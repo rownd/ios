@@ -456,11 +456,11 @@ public enum SignInType: String, Codable {
 }
 
 internal enum RowndSignInLoginStep: String, Codable {
-    case Init = "init"
-    case NoAccount = "no_account"
-    case Success = "success"
-    case Completing = "completing"
-    case Error = "error"
+    case initialize = "init"
+    case noAccount = "no_account"
+    case success = "success"
+    case completing = "completing"
+    case error = "error"
 }
 
 internal struct RowndSignInJsOptions: Encodable {
