@@ -61,6 +61,11 @@ class BottomSheetController: UIViewController {
         //Unsubscribe from all our notifications
         unsubscribeFromAllNotifications()
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.controller = nil
+    }
 }
 
 extension BottomSheetController {

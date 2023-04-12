@@ -95,7 +95,7 @@ extension RowndEncryption {
     }
 
     public static func encrypt(plaintext: String, withKeyId keyId: String) throws -> Data {
-        let key: SecretBox.Key? = try loadKey(keyId: keyId)
+        let key: SecretBox.Key? = loadKey(keyId: keyId)
 
         guard let key = key else {
             throw KeyStoreError("The requested key '\(keyId)' could not be found")

@@ -64,7 +64,7 @@ func signInReducer(action: Action, state: SignInState?) -> SignInState {
     var state = state ?? SignInState()
     
     switch action {
-    case let action as ResetSignInState:
+    case _ as ResetSignInState:
         state = SignInState()
     case let action as SetLastSignInMethod:
         state.lastSignIn = action.payload

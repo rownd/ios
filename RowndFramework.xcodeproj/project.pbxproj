@@ -20,6 +20,7 @@
 		B302E2CD2866C75A005FD927 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CC2866C75A005FD927 /* Auth.swift */; };
 		B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */; };
 		B302E2D1286A4530005FD927 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2D0286A452F005FD927 /* Exporter.swift */; };
+		B305C58D29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B305C58C29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift */; };
 		B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD8E28E780BF00216034 /* GoogleSignIn */; };
 		B30FBD9128E780BF00216034 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9028E780BF00216034 /* GoogleSignInSwift */; };
 		B30FBD9428E7811D00216034 /* CodeScanner_Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B30FBD9328E7811D00216034 /* CodeScanner_Rownd */; };
@@ -63,6 +64,7 @@
 		B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40CE2883C81D00FD0813 /* Sodium */; };
 		B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */; };
 		B396004528D4348D00754238 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = B396004428D4348D00754238 /* Get */; };
+		B39BE52029DB62ED00F3AEBB /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39BE51F29DB62ED00F3AEBB /* ArrayExtensions.swift */; };
 		B39ECA9728E242B10055CB60 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = B39ECA9628E242B10055CB60 /* Lottie */; };
 		B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */; };
 		B3B164F6292C13FE002129A7 /* ReSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B3B164F5292C13FE002129A7 /* ReSwift */; };
@@ -110,6 +112,7 @@
 		B302E2CC2866C75A005FD927 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		B302E2CE286A4060005FD927 /* ReSwiftObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSwiftObserver.swift; sourceTree = "<group>"; };
 		B302E2D0286A452F005FD927 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
+		B305C58C29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInCoordinator.swift; sourceTree = "<group>"; };
 		B344910828DBA49E00A992E9 /* auth_refresh_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = auth_refresh_response.json; sourceTree = "<group>"; };
 		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
@@ -146,6 +149,7 @@
 		B38A40C02882185B00FD0813 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleSignUpCoordinator.swift; sourceTree = "<group>"; };
+		B39BE51F29DB62ED00F3AEBB /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieSwiftView.swift; sourceTree = "<group>"; };
 		B3CE7BE0298855B500AF95B8 /* SignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
 		B3F01B0228A8A60800EE764B /* KeyTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransferViewController.swift; sourceTree = "<group>"; };
@@ -208,6 +212,7 @@
 			children = (
 				B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */,
 				B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */,
+				B305C58C29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift */,
 				B302E2BE28641F26005FD927 /* Context */,
 				B302E2942863A95A005FD927 /* RowndConfig.swift */,
 				B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */,
@@ -325,6 +330,7 @@
 				B39ECA9D28E2A2B50055CB60 /* LottieSwiftView.swift */,
 				B36AA915291DF8F1002B3B60 /* Container.swift */,
 				B3F921A529492DB500D3C48F /* Logging.swift */,
+				B39BE51F29DB62ED00F3AEBB /* ArrayExtensions.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -610,6 +616,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */,
+				B305C58D29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift in Sources */,
+				B39BE52029DB62ED00F3AEBB /* ArrayExtensions.swift in Sources */,
 				B3F921A629492DB500D3C48F /* Logging.swift in Sources */,
 				B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */,
 				B349906628CFCED9004ADF3F /* Customizations.swift in Sources */,

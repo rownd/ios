@@ -41,7 +41,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         //Create an object of the ASAuthorizationAppleIDProvider
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         //Create a request
-        let request         = appleIDProvider.createRequest()
+        let request = appleIDProvider.createRequest()
         //Define the scope of the request
         request.requestedScopes = [.fullName, .email]
         //Make the request
@@ -62,20 +62,32 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         return String("\(firstName ?? "") \(lastName ?? "")")
     }
     
-    //If authorization is successful then this method will get triggered
+    // If authorization is successful then this method will get triggered
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        
+        DispatchQueue.main.async {
+            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                loginStep: .completing
+            ))
+        }
+        
         switch authorization.credential {
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
             
             // Create an account in your system.
-            //let userIdentifier = appleIDCredential.user
+            // let userIdentifier = appleIDCredential.user
             let fullName = appleIDCredential.fullName
             let email = appleIDCredential.email
             let identityToken = appleIDCredential.identityToken
             
             if let email = email {
                 //Store email and fullName in AppleSignInData struct if available
-                let userAppleSignInData = AppleSignInData(email: email, firstName: fullName?.givenName, lastName: fullName?.familyName, fullName: getFullName(firstName: fullName?.givenName, lastName: fullName?.familyName))
+                let userAppleSignInData = AppleSignInData(
+                    email: email,
+                    firstName: fullName?.givenName,
+                    lastName: fullName?.familyName,
+                    fullName: getFullName(firstName: fullName?.givenName, lastName: fullName?.familyName)
+                )
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(userAppleSignInData) {
                     let defaults = UserDefaults.standard
@@ -83,17 +95,31 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                 }
             }
             
-            
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
-                Auth.fetchToken(idToken: idToken, intent: intent) { [self] tokenResponse in
-                    if (tokenResponse?.userType == UserType.NewUser && intent == RowndSignInIntent.signIn) {
-                        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(token: idToken, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn  ))
-                    } else {
+                
+                Task {
+                    do {
+                        let tokenResponse = try await Auth.fetchToken(idToken: idToken, intent: intent)
+                        
+                        Task { @MainActor in
+                            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                                loginStep: RowndSignInLoginStep.success,
+                                intent: self.intent,
+                                userType: tokenResponse?.userType
+                            ))
+                        }
+                        
+                        // Prevent fast auth handshakes from feeling jarring to the user
+                        try await Task.sleep(nanoseconds: UInt64(2 * Double(NSEC_PER_SEC)))
+                        
                         DispatchQueue.main.async {
                             store.dispatch(store.state.auth.onReceiveAuthTokens(
-                                AuthState(accessToken: tokenResponse?.accessToken, refreshToken: tokenResponse?.refreshToken)
+                                AuthState(
+                                    accessToken: tokenResponse?.accessToken,
+                                    refreshToken: tokenResponse?.refreshToken
+                                )
                             ))
                             
                             store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
@@ -127,19 +153,46 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                         dispatch(UserData.save(userData))
                                     }
                                 }
-                                
-//                                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(loginStep: RowndSignInLoginStep.Success,intent: self.intent, userType: tokenResponse?.userType))
                             })
                         }
+                    } catch ApiError.generic(let errorInfo) {
+                        if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
+                            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                                token: idToken,
+                                loginStep: .noAccount,
+                                intent: .signIn
+                            ))
+                        } else {
+                            DispatchQueue.main.async {
+                                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                                    loginStep: .error,
+                                    signInType: .apple
+                                ))
+                            }
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                                loginStep: .error,
+                                signInType: .apple
+                            ))
+                        }
                     }
-                    
                 }
             } else {
-                logger.trace("apple sign credential alternative")
+                logger.error("Missing data from Apple sign-in response: \(String(describing: appleIDCredential))")
+                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                    loginStep: .error,
+                    signInType: .apple
+                ))
             }
             
         default:
-            logger.trace("apple sign credential break")
+            logger.error("Unknown credential type returned from Apple ID sign-in: \(String(describing: authorization.credential))")
+            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                loginStep: .error,
+                signInType: .apple
+            ))
             break
         }
     }
@@ -149,6 +202,24 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         
         //If there is any error will get it here
         logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
+        
+        guard let authorizationError = error as? ASAuthorizationError else {
+            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                loginStep: .error,
+                signInType: .apple
+            ))
+            return
+        }
+        
+        switch authorizationError.code {
+        case .canceled:
+            return
+        default:
+            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                loginStep: .error,
+                signInType: .apple
+            ))
+        }
     }
 }
 

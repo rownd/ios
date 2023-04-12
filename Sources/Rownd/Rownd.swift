@@ -22,7 +22,8 @@ public class Rownd: NSObject {
     public static var config: RowndConfig = RowndConfig()
 
     public static let user = UserPropAccess()
-    private static var appleSignUpCoordinator: AppleSignUpCoordinator? = AppleSignUpCoordinator(inst)
+    private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
+    private static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
     internal var bottomSheetController: BottomSheetController = BottomSheetController()
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
@@ -121,101 +122,38 @@ public class Rownd: NSObject {
         let signInOptions = determineSignInOptions(signInOptions)
         switch with {
         case .appleId:
-            appleSignUpCoordinator?.signIn(signInOptions?.intent)
+            appleSignUpCoordinator.signIn(signInOptions?.intent)
         case .passkey:
-            passkeyCoordinator.signInWith()
+            passkeyCoordinator.authenticate()
         case .googleId:
-            let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
-            guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
-                return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
+            Task {
+                await googleSignInCoordinator.signIn(
+                    signInOptions?.intent
+                )
+                completion?()
             }
-
-            if (googleConfig.serverClientId == nil ||
-                googleConfig.serverClientId == "" ||
-                googleConfig.iosClientId == nil ||
-                googleConfig.iosClientId == "") {
-                return logger.error("Cannot sign in with Google. Missing client configuration")
-            }
-
-            let reversedClientId = googleConfig.iosClientId!.split(separator: ".").reversed().joined(separator: ".")
-            if let url = NSURL(string: reversedClientId + "://") {
-                if (UIApplication.shared.canOpenURL(url as URL) == false) {
-                    return logger.error("Cannot sign in with Google. \(String(describing: reversedClientId)) is not defined in URL schemes")
-                }
-            }
-
-            let gidConfig = GIDConfiguration(
-                clientID: (googleConfig.iosClientId)!,   // (IOS)
-                serverClientID: googleConfig.serverClientId  // (Web)
-            )
-
-            GIDSignIn.sharedInstance.signIn(
-                with: gidConfig,
-                presenting: inst.getRootViewController()!
-            ) { user, error in
-                guard error == nil else { return logger.error("Failed to sign in with Google: \(String(describing: error))")}
-                guard let user = user else { return }
-
-                user.authentication.do { authentication, error in
-                    guard error == nil else { return }
-                    guard let authentication = authentication else { return }
-
-                    if let idToken = authentication.idToken {
-                        logger.debug("Successully completed Google sign-in")
-                        Auth.fetchToken(idToken: idToken, intent: signInOptions?.intent) { tokenResponse in
-                            if (tokenResponse?.userType == UserType.NewUser && signInOptions?.intent == RowndSignInIntent.signIn) {
-                                requestSignIn(jsFnOptions: RowndSignInJsOptions(token: idToken, loginStep: RowndSignInLoginStep.NoAccount, intent: RowndSignInIntent.signIn ))
-                            } else {
-                                DispatchQueue.main.async {
-                                    store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse?.accessToken, refreshToken: tokenResponse?.refreshToken)))
-                                    store.dispatch(UserData.fetch())
-                                    store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
-                                    
-//                                    requestSignIn(
-//                                        jsFnOptions: RowndSignInJsOptions(
-//                                            loginStep: RowndSignInLoginStep.Success,
-//                                            intent: signInOptions?.intent,
-//                                            userType: tokenResponse?.userType
-//                                        )
-//                                    )
-                                }
-                            }
-                        }
-
-                    } else {
-                        logger.error("Could not complete Google sign-in. Missing idToken")
-                    }
-                    
-                    if let completion = completion {
-                        completion()
-                    }
-                }
-            }
-        default:
-            requestSignIn()
         }
     }
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
-        var signInOptions = determineSignInOptions(signInOptions)
-        let _ = inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
+        let signInOptions = determineSignInOptions(signInOptions)
+        inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
     
     internal static func requestSignIn(jsFnOptions: Encodable?) {
-        let _ = inst.displayHub(.signIn, jsFnOptions: jsFnOptions)
+        inst.displayHub(.signIn, jsFnOptions: jsFnOptions)
     }
     
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         switch with {
         case .passkey:
             if (store.state.auth.accessToken != nil) {
-                let _ = inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue))
+                inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(
+                    biometricType: LAContext().biometricType.rawValue
+                ))
             } else {
                 requestSignIn()
             }
-            
-        default:
-            logger.debug("Connect Sign in Method was not selected")
         }
     }
     
@@ -241,7 +179,7 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
-        guard let tokenResponse = await Auth.fetchToken(token) else { return nil }
+        guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
         
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
@@ -259,6 +197,7 @@ public class Rownd: NSObject {
     // This is an internal test function used only to manually test
     // ensuring refresh tokens are only used once when attempting
     // to fetch new access tokens
+    @available(*, deprecated, message: "Internal test use only. This method may change any time without warning.")
     public static func _refreshToken() {
         Task {
             do {
@@ -329,41 +268,65 @@ public class Rownd: NSObject {
         return displayHub(page, jsFnOptions: nil)
     }
     
+    @discardableResult
     private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
-        let hubController = HubViewController()
-        hubController.targetPage = page
+        let hubController = getHubViewController()
         
+//        hubController.targetPage = page
         displayViewControllerOnTop(hubController)
+        hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
         
-        if let jsFnOptions = jsFnOptions {
-            do {
-                hubController.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
-            } catch {
-                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
-            }
-        }
+        
+        
+//        if let jsFnOptions = jsFnOptions {
+//            do {
+//                hubController.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
+//            } catch {
+//                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+//            }
+//        }
         
         return hubController
     }
+    
+    private func getHubViewController() -> HubViewController {
+        
+        if bottomSheetController.controller is HubViewController {
+            return bottomSheetController.controller as! HubViewController
+        }
+        
+        return HubViewController()
+    }
 
-    private func getRootViewController() -> UIViewController? {
-        return UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
-            .first?.windows
-            .filter({$0.isKeyWindow}).first?.rootViewController
+    internal func getRootViewController() -> UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let vc = windowScene?.windows.last?.rootViewController
+        return vc
+//        return UIApplication.shared.connectedScenes
+//            .filter({$0.activationState == .foregroundActive})
+//            .compactMap({$0 as? UIWindowScene})
+//            .first?.windows
+//            .filter({$0.isKeyWindow}).first?.rootViewController
     }
     
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
-        let rootViewController = getRootViewController()
-        
-        // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
-        // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
-        bottomSheetController.controller = viewController
-        bottomSheetController.modalPresentationStyle = .overFullScreen
+        Task { @MainActor in
+            let rootViewController = getRootViewController()
+            
+            // Don't try to present again if it's already presented
+            if (bottomSheetController.presentingViewController != nil) {
+                return
+            }
+            
+            // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
+            // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
+            bottomSheetController.controller = viewController
+            bottomSheetController.modalPresentationStyle = .overFullScreen
 
-        DispatchQueue.main.async {
-            rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
+            DispatchQueue.main.async {
+                rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
+            }
         }
     }
     
@@ -484,10 +447,20 @@ public enum RowndSignInIntent: String, Codable {
     case signUp = "sign_up"
 }
 
+public enum SignInType: String, Codable {
+    case email = "email"
+    case phone = "phone"
+    case apple = "apple"
+    case google = "google"
+    case passkey = "passkey"
+}
+
 internal enum RowndSignInLoginStep: String, Codable {
-    case Init = "init"
-    case NoAccount = "no_account"
-    case Success = "success"
+    case initialize = "init"
+    case noAccount = "no_account"
+    case success = "success"
+    case completing = "completing"
+    case error = "error"
 }
 
 internal struct RowndSignInJsOptions: Encodable {
@@ -495,11 +468,13 @@ internal struct RowndSignInJsOptions: Encodable {
     public var loginStep: RowndSignInLoginStep? = nil
     public var intent: RowndSignInIntent? = nil
     public var userType: UserType? = nil
+    public var signInType: SignInType? = nil
     
     enum CodingKeys: String, CodingKey {
         case token, intent
         case loginStep = "login_step"
         case userType = "user_type"
+        case signInType = "sign_in_type"
     }
 }
 
@@ -507,9 +482,10 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
     public var status: Status? = nil
     public var biometricType: String? = ""
     public var type: String = "passkey"
+    public var error: String?
     
     enum CodingKeys: String, CodingKey {
-        case status, type
+        case status, type, error
         case biometricType = "biometric_type"
     }
 }
