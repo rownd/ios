@@ -147,11 +147,13 @@ struct TokenRequest: Codable {
     var idToken: String?
     var appId: String?
     var intent: RowndSignInIntent?
+    var intentMismatchBehavior: String?
     
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
         case idToken = "id_token"
         case appId = "app_id"
+        case intentMismatchBehavior = "intent_mismatch_behavior"
         case intent
     }
 }
@@ -189,7 +191,12 @@ class Auth {
     
     static func fetchToken(idToken: String, intent: RowndSignInIntent?) async throws -> TokenResponse? {
         guard let appId = store.state.appConfig.id else { return nil }
-        let tokenRequest = TokenRequest(idToken: idToken, appId: appId, intent: intent)
+        let tokenRequest = TokenRequest(
+            idToken: idToken,
+            appId: appId,
+            intent: intent,
+            intentMismatchBehavior: "throw"
+        )
         return try await fetchToken(tokenRequest: tokenRequest)
     }
     
@@ -197,9 +204,6 @@ class Auth {
         let tokenResp: Response<TokenResponse> = try await rowndApi.send(Request(
             path: "/hub/auth/token",
             method: .post,
-            query: [
-                ("intent_mismatch_behavior", "throw")
-            ],
             body: tokenRequest
         ))
         
