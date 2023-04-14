@@ -16,15 +16,16 @@ protocol HubViewProtocol {
     func setLoading(_ isLoading: Bool)
     func show()
     func hide()
+    func height(_ height: CGFloat)
 }
 
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
-    
+    @objc var preferredHeightInBottomSheet: CGFloat = 550
     var activityIndicator = UIActivityIndicatorView(style: .large)
     var customLoadingAnimationView: Lottie.AnimationView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
-    var hostController: UIViewController?
+    var hostController: BottomSheetController?
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -151,6 +152,10 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     
     func show() {
         view.isHidden = false
+    }
+    
+    func height(_ number: CGFloat) {
+        hostController?.randy(number)
     }
     
     fileprivate func setupConstraints() {
