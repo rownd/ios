@@ -55,12 +55,13 @@ public class Rownd: NSObject {
                     switch result {
                     case .success(let detectedPatterns):
                         if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
-                            var _launchUrl = UIPasteboard.general.string!
-                            if !_launchUrl.starts(with: "http") {
-                                _launchUrl = "https://\(_launchUrl)"
+                            if var _launchUrl = UIPasteboard.general.string {
+                                if !_launchUrl.starts(with: "http") {
+                                    _launchUrl = "https://\(_launchUrl)"
+                                }
+                                launchUrl = URL(string: _launchUrl)
+                                handleSignInLink(url: launchUrl)
                             }
-                            launchUrl = URL(string: _launchUrl)
-                            handleSignInLink(url: launchUrl)
                         }
                     default:
                         break
