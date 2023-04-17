@@ -1,5 +1,12 @@
 
 
+## [2.5.3](https://github.com/rownd/ios/compare/2.5.2...2.5.3) (2023-04-17)
+
+
+### Bug Fixes
+
+* **paste:** result might be nil after successful detection ([6fd429c](https://github.com/rownd/ios/commit/6fd429c88965a04125fff72e86d833a55531c329))
+
 ## [2.5.2](https://github.com/rownd/ios/compare/2.5.1...2.5.2) (2023-04-17)
 
 
