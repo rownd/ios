@@ -49,14 +49,24 @@ public class Rownd: NSObject {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
                 launchUrl = _launchUrl
-            } else if UIPasteboard.general.hasStrings, var _launchUrl = UIPasteboard.general.string {
-                if !_launchUrl.starts(with: "http") {
-                    _launchUrl = "https://\(_launchUrl)"
+                handleSignInLink(url: launchUrl)
+            } else if UIPasteboard.general.hasStrings {
+                UIPasteboard.general.detectPatterns(for: [UIPasteboard.DetectionPattern.probableWebURL]) { result in
+                    switch result {
+                    case .success(let detectedPatterns):
+                        if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
+                            var _launchUrl = UIPasteboard.general.string!
+                            if !_launchUrl.starts(with: "http") {
+                                _launchUrl = "https://\(_launchUrl)"
+                            }
+                            launchUrl = URL(string: _launchUrl)
+                            handleSignInLink(url: launchUrl)
+                        }
+                    default:
+                        break
+                    }
                 }
-                launchUrl = URL(string: _launchUrl)
             }
-
-            handleSignInLink(url: launchUrl)
 
             if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
                 GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
