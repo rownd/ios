@@ -1,5 +1,12 @@
 
 
+## [2.5.4](https://github.com/rownd/ios/compare/2.5.3...2.5.4) (2023-04-25)
+
+
+### Bug Fixes
+
+* **ui:** wrong rootvc sometimes selected for bottom sheet ([5a5ab16](https://github.com/rownd/ios/commit/5a5ab162bf9e8bda94d4a4a2e241e6aaae339092))
+
 ## [2.5.3](https://github.com/rownd/ios/compare/2.5.2...2.5.3) (2023-04-17)
 
 
