@@ -310,15 +310,11 @@ public class Rownd: NSObject {
     }
 
     internal func getRootViewController() -> UIViewController? {
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let vc = windowScene?.windows.last?.rootViewController
-        return vc
-//        return UIApplication.shared.connectedScenes
-//            .filter({$0.activationState == .foregroundActive})
-//            .compactMap({$0 as? UIWindowScene})
-//            .first?.windows
-//            .filter({$0.isKeyWindow}).first?.rootViewController
+        return UIApplication.shared.connectedScenes
+            .filter({$0.activationState == .foregroundActive})
+            .compactMap({$0 as? UIWindowScene})
+            .first?.windows
+            .filter({$0.isKeyWindow}).first?.rootViewController
     }
     
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
