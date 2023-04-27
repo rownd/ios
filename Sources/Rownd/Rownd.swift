@@ -49,14 +49,25 @@ public class Rownd: NSObject {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
                 launchUrl = _launchUrl
-            } else if UIPasteboard.general.hasStrings, var _launchUrl = UIPasteboard.general.string {
-                if !_launchUrl.starts(with: "http") {
-                    _launchUrl = "https://\(_launchUrl)"
+                handleSignInLink(url: launchUrl)
+            } else if UIPasteboard.general.hasStrings {
+                UIPasteboard.general.detectPatterns(for: [UIPasteboard.DetectionPattern.probableWebURL]) { result in
+                    switch result {
+                    case .success(let detectedPatterns):
+                        if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
+                            if var _launchUrl = UIPasteboard.general.string {
+                                if !_launchUrl.starts(with: "http") {
+                                    _launchUrl = "https://\(_launchUrl)"
+                                }
+                                launchUrl = URL(string: _launchUrl)
+                                handleSignInLink(url: launchUrl)
+                            }
+                        }
+                    default:
+                        break
+                    }
                 }
-                launchUrl = URL(string: _launchUrl)
             }
-
-            handleSignInLink(url: launchUrl)
 
             if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
                 GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
@@ -299,15 +310,11 @@ public class Rownd: NSObject {
     }
 
     internal func getRootViewController() -> UIViewController? {
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let vc = windowScene?.windows.last?.rootViewController
-        return vc
-//        return UIApplication.shared.connectedScenes
-//            .filter({$0.activationState == .foregroundActive})
-//            .compactMap({$0 as? UIWindowScene})
-//            .first?.windows
-//            .filter({$0.isKeyWindow}).first?.rootViewController
+        return UIApplication.shared.connectedScenes
+            .filter({$0.activationState == .foregroundActive})
+            .compactMap({$0 as? UIWindowScene})
+            .first?.windows
+            .filter({$0.isKeyWindow}).first?.rootViewController
     }
     
     private func displayViewControllerOnTop(_ viewController: UIViewController) {

@@ -1,5 +1,28 @@
 
 
+## [2.5.4](https://github.com/rownd/ios/compare/2.5.3...2.5.4) (2023-04-25)
+
+
+### Bug Fixes
+
+* **ui:** wrong rootvc sometimes selected for bottom sheet ([5a5ab16](https://github.com/rownd/ios/commit/5a5ab162bf9e8bda94d4a4a2e241e6aaae339092))
+
+## [2.5.3](https://github.com/rownd/ios/compare/2.5.2...2.5.3) (2023-04-17)
+
+
+### Bug Fixes
+
+* **paste:** result might be nil after successful detection ([6fd429c](https://github.com/rownd/ios/commit/6fd429c88965a04125fff72e86d833a55531c329))
+
+## [2.5.2](https://github.com/rownd/ios/compare/2.5.1...2.5.2) (2023-04-17)
+
+
+### Bug Fixes
+
+* **auth:** passkey and social sign-in flow improvements ([#49](https://github.com/rownd/ios/issues/49)) ([888cfb1](https://github.com/rownd/ios/commit/888cfb12877cd6116a8c0a6bee59778a41408520))
+* **offline:** honor light/dark colors as applicable ([d192bc0](https://github.com/rownd/ios/commit/d192bc0584ceaddc1cc6b5aed181ff709e6ca405))
+* **paste:** only grab from pasteboard if it prob has a url ([5149b67](https://github.com/rownd/ios/commit/5149b67bb2bfd87530e8909b27d0aa136654c9b7))
+
 ## [2.5.1](https://github.com/rownd/ios/compare/2.5.0...2.5.1) (2023-04-07)
 
 

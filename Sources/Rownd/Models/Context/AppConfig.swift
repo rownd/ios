@@ -102,12 +102,16 @@ extension AppCustomizationsConfigState: Codable {
 public struct AppHubCustomizationsConfigState: Hashable {
     public var fontFamily: String?
     public var darkMode: String?
+    public var primaryColor: String?
+    public var primaryColorDarkMode: String?
 }
 
 extension AppHubCustomizationsConfigState: Codable {
     enum CodingKeys: String, CodingKey {
         case fontFamily = "font_family"
         case darkMode = "dark_mode"
+        case primaryColor = "primary_color"
+        case primaryColorDarkMode = "primary_color_dark_mode"
     }
 }
 

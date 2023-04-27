@@ -3,16 +3,16 @@ import Foundation
 import SwiftUI
 
 func NoInternetHTML(appConfig: AppConfigState?) -> String {
-    let isAppConfig = appConfig != nil
+    let hasAppConfig = appConfig != nil
     let fontSize = Rownd.config.customizations.defaultFontSize
     
-    var isDarkMode = UIViewController().colorScheme == .dark || Rownd.config.forceDarkMode
-    if (isAppConfig) {
-        let darkMode = appConfig?.config?.hub?.customizations?.darkMode
-        isDarkMode = darkMode == "enabled"  || darkMode == "auto"
+    var isDarkMode = UIViewController().traitCollection.userInterfaceStyle == .dark || Rownd.config.forceDarkMode
+    if (hasAppConfig) {
+        let darkModeCfg = appConfig?.config?.hub?.customizations?.darkMode
+        isDarkMode = darkModeCfg == "enabled" || isDarkMode && darkModeCfg == "auto"
     }
     
-    let primaryColor = appConfig?.config?.customizations?.primaryColor ?? "#5b13df"
+    let primaryColor = (isDarkMode ? appConfig?.config?.hub?.customizations?.primaryColorDarkMode : appConfig?.config?.hub?.customizations?.primaryColor) ?? "#5b13df"
     
     return """
         <html>
