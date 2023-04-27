@@ -67,21 +67,22 @@ class BottomSheetController: UIViewController {
         self.controller = nil
     }
     
-    func randy(_ number: CGFloat) {
-        let screenHeight = UIScreen.main.bounds.height
-               
-        let controllerHeight = controller?.view.frame.height
-        
+    func updateBottomSheetHeight(_ number: CGFloat) {
         if let sheetController = sheetController {
-            DispatchQueue.main.async {
-                var randy = self.controller as! HubViewController
-                var newHeight = Double.minimum(number, UIScreen.main.bounds.height * 0.90)
-                
-                print("NEW HEIGHT: \(newHeight) Number: \(number)")
-                randy.preferredHeightInBottomSheet = newHeight
-                sheetController.preferredHeightInBottomSheetDidUpdate()
-
+            guard let controller = self.controller else {
+                return
             }
+            DispatchQueue.main.async {
+                let hubViewController = controller as! HubViewController
+                hubViewController.preferredHeightInBottomSheet = Double.minimum(number, UIScreen.main.bounds.height * 0.90)
+                sheetController.preferredHeightInBottomSheetDidUpdate()
+            }
+        }
+    }
+    
+    func canTouchDimmingBackgroundToDismiss(_ enable: Bool) {
+        if let sheetController = sheetController {
+            sheetController.setCanTouchDimmingBackgroundToDismiss(enable)
         }
     }
 }
@@ -98,10 +99,12 @@ extension BottomSheetController {
     @objc func keyboardWillShow(notification: NSNotification) {
         // Get required info out of the notification
         if let sheetController = sheetController {
+            guard let controller = self.controller else {
+                return
+            }
             DispatchQueue.main.async {
-                //self.controller?.preferredHeightInBottomSheet = 800
-                var randy = self.controller as! HubViewController
-                randy.preferredHeightInBottomSheet = UIScreen.main.bounds.height * 0.9
+                let hubViewController = controller as! HubViewController
+                hubViewController.preferredHeightInBottomSheet = UIScreen.main.bounds.height * 0.9
                 sheetController.preferredHeightInBottomSheetDidUpdate()
             }
         }

@@ -330,16 +330,21 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             
             case .hubResize:
                 guard case .hubResize(let hubResizeMessage) = hubMessage.payload else { return }
-                print("HUB RESIZE MESSAGE \(hubResizeMessage)")
-                
-                if let doubleValue = Double(hubResizeMessage.size ?? "") {
+                if let doubleValue = Double(hubResizeMessage.height ?? "") {
                     let cgFloatValue = CGFloat(doubleValue)
-                    self.hubViewController?.height(cgFloatValue)
-                    print("Value: \(cgFloatValue)")
+                    self.hubViewController?.updateBottomSheetHeight(cgFloatValue)
                 } else {
-                    print("Invalid string format.")
+                    logger.error("Invalid string format for Hub Resize.")
                 }
                 
+            case .canTouchBackgroundToDismiss:
+                guard case .canTouchBackgroundToDismiss(let canDismissMessage) = hubMessage.payload else { return }
+                if (canDismissMessage.enable == "false") {
+                    self.hubViewController?.canTouchDimmingBackgroundToDismiss(false)
+                    return
+                }
+                self.hubViewController?.canTouchDimmingBackgroundToDismiss(true)
+                break
             case .unknown:
                 break
             }

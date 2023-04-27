@@ -16,11 +16,12 @@ protocol HubViewProtocol {
     func setLoading(_ isLoading: Bool)
     func show()
     func hide()
-    func height(_ height: CGFloat)
+    func updateBottomSheetHeight(_ height: CGFloat)
+    func canTouchDimmingBackgroundToDismiss(_ enable: Bool)
 }
 
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
-    @objc var preferredHeightInBottomSheet: CGFloat = 550
+    @objc var preferredHeightInBottomSheet: CGFloat = UIScreen.main.bounds.height * 0.3
     var activityIndicator = UIActivityIndicatorView(style: .large)
     var customLoadingAnimationView: Lottie.AnimationView?
     var hubWebController = HubWebViewController()
@@ -154,8 +155,12 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         view.isHidden = false
     }
     
-    func height(_ number: CGFloat) {
-        hostController?.randy(number)
+    func updateBottomSheetHeight(_ number: CGFloat) {
+        hostController?.updateBottomSheetHeight(number)
+    }
+    
+    func canTouchDimmingBackgroundToDismiss(_ enable: Bool) {
+        hostController?.canTouchDimmingBackgroundToDismiss(enable)
     }
     
     fileprivate func setupConstraints() {
