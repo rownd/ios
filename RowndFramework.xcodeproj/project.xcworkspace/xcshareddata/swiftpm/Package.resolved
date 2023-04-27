@@ -93,10 +93,10 @@
     {
       "identity" : "lbbottomsheet",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/LunabeeStudio/LBBottomSheet.git",
+      "location" : "https://github.com/rownd/LBBottomSheet",
       "state" : {
-        "revision" : "c62e58bd3dbb808ffe03ea89652622b092b0e3e0",
-        "version" : "1.0.17"
+        "branch" : "master",
+        "revision" : "e3954f859db221189ecfe8ce7bb96cc076d2013e"
       }
     },
     {

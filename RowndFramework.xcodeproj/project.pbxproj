@@ -53,7 +53,6 @@
 		B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A408F287F5B4900FD0813 /* Encodable.swift */; };
 		B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A4096287FC7BB00FD0813 /* AccountManagerViewController.swift */; };
 		B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A409D288111F200FD0813 /* BottomSheetController.swift */; };
-		B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */ = {isa = PBXBuildFile; productRef = B38A40A02881157D00FD0813 /* LBBottomSheet */; };
 		B38A40AB2882020900FD0813 /* Rownd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B374E55828545A1C00955719 /* Rownd.framework */; };
 		B38A40BA2882185800FD0813 /* RowndFrameworkTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40B92882185800FD0813 /* RowndFrameworkTestAppApp.swift */; };
 		B38A40BC2882185800FD0813 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A40BB2882185800FD0813 /* ContentView.swift */; };
@@ -175,7 +174,6 @@
 				B30FBD8F28E780BF00216034 /* GoogleSignIn in Frameworks */,
 				B30FBD9128E780BF00216034 /* GoogleSignInSwift in Frameworks */,
 				B3B164FD292C1567002129A7 /* ReSwiftThunk in Frameworks */,
-				B38A40A12881157D00FD0813 /* LBBottomSheet in Frameworks */,
 				C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */,
 				B347C27B287CB46A00935115 /* JWTDecode in Frameworks */,
 				B302E2BB28641A7A005FD927 /* ReSwift in Frameworks */,
@@ -458,7 +456,6 @@
 			packageProductDependencies = (
 				B302E2BA28641A7A005FD927 /* ReSwift */,
 				B347C27A287CB46A00935115 /* JWTDecode */,
-				B38A40A02881157D00FD0813 /* LBBottomSheet */,
 				B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */,
 				B38A40CB288274D900FD0813 /* SwiftKeychainWrapper */,
 				B38A40CE2883C81D00FD0813 /* Sodium */,
@@ -556,7 +553,6 @@
 			packageReferences = (
 				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
 				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
-				B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
@@ -569,6 +565,7 @@
 				B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */,
 				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
 				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */,
+				DF4CA84829FAADCD00DFDBFB /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
@@ -1082,14 +1079,6 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/LunabeeStudio/LBBottomSheet.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
@@ -1146,6 +1135,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		DF4CA84829FAADCD00DFDBFB /* XCRemoteSwiftPackageReference "LBBottomSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rownd/LBBottomSheet";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1188,11 +1185,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */;
 			productName = Kronos;
-		};
-		B38A40A02881157D00FD0813 /* LBBottomSheet */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B38A409F2881157D00FD0813 /* XCRemoteSwiftPackageReference "LBBottomSheet" */;
-			productName = LBBottomSheet;
 		};
 		B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
