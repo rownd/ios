@@ -24,8 +24,6 @@ open class RowndCustomizations: Encodable {
     }
 
     open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
-    
-    internal var deviceHeight = UIScreen.main.bounds.height
 
     open var loadingAnimation: Lottie.Animation? = nil
 
@@ -53,14 +51,12 @@ open class RowndCustomizations: Encodable {
         case defaultFontSize
         case fontFamily
         case customStylesFlag
-        case deviceHeight
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(sheetCornerBorderRadius, forKey: .sheetCornerBorderRadius)
         try container.encode(defaultFontSize, forKey: .defaultFontSize)
-        try container.encode(deviceHeight, forKey: .deviceHeight)
         try container.encode(uiColorToRgbaString(color: sheetBackgroundColor), forKey: .sheetBackgroundColor)
         try container.encode(store.state.appConfig.config?.hub?.customizations?.fontFamily, forKey: .fontFamily)
         try container.encode(store.state.appConfig.config?.hub?.customStyles?[safe: 0]?.content.count ?? 0 > 0, forKey: .customStylesFlag)
