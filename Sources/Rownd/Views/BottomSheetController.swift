@@ -73,7 +73,9 @@ class BottomSheetController: UIViewController {
                 return
             }
             DispatchQueue.main.async {
-                let hubViewController = controller as! HubViewController
+                guard let hubViewController = controller as? HubViewController else {
+                    return
+                }
                 hubViewController.preferredHeightInBottomSheet = Double.minimum(number, UIScreen.main.bounds.height * 0.90)
                 sheetController.preferredHeightInBottomSheetDidUpdate()
             }
