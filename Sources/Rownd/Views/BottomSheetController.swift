@@ -105,7 +105,9 @@ extension BottomSheetController {
                 return
             }
             DispatchQueue.main.async {
-                let hubViewController = controller as! HubViewController
+                guard let hubViewController = controller as? HubViewController else {
+                    return
+                }
                 hubViewController.preferredHeightInBottomSheet = UIScreen.main.bounds.height * 0.9
                 sheetController.preferredHeightInBottomSheetDidUpdate()
             }
