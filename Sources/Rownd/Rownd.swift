@@ -143,7 +143,12 @@ public class Rownd: NSObject {
                 )
                 completion?()
             }
+        case .guest, .anonymous:
+            requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                signInType: .anonymous
+            ))
         }
+            
     }
     
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
@@ -427,7 +432,8 @@ public enum UserFieldAccessType {
 }
 
 public enum RowndSignInHint {
-    case appleId, googleId, passkey
+    case appleId, googleId, passkey,
+         guest, anonymous // these two do the same thing
 }
 
 public enum RowndConnectSignInHint {
@@ -460,6 +466,7 @@ public enum SignInType: String, Codable {
     case apple = "apple"
     case google = "google"
     case passkey = "passkey"
+    case anonymous = "anonymous"
 }
 
 internal enum RowndSignInLoginStep: String, Codable {
