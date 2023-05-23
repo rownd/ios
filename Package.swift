@@ -14,7 +14,8 @@ let package = Package(
     name: "Rownd",
     platforms: [
         .iOS(.v14),
-        .macOS(.v11)
+        .macOS(.v11),
+        .macCatalyst(.v14)
     ],
     products: [
         .library(
@@ -72,7 +73,7 @@ let package = Package(
         .package(
             name: "GoogleSignIn",
             url: "https://github.com/google/GoogleSignIn-iOS.git",
-            .upToNextMajor(from: "6.2.4")
+            .upToNextMajor(from: "7.0.0")
         ),
         .package(
             name: "Lottie",
