@@ -28,19 +28,19 @@ public class Rownd: NSObject {
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
-    
+
     private override init() {
         super.init()
-        
+
         // Start NTP sync
         Clock.sync(from: "time.cloudflare.com")
     }
-    
-    public static func configure(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil, appKey: String?) async {
+
+    public static func configure(launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, appKey: String?) async {
         if let _appKey = appKey {
             config.appKey = _appKey
         }
-        
+
         inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
@@ -69,7 +69,7 @@ public class Rownd: NSObject {
                 }
             }
 
-            if (store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true) {
+            if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
                 GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
                     if error != nil || user == nil {
                         logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
@@ -79,7 +79,7 @@ public class Rownd: NSObject {
                 }
             }
         }
-        
+
         // Fetch user if authenticated and app is in foreground
         DispatchQueue.main.async {
             if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
@@ -116,19 +116,19 @@ public class Rownd: NSObject {
 
         return false
     }
-    
+
     public static func getInstance() -> Rownd {
         return inst
     }
-    
+
     public static func requestSignIn() {
         requestSignIn(RowndSignInOptions())
     }
-    
+
     public static func requestSignIn(with: RowndSignInHint, completion: (() -> Void)? = nil) {
         requestSignIn(with: with, signInOptions: RowndSignInOptions(), completion: completion)
     }
-    
+
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
         let signInOptions = determineSignInOptions(signInOptions)
         switch with {
@@ -148,22 +148,22 @@ public class Rownd: NSObject {
                 signInType: .anonymous
             ))
         }
-            
+
     }
-    
+
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         let signInOptions = determineSignInOptions(signInOptions)
         inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
     }
-    
+
     internal static func requestSignIn(jsFnOptions: Encodable?) {
         inst.displayHub(.signIn, jsFnOptions: jsFnOptions)
     }
-    
+
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         switch with {
         case .passkey:
-            if (store.state.auth.accessToken != nil) {
+            if store.state.auth.accessToken != nil {
                 inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(
                     biometricType: LAContext().biometricType.rawValue
                 ))
@@ -172,7 +172,7 @@ public class Rownd: NSObject {
             }
         }
     }
-    
+
     public static func signOut() {
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState()))
@@ -185,25 +185,25 @@ public class Rownd: NSObject {
             inst.displayViewControllerOnTop(KeyTransferViewController())
         }
     }
-    
+
     public static func manageAccount() {
-        let _ = inst.displayHub(.manageAccount)
+        _ = inst.displayHub(.manageAccount)
     }
-    
+
     @discardableResult public static func getAccessToken() async throws -> String? {
         return try await store.state.auth.getAccessToken()
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
         guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
-        
+
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
             store.dispatch(UserData.fetch())
         }
-        
+
         return tokenResponse.accessToken
-        
+
     }
 
     public func state() -> Store<RowndState> {
@@ -242,24 +242,23 @@ public class Rownd: NSObject {
             }
         }
     }
-    
+
     internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
         var signInOptions = signInOptions
-        if (signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn) {
-            if (store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true) {
+        if signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn {
+            if store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true {
                 signInOptions?.intent = nil
                 logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
             }
         }
         return signInOptions
     }
-    
+
     // MARK: Internal methods
     private func loadAppleSignIn() {
-        //If we want to check if the AppleId userIdentifier is still valid
+        // If we want to check if the AppleId userIdentifier is still valid
     }
- 
-    
+
     private func loadAppConfig() async {
         if store.state.appConfig.id == nil {
             // Await the config if it wasn't already cached
@@ -275,25 +274,23 @@ public class Rownd: NSObject {
         }
 
     }
-    
+
     private func inflateStoreCache() {
         RowndState.load()
     }
-    
+
     private func displayHub(_ page: HubPageSelector) -> HubViewController {
         return displayHub(page, jsFnOptions: nil)
     }
-    
+
     @discardableResult
     private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
         let hubController = getHubViewController()
-        
+
 //        hubController.targetPage = page
         displayViewControllerOnTop(hubController)
         hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
-        
-        
-        
+
 //        if let jsFnOptions = jsFnOptions {
 //            do {
 //                hubController.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
@@ -301,16 +298,16 @@ public class Rownd: NSObject {
 //                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
 //            }
 //        }
-        
+
         return hubController
     }
-    
+
     private func getHubViewController() -> HubViewController {
-        
+
         if bottomSheetController.controller is HubViewController {
             return bottomSheetController.controller as! HubViewController
         }
-        
+
         return HubViewController()
     }
 
@@ -321,16 +318,16 @@ public class Rownd: NSObject {
             .first?.windows
             .filter({$0.isKeyWindow}).first?.rootViewController
     }
-    
+
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
         Task { @MainActor in
             let rootViewController = getRootViewController()
-            
+
             // Don't try to present again if it's already presented
-            if (bottomSheetController.presentingViewController != nil) {
+            if bottomSheetController.presentingViewController != nil {
                 return
             }
-            
+
             // TODO: Eventually, replace this with native iOS 15+ sheetPresentationController
             // But, we can't replace it yet (2022) since there are too many devices running iOS 14.
             bottomSheetController.controller = viewController
@@ -341,28 +338,28 @@ public class Rownd: NSObject {
             }
         }
     }
-    
+
 }
 
 public class UserPropAccess {
     public func get() -> UserState {
         return store.state.user.get()
     }
-    
+
     public func get(field: String) -> Any {
         return store.state.user.get(field: field)
     }
-    
+
     public func get<T>(field: String) -> T? {
         let value: T? = store.state.user.get(field: field)
         return value
     }
-    
-    public func set(data: Dictionary<String, AnyCodable>) -> Void {
+
+    public func set(data: [String: AnyCodable]) {
         store.state.user.set(data: data)
     }
-    
-    public func set(field: String, value: AnyCodable) -> Void {
+
+    public func set(field: String, value: AnyCodable) {
         store.state.user.set(field: field, value: value)
     }
 
@@ -445,10 +442,10 @@ public struct RowndSignInOptions: Encodable {
         self.postSignInRedirect = postSignInRedirect
         self.intent = intent
     }
-    
+
     public var postSignInRedirect: String? = Rownd.config.postSignInRedirect
-    public var intent: RowndSignInIntent? = nil
-    
+    public var intent: RowndSignInIntent?
+
     enum CodingKeys: String, CodingKey {
         case intent
         case postSignInRedirect = "post_login_redirect"
@@ -478,12 +475,12 @@ internal enum RowndSignInLoginStep: String, Codable {
 }
 
 internal struct RowndSignInJsOptions: Encodable {
-    public var token: String? = nil
-    public var loginStep: RowndSignInLoginStep? = nil
-    public var intent: RowndSignInIntent? = nil
-    public var userType: UserType? = nil
-    public var signInType: SignInType? = nil
-    
+    public var token: String?
+    public var loginStep: RowndSignInLoginStep?
+    public var intent: RowndSignInIntent?
+    public var userType: UserType?
+    public var signInType: SignInType?
+
     enum CodingKeys: String, CodingKey {
         case token, intent
         case loginStep = "login_step"
@@ -493,11 +490,11 @@ internal struct RowndSignInJsOptions: Encodable {
 }
 
 public struct RowndConnectPasskeySignInOptions: Encodable {
-    public var status: Status? = nil
+    public var status: Status?
     public var biometricType: String? = ""
     public var type: String = "passkey"
     public var error: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case status, type, error
         case biometricType = "biometric_type"
