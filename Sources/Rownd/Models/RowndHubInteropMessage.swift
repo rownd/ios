@@ -164,9 +164,11 @@ enum MessagePayload: Decodable {
     
     public struct UserDataUpdateMessage: Codable {
         var data: Dictionary<String, AnyCodable>
+        var meta: Dictionary<String, AnyCodable>?
         
         enum CodingKeys: String, CodingKey {
             case data = "data"
+            case meta = "meta"
         }
     }
 }
