@@ -50,6 +50,8 @@ class SignInLinks {
                 )))
 
                 store.dispatch(UserData.fetch())
+                
+                store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
         } catch {
             logger.error("Auto sign-in failed: \(String(describing: error))")

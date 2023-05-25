@@ -103,6 +103,7 @@ class GoogleSignInCoordinator: NSObject {
                                     ))
                                     store.dispatch(UserData.fetch())
                                     store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
+                                    store.dispatch(PasskeyData.fetchPasskeyRegistration())
                                     
                                     Rownd.requestSignIn(
                                         jsFnOptions: RowndSignInJsOptions(
