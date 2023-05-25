@@ -10,6 +10,7 @@ import UIKit
 import ReSwift
 import ReSwiftThunk
 import Get
+import AnyCodable
 
 public struct AppConfigState: Hashable {
     public var isLoading: Bool = false
@@ -29,6 +30,7 @@ extension AppConfigState: Codable {
 }
 
 public struct AppConfigConfig: Hashable {
+    public var automations: [RowndAutomation]?
     public var hub: AppHubConfigState?
     public var customizations: AppCustomizationsConfigState?
     public var subdomain: String?
@@ -36,7 +38,7 @@ public struct AppConfigConfig: Hashable {
 
 extension AppConfigConfig: Codable {
     enum CodingKeys: String, CodingKey {
-        case hub, customizations, subdomain
+        case hub, customizations, subdomain, automations
     }
 }
 
