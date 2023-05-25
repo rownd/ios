@@ -16,12 +16,13 @@ public struct RowndState: Codable, Hashable {
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
+    public var passkeys = PasskeyState()
     public var signIn = SignInState()
 }
 
 extension RowndState {
     enum CodingKeys: String, CodingKey {
-        case appConfig, auth, user, signIn
+        case appConfig, auth, user, signIn, passkeys
     }
 
     public init(from decoder: Decoder) throws {
@@ -29,6 +30,7 @@ extension RowndState {
         appConfig = try container.decode(AppConfigState.self, forKey: .appConfig)
         auth = try container.decode(AuthState.self, forKey: .auth)
         user = try container.decode(UserState.self, forKey: .user)
+        passkeys = try container.decode(PasskeyState.self, forKey: .passkeys)
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
     }
 
@@ -91,6 +93,7 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
             appConfig: appConfigReducer(action: action, state: state?.appConfig),
             auth: authReducer(action: action, state: state?.auth),
             user: userReducer(action: action, state: state?.user),
+            passkeys: passkeyReducer(action: action, state: state?.passkeys),
             signIn: signInReducer(action: action, state: state?.signIn)
         )
 

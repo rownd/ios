@@ -103,6 +103,7 @@ extension AuthState: Codable {
                 DispatchQueue.main.async {
                     dispatch(SetAuthState(payload: newAuthState))
                     dispatch(UserData.fetch())
+                    dispatch(PasskeyData.fetchPasskeyRegistration())
                 }
             }
 
