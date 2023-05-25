@@ -28,6 +28,7 @@ public class Rownd: NSObject {
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
+    internal let automationsCoordinator = AutomationsCoordinator()
     
     private override init() {
         super.init()
@@ -84,6 +85,7 @@ public class Rownd: NSObject {
         DispatchQueue.main.async {
             if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
                 store.dispatch(UserData.fetch())
+                store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
         }
     }
@@ -156,22 +158,30 @@ public class Rownd: NSObject {
     }
     
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
+        connectAuthenticator(with: with, completion: completion, args: nil)
+    }
+    
+    internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: Dictionary<String, AnyCodable>?) {
         switch with {
-        case .passkey:
-            if (store.state.auth.accessToken != nil) {
-                inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(
-                    biometricType: LAContext().biometricType.rawValue
-                ))
-            } else {
-                requestSignIn()
-            }
+            case .passkey:
+                if (store.state.auth.accessToken != nil) {
+                    var passkeySignInOptions = RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary()
+                    args?.forEach{ (k,v) in passkeySignInOptions[k] = v }
+                    inst.displayHub(.connectPasskey, jsFnOptions: passkeySignInOptions)
+                } else {
+                    logger.log("Need to be authenticated to Connect another method")
+                    requestSignIn()
+                }
+            default:
+                logger.log("Connect Authenticator hint is not available")
         }
     }
     
     public static func signOut() {
         DispatchQueue.main.async {
             store.dispatch(SetAuthState(payload: AuthState()))
-            store.dispatch(SetUserData(payload: [:]))
+            store.dispatch(SetUserData(data: [:], meta: [:]))
+            store.dispatch(SetPasskeyState())
         }
     }
 
@@ -490,6 +500,13 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
     public var biometricType: String? = ""
     public var type: String = "passkey"
     public var error: String?
+    internal func dictionary() -> Dictionary<String, AnyCodable> {
+        return ["status": AnyCodable(status),
+                "biometric_type": AnyCodable(biometricType),
+                "type": AnyCodable(type),
+                "error": AnyCodable(error)
+        ]
+    }
     
     enum CodingKeys: String, CodingKey {
         case status, type, error
