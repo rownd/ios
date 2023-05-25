@@ -17,12 +17,13 @@ public struct UserState: Hashable {
     public var isErrored: Bool = false
     public var errorMessage: String?
     public var data: Dictionary<String, AnyCodable> = [:]
+    public var meta: Dictionary<String, AnyCodable> = [:]
     public var redacted: [String]?
 }
 
 extension UserState: Codable {
     public enum CodingKeys: String, CodingKey {
-        case data, redacted
+        case data, redacted, meta
     }
 
     public func get() -> UserState {
@@ -54,11 +55,25 @@ extension UserState: Codable {
             store.dispatch(UserData.save(userData))
         }
     }
+    
+    internal func setMetaData(_ meta: Dictionary<String, AnyCodable>) -> Void {
+        DispatchQueue.main.async {
+            store.dispatch(UserData.saveMetaData(meta))
+        }
+    }
+    
+    internal func setMetaData(field: String, value: AnyCodable) ->  Void {
+        var meta = self.meta
+        meta[field] = value
+        DispatchQueue.main.async {
+            store.dispatch(UserData.saveMetaData(meta))
+        }
+    }
 
-    internal func dataAsEncrypted() -> Dictionary<String, AnyCodable> {
+    internal func dataAsEncrypted(_ userData: Dictionary<String, AnyCodable>) -> Dictionary<String, AnyCodable> {
         let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
 
-        var data: Dictionary<String, AnyCodable> = [:].merging(self.data) { (current, _) in current }
+        var data: Dictionary<String, AnyCodable> = [:].merging(userData) { (current, _) in current }
 
         if let encKeyId = encKeyId {
             // Decrypt user fields
@@ -77,10 +92,10 @@ extension UserState: Codable {
         return data
     }
 
-    internal func dataAsDecrypted() -> Dictionary<String, AnyCodable> {
+    internal func dataAsDecrypted(_ userData: Dictionary<String, AnyCodable>) -> Dictionary<String, AnyCodable> {
         let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
 
-        var data: Dictionary<String, AnyCodable> = [:].merging(self.data) { (current, _) in current }
+        var data: Dictionary<String, AnyCodable> = [:].merging(userData) { (current, _) in current }
 
         if let encKeyId = encKeyId {
             // Decrypt user fields
@@ -109,7 +124,8 @@ struct SetUserLoading: Action {
 }
 
 struct SetUserData: Action {
-    var payload: Dictionary<String, AnyCodable> = [:]
+    var data: Dictionary<String, AnyCodable> = [:]
+    var meta: Dictionary<String, AnyCodable> = [:]
 }
 
 struct SetUserError: Action {
@@ -122,7 +138,8 @@ func userReducer(action: Action, state: UserState?) -> UserState {
     
     switch action {
     case let action as SetUserData:
-        state.data = action.payload
+        state.data = action.data
+        state.meta = action.meta
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
     case let action as SetUserState:
@@ -140,6 +157,21 @@ func userReducer(action: Action, state: UserState?) -> UserState {
 struct UserDataPayload: Codable {
     var data: Dictionary<String, AnyCodable>
     var redacted: [String]?
+}
+
+struct UserMetaDataPayload: Codable {
+    var meta: Dictionary<String, AnyCodable>
+}
+
+public struct UserMetaDataResponse: Hashable {
+    public var id: String = ""
+    public var meta: Dictionary<String, AnyCodable> = [:]
+}
+
+extension UserMetaDataResponse: Codable {
+    public enum CodingKeys: String, CodingKey {
+        case id, meta
+    }
 }
 
 class UserData {
@@ -177,7 +209,7 @@ class UserData {
                     logger.debug("Decoded user response: \(String(describing: user))")
 
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(payload: user?.dataAsDecrypted() ?? [:]))
+                        dispatch(SetUserData(data: user?.dataAsDecrypted(user?.data ?? [:]) ?? [:] , meta: user?.dataAsDecrypted(user?.meta ?? [:]) ?? [:]))
                     }
                 } catch {
                     logger.error("Failed to retrieve user: \(String(describing: error))")
@@ -203,7 +235,7 @@ class UserData {
             guard !state.user.isLoading else { return }
 
             DispatchQueue.main.async {
-                dispatch(SetUserData(payload: data))
+                dispatch(SetUserData(data: data, meta: state.user.meta))
             }
             
             Task {
@@ -225,7 +257,7 @@ class UserData {
                 var updatedUserState = UserState()
                 updatedUserState.data = data
                 
-                let userDataPayload = UserDataPayload(data: updatedUserState.dataAsEncrypted())
+                let userDataPayload = UserDataPayload(data: updatedUserState.dataAsEncrypted(updatedUserState.data))
                 
                 do {
                     let user = try await Rownd.apiClient.send(Request<UserState?>(
@@ -237,13 +269,42 @@ class UserData {
                     logger.debug("Decoded user response: \(String(describing: user))")
                     
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(payload: user?.dataAsDecrypted() ?? [:]))
+                        dispatch(SetUserData(data: user?.dataAsDecrypted(user?.data ?? [:]) ?? [:], meta: state.user.meta))
                     }
                 } catch {
                     logger.error("Failed to save user profile: \(String(describing: error))")
                     DispatchQueue.main.async {
                         dispatch(SetUserError(errorMessage: "The user profile could not be saved: \(String(describing: error))"))
                     }
+                }
+            }
+        }
+    }
+    
+    static func saveMetaData(_ meta: Dictionary<String, AnyCodable>) -> Thunk<RowndState> {
+        return Thunk<RowndState> { dispatch, getState in
+            guard let state = getState() else { return }
+            guard !state.user.isLoading else { return }
+
+            DispatchQueue.main.async {
+                dispatch(SetUserData(data: state.user.data, meta: meta))
+            }
+            
+            Task {
+                guard state.auth.isAuthenticated else {
+                    return
+                }
+                          
+                do {
+                    let response = try await Rownd.apiClient.send(Request<UserMetaDataResponse?>(
+                        path: "/me/meta",
+                        method: .put,
+                        body: UserMetaDataPayload(meta: UserState().dataAsEncrypted(meta))
+                    )).value
+                    
+                    logger.debug("Saved Rownd meta data: \(String(describing: response))")
+                } catch {
+                    logger.error("Failed to save meta data: \(String(describing: error))")
                 }
             }
         }
