@@ -45,9 +45,8 @@ let package = Package(
             .upToNextMajor(from: "2.6.3")
         ),
         .package(
-            name: "LBBottomSheet",
-            url: "https://github.com/LunabeeStudio/LBBottomSheet",
-            .upToNextMajor(from: "1.0.17")
+            url: "https://github.com/rownd/LBBottomSheet.git",
+            .upToNextMajor(from: "1.1.7")
         ),
         .package(
             name: "SwiftKeychainWrapper",

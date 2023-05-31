@@ -28,7 +28,7 @@ class KeyTransferViewState : ObservableObject {
 
 class KeyTransferViewController : UIViewController, BottomSheetControllerProtocol, BottomSheetHostProtocol {
 
-    var hostController: UIViewController?
+    var hostController: BottomSheetController?
 
     lazy var contentView: UIHostingController<KeyTransferView> = UIHostingController(rootView: KeyTransferView(
         parentViewController: self,

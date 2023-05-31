@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target     = '14.0'
 
-  s.dependency 'LBBottomSheet', '~> 1.0.24'
+  s.dependency 'LBBottomSheet', '~> 1.1.17'
   s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
   s.dependency 'JWTDecode', '~> 3.0.0'
   s.dependency 'ReSwift', '~> 6.1.0'

@@ -295,6 +295,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 )
                 
             case .triggerSignInWithGoogle:
+                //self.hubViewController?.height()
                 var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage? = nil
                 if case .triggerSignInWithGoogle(let message) = hubMessage.payload {
                     signInWithGoogleMessage = message
@@ -326,6 +327,24 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 startLoading()
             case .hubLoaded:
                 self.animateInContent()
+            
+            case .hubResize:
+                guard case .hubResize(let hubResizeMessage) = hubMessage.payload else { return }
+                if let doubleValue = Double(hubResizeMessage.height ?? "") {
+                    let cgFloatValue = CGFloat(doubleValue)
+                    self.hubViewController?.updateBottomSheetHeight(cgFloatValue)
+                } else {
+                    logger.error("Invalid string format for Hub Resize.")
+                }
+                
+            case .canTouchBackgroundToDismiss:
+                guard case .canTouchBackgroundToDismiss(let canDismissMessage) = hubMessage.payload else { return }
+                if (canDismissMessage.enable == "false") {
+                    self.hubViewController?.canTouchDimmingBackgroundToDismiss(false)
+                    return
+                }
+                self.hubViewController?.canTouchDimmingBackgroundToDismiss(true)
+                break
             case .unknown:
                 break
             }
