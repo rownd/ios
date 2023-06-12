@@ -15,7 +15,7 @@ PODS:
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
   - GTMSessionFetcher/Core (3.1.1)
   - JWTDecode (2.6.3)
-  - LBBottomSheet (1.0.24)
+  - LBBottomSheet (1.1.17)
   - lottie-ios (3.4.3)
   - ReSwift (6.1.0)
   - ReSwiftThunk (2.0.1):
