@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		89A9928D2A131F5345CA0FCE /* Pods_Rownd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69E307F9F39A2D84926086E /* Pods_Rownd.framework */; };
 		B302E2862863A8D0005FD927 /* HubWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2812863A8D0005FD927 /* HubWebViewController.swift */; };
 		B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */; };
 		B302E2962863A95A005FD927 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302E2932863A95A005FD927 /* Storage.swift */; };
@@ -99,6 +100,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5639A58F8AF1FD8FBE3DC781 /* Pods-Rownd.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rownd.debug.xcconfig"; path = "Target Support Files/Pods-Rownd/Pods-Rownd.debug.xcconfig"; sourceTree = "<group>"; };
+		A69E307F9F39A2D84926086E /* Pods_Rownd.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Rownd.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B302E2812863A8D0005FD927 /* HubWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HubWebViewController.swift; sourceTree = "<group>"; };
 		B302E2922863A95A005FD927 /* RowndHubInteropMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowndHubInteropMessage.swift; sourceTree = "<group>"; };
 		B302E2932863A95A005FD927 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
@@ -162,6 +165,7 @@
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasskeyCoordinator.swift; sourceTree = "<group>"; };
 		B3F921A529492DB500D3C48F /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		C301C31B38626FE123AC4B99 /* Pods-Rownd.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rownd.release.xcconfig"; path = "Target Support Files/Pods-Rownd/Pods-Rownd.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +187,7 @@
 				B38A40CC288274D900FD0813 /* SwiftKeychainWrapper in Frameworks */,
 				B38A40CF2883C81D00FD0813 /* Sodium in Frameworks */,
 				B396004528D4348D00754238 /* Get in Frameworks */,
+				89A9928D2A131F5345CA0FCE /* Pods_Rownd.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +211,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0EF8B1B94379106C34762F99 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5639A58F8AF1FD8FBE3DC781 /* Pods-Rownd.debug.xcconfig */,
+				C301C31B38626FE123AC4B99 /* Pods-Rownd.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		B302E28B2863A8E5005FD927 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -299,6 +314,7 @@
 				B38A40B82882185800FD0813 /* RowndFrameworkTestApp */,
 				B374E55928545A1C00955719 /* Products */,
 				B38A40D628873F9B00FD0813 /* Frameworks */,
+				0EF8B1B94379106C34762F99 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -411,6 +427,7 @@
 			isa = PBXGroup;
 			children = (
 				B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */,
+				A69E307F9F39A2D84926086E /* Pods_Rownd.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -445,6 +462,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B374E55F28545A1C00955719 /* Build configuration list for PBXNativeTarget "Rownd" */;
 			buildPhases = (
+				746460B18752C0EB44FB0F15 /* [CP] Check Pods Manifest.lock */,
 				B374E55328545A1C00955719 /* Headers */,
 				B374E55428545A1C00955719 /* Sources */,
 				B374E55528545A1C00955719 /* Frameworks */,
@@ -553,20 +571,20 @@
 			);
 			mainGroup = B374E54E28545A1C00955719;
 			packageReferences = (
-				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
-				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
+				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */,
+				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 				C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
-				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
-				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */,
-				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */,
+				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */,
+				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */,
+				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */,
 				B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */,
-				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
-				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */,
+				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */,
+				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */,
 				DF4CA84829FAADCD00DFDBFB /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
@@ -608,6 +626,31 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		746460B18752C0EB44FB0F15 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Rownd-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B374E55428545A1C00955719 /* Sources */ = {
@@ -820,6 +863,7 @@
 		};
 		B374E56028545A1C00955719 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5639A58F8AF1FD8FBE3DC781 /* Pods-Rownd.debug.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -856,6 +900,7 @@
 		};
 		B374E56128545A1C00955719 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C301C31B38626FE123AC4B99 /* Pods-Rownd.release.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -1037,7 +1082,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */ = {
+		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift.git";
 			requirement = {
@@ -1045,7 +1090,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
 			requirement = {
@@ -1053,7 +1098,7 @@
 				minimumVersion = 7.0.0;
 			};
 		};
-		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */ = {
+		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rownd/CodeScanner_Rownd.git";
 			requirement = {
@@ -1061,7 +1106,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
+		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
 			requirement = {
@@ -1069,7 +1114,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */ = {
+		B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:WeTransfer/Mocker.git";
 			requirement = {
@@ -1085,7 +1130,7 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */ = {
+		B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MobileNativeFoundation/Kronos.git";
 			requirement = {
@@ -1133,7 +1178,7 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */ = {
+		B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift-Thunk.git";
 			requirement = {
@@ -1162,32 +1207,32 @@
 /* Begin XCSwiftPackageProductDependency section */
 		B302E2BA28641A7A005FD927 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
 			productName = ReSwift;
 		};
 		B30FBD8E28E780BF00216034 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
 			productName = GoogleSignIn;
 		};
 		B30FBD9028E780BF00216034 /* GoogleSignInSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
 			productName = GoogleSignInSwift;
 		};
 		B30FBD9328E7811D00216034 /* CodeScanner_Rownd */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */;
+			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */;
 			productName = CodeScanner_Rownd;
 		};
 		B347C27A287CB46A00935115 /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
+			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */;
 			productName = JWTDecode;
 		};
 		B36AA90A291D7273002B3B60 /* Mocker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */;
+			package = B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */;
 			productName = Mocker;
 		};
 		B36AA913291DF829002B3B60 /* Factory */ = {
@@ -1197,7 +1242,7 @@
 		};
 		B3771833293FC39C0055B4A5 /* Kronos */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */;
+			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */;
 			productName = Kronos;
 		};
 		B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */ = {
@@ -1227,12 +1272,12 @@
 		};
 		B3B164F5292C13FE002129A7 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
 			productName = ReSwift;
 		};
 		B3B164FC292C1567002129A7 /* ReSwiftThunk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
+			package = B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */;
 			productName = ReSwiftThunk;
 		};
 		C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */ = {

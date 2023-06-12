@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
         "state": {
           "branch": null,
-          "revision": "9c9b36af86a4dd3da16048a36cf37351e63ccfe1",
-          "version": "6.2.4"
+          "revision": "7932d33686c1dc4d7df7a919aae47361d1cdfda4",
+          "version": "7.0.0"
         }
       },
       {
@@ -93,11 +93,11 @@
       },
       {
         "package": "LBBottomSheet",
-        "repositoryURL": "https://github.com/LunabeeStudio/LBBottomSheet",
+        "repositoryURL": "https://github.com/rownd/LBBottomSheet.git",
         "state": {
           "branch": null,
-          "revision": "c62e58bd3dbb808ffe03ea89652622b092b0e3e0",
-          "version": "1.0.17"
+          "revision": "047863471a722edab0eb4ce1a88d521142bc6425",
+          "version": "1.1.7"
         }
       },
       {
