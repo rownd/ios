@@ -15,7 +15,7 @@ PODS:
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
   - GTMSessionFetcher/Core (3.1.1)
   - JWTDecode (2.6.3)
-  - LBBottomSheet (1.1.17)
+  - LBBottomSheet (1.1.7)
   - lottie-ios (3.4.3)
   - ReSwift (6.1.0)
   - ReSwiftThunk (2.0.1):
@@ -59,7 +59,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   JWTDecode: 33e5e26e5ddbd21b2065820894c08fef0cad9509
-  LBBottomSheet: 1d1a27847388b1a0fc266b439bcc9b386f792886
+  LBBottomSheet: 8ee6d3a86fcfc583bec73aa3bfcb776b2763f59d
   lottie-ios: 9ae750cdc7820fecbd3c2f0cfc493038208fcdc4
   ReSwift: eab3c01e4279ba81b54a61e4fd6499634d20123a
   ReSwiftThunk: 7ca5145764be6f30b62db88a52d170133954629e
