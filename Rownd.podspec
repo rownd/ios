@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Rownd"
-  s.version          = "2.5.4"
+  s.version          = "2.6.0"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
                         Rownd is a user management platform designed to make authentication
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target     = '14.0'
 
-  s.dependency 'LBBottomSheet', '~> 1.1.17'
+  s.dependency 'LBBottomSheet', '~> 1.1.7'
   s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
   s.dependency 'JWTDecode', '~> 3.0.0'
   s.dependency 'ReSwift', '~> 6.1.0'
