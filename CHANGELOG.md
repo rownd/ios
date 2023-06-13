@@ -1,5 +1,7 @@
 
 
+## [2.6.1](https://github.com/rownd/ios/compare/2.6.0...2.6.1) (2023-06-13)
+
 ## [2.5.4](https://github.com/rownd/ios/compare/2.5.3...2.5.4) (2023-04-25)
 
 
