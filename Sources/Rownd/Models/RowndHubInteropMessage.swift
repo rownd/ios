@@ -52,6 +52,8 @@ enum MessageType: String, Codable {
     case userDataUpdate = "user_data_update"
     case tryAgain = "try_again"
     case hubLoaded = "hub_loaded"
+    case hubResize = "hub_resize"
+    case canTouchBackgroundToDismiss = "can_touch_background_to_dismiss"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -81,6 +83,8 @@ enum MessagePayload: Decodable {
     case hubLoaded
     case triggerSignInWithPasskey
     case tryAgain
+    case hubResize(TriggerHubResize)
+    case canTouchBackgroundToDismiss(CanTouchBackgroundToDismiss)
     
     enum CodingKeys: String, CodingKey {
         case type
@@ -121,6 +125,14 @@ enum MessagePayload: Decodable {
         case .userDataUpdate:
             let payload = try objectContainer.decode(UserDataUpdateMessage.self)
             self = .userDataUpdate(payload)
+        
+        case .hubResize:
+            let payload = try objectContainer.decode(TriggerHubResize.self)
+            self = .hubResize(payload)
+        
+        case .canTouchBackgroundToDismiss:
+            let payload = try objectContainer.decode(CanTouchBackgroundToDismiss.self)
+            self = .canTouchBackgroundToDismiss(payload)
             
         case .signOut:
             self = .signOut
@@ -169,6 +181,22 @@ enum MessagePayload: Decodable {
         enum CodingKeys: String, CodingKey {
             case data = "data"
             case meta = "meta"
+        }
+    }
+    
+    public struct TriggerHubResize: Codable {
+        var height: String? = nil
+
+        enum CodingKeys: String, CodingKey {
+            case height
+        }
+    }
+    
+    public struct CanTouchBackgroundToDismiss: Codable {
+        var enable: String? = nil
+
+        enum CodingKeys: String, CodingKey {
+            case enable
         }
     }
 }

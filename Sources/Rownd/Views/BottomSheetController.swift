@@ -13,7 +13,7 @@ protocol BottomSheetControllerProtocol {
 }
 
 protocol BottomSheetHostProtocol {
-    var hostController: UIViewController? { get set }
+    var hostController: BottomSheetController? { get set }
 }
 
 class BottomSheetController: UIViewController {
@@ -35,7 +35,7 @@ class BottomSheetController: UIViewController {
         if let controller = controller as? BottomSheetControllerProtocol {
             behavior.heightMode = .specific(values: controller.detents, heightLimit: .statusBar)
         } else {
-            behavior.heightMode = .specific(values: [.screenRatio(value: 0.7), .screenRatio(value: 1)], heightLimit: .statusBar)
+            behavior.heightMode = .fitContent()
         }
         
         subscribeToNotification(UIResponder.keyboardWillShowNotification, selector: #selector(keyboardWillShow))
@@ -66,6 +66,27 @@ class BottomSheetController: UIViewController {
         super.viewDidDisappear(animated)
         self.controller = nil
     }
+    
+    func updateBottomSheetHeight(_ number: CGFloat) {
+        if let sheetController = sheetController {
+            guard let controller = self.controller else {
+                return
+            }
+            DispatchQueue.main.async {
+                guard let hubViewController = controller as? HubViewController else {
+                    return
+                }
+                hubViewController.preferredHeightInBottomSheet = Double.minimum(number, UIScreen.main.bounds.height * 0.90)
+                sheetController.preferredHeightInBottomSheetDidUpdate()
+            }
+        }
+    }
+    
+    func canTouchDimmingBackgroundToDismiss(_ enable: Bool) {
+        if let sheetController = sheetController {
+            sheetController.setCanTouchDimmingBackgroundToDismiss(enable)
+        }
+    }
 }
 
 extension BottomSheetController {
@@ -80,8 +101,15 @@ extension BottomSheetController {
     @objc func keyboardWillShow(notification: NSNotification) {
         // Get required info out of the notification
         if let sheetController = sheetController {
+            guard let controller = self.controller else {
+                return
+            }
             DispatchQueue.main.async {
-                sheetController.grow(toMaximumHeight: true)
+                guard let hubViewController = controller as? HubViewController else {
+                    return
+                }
+                hubViewController.preferredHeightInBottomSheet = UIScreen.main.bounds.height * 0.9
+                sheetController.preferredHeightInBottomSheetDidUpdate()
             }
         }
     }

@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleSignIn-iOS.git",
       "state" : {
-        "revision" : "9c9b36af86a4dd3da16048a36cf37351e63ccfe1",
-        "version" : "6.2.4"
+        "revision" : "7932d33686c1dc4d7df7a919aae47361d1cdfda4",
+        "version" : "7.0.0"
       }
     },
     {
@@ -93,10 +93,10 @@
     {
       "identity" : "lbbottomsheet",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/LunabeeStudio/LBBottomSheet.git",
+      "location" : "https://github.com/rownd/LBBottomSheet",
       "state" : {
-        "revision" : "c62e58bd3dbb808ffe03ea89652622b092b0e3e0",
-        "version" : "1.0.17"
+        "branch" : "master",
+        "revision" : "e3954f859db221189ecfe8ce7bb96cc076d2013e"
       }
     },
     {

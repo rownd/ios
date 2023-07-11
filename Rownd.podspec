@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Rownd"
-  s.version          = "2.5.4"
+  s.version          = "2.6.1"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
                         Rownd is a user management platform designed to make authentication
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target     = '14.0'
 
-  s.dependency 'LBBottomSheet', '~> 1.0.24'
+  s.dependency 'LBBottomSheet', '~> 1.1.7'
   s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
   s.dependency 'JWTDecode', '~> 3.0.0'
   s.dependency 'ReSwift', '~> 6.1.0'
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
   s.dependency 'Get', '~> 2.0.1'
-  s.dependency 'GoogleSignIn', '~> 6.2.4'
+  s.dependency 'GoogleSignIn', '~> 7.0.0'
   s.dependency 'lottie-ios', '~> 3.4.3'
   s.dependency 'Factory', '~> 1.2.8'
   s.dependency 'Kronos', '~> 4.2.1'
