@@ -18,7 +18,7 @@ public struct AutomationStoreState {
 }
 
 func computeLastRunId(_ automation: RowndAutomation) -> String {
-    let lastRunId = "automation_ios_\(automation.id)_last_run"
+    let lastRunId = "automation_\(automation.id)_last_run"
     logger.log("Last run id: \(lastRunId)")
     return lastRunId
 }
