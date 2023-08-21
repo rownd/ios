@@ -1,5 +1,17 @@
 
 
+# [2.7.0](https://github.com/rownd/ios/compare/2.6.1...2.7.0) (2023-08-21)
+
+
+### Bug Fixes
+
+* bumped podspec version ([cf8a217](https://github.com/rownd/ios/commit/cf8a217bfb8640239ca85bb1219a2af1692dda19))
+
+
+### Features
+
+* bumped lottie version to 4.2.0 ([1aa1681](https://github.com/rownd/ios/commit/1aa16819a4e30d08ce2909aa75d7142adcacef1c))
+
 ## [2.6.1](https://github.com/rownd/ios/compare/2.6.0...2.6.1) (2023-06-13)
 
 ## [2.5.4](https://github.com/rownd/ios/compare/2.5.3...2.5.4) (2023-04-25)
