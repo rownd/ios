@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
   s.dependency 'Get', '~> 2.0.1'
   s.dependency 'GoogleSignIn', '~> 7.0.0'
-  s.dependency 'lottie-ios', '~> 3.4.3'
+  s.dependency 'lottie-ios', '~> 4.2.0'
   s.dependency 'Factory', '~> 1.2.8'
   s.dependency 'Kronos', '~> 4.2.1'
 
