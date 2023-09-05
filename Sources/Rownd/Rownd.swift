@@ -16,6 +16,7 @@ import LBBottomSheet
 import GoogleSignIn
 import LocalAuthentication
 import Kronos
+import Get
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -28,6 +29,7 @@ public class Rownd: NSObject {
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
+    internal static var connectionAction = ConnectionAction()
 
     private override init() {
         super.init()
@@ -188,6 +190,12 @@ public class Rownd: NSObject {
 
     public static func manageAccount() {
         _ = inst.displayHub(.manageAccount)
+    }
+    
+    public class firebase {
+        public static func getIdToken() async throws -> String {
+            return try await connectionAction.getFirebaseIdToken()
+        }
     }
 
     @discardableResult public static func getAccessToken() async throws -> String? {
