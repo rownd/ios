@@ -27,7 +27,7 @@ internal struct ConnectionActionPayload: Encodable {
 class ConnectionAction {
     internal func getFirebaseIdToken() async throws -> String {
         if (!store.state.auth.isAuthenticated) {
-            throw ConnectionActionError.customMessage("User needs to be authenticated to grab a firebase idToken")
+            throw ConnectionActionError.customMessage("User needs to be authenticated to generate a firebase *ID token*")
         }
         do {
             let body = ConnectionActionPayload(actionType: ConnectionActionType.firebaseToken.rawValue)
