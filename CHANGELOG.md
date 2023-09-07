@@ -1,5 +1,17 @@
 
 
+# [2.8.0](https://github.com/rownd/ios/compare/2.7.0...2.8.0) (2023-09-07)
+
+
+### Bug Fixes
+
+* error message wording ([b07b709](https://github.com/rownd/ios/commit/b07b709167f1f030701f1a208923efe920ab481c))
+
+
+### Features
+
+* rownd firebase api for grabbing firebase idToken for authenticated user ([82ad694](https://github.com/rownd/ios/commit/82ad694090269eafb14186f4621b3e7ffecd5e34))
+
 # [2.7.0](https://github.com/rownd/ios/compare/2.6.1...2.7.0) (2023-08-21)
 
 
