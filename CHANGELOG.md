@@ -1,5 +1,13 @@
 
 
+## [2.8.1](https://github.com/rownd/ios/compare/2.8.0...2.8.1) (2023-09-11)
+
+
+### Bug Fixes
+
+* downgrade lottie version for current customer ([#58](https://github.com/rownd/ios/issues/58)) ([7d93894](https://github.com/rownd/ios/commit/7d938941364698790e634b7578bbdf136ba9b6e7))
+* library fixes for lottie pod ([96df1bf](https://github.com/rownd/ios/commit/96df1bf70f1cd79fb9f8b676d9654587e24d6b2f))
+
 # [2.8.0](https://github.com/rownd/ios/compare/2.7.0...2.8.0) (2023-09-07)
 
 
