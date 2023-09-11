@@ -23,7 +23,7 @@ protocol HubViewProtocol {
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
     @objc var preferredHeightInBottomSheet: CGFloat = UIScreen.main.bounds.height * 0.3
     var activityIndicator = UIActivityIndicatorView(style: .large)
-    var customLoadingAnimationView: LottieAnimationView?
+    var customLoadingAnimationView: Lottie.AnimationView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: BottomSheetController?
@@ -133,11 +133,9 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     func setLoading(_ isLoading: Bool) {
         if customLoadingAnimationView != nil {
             if (isLoading) {
-                customLoadingAnimationView?.isHidden = false
                 customLoadingAnimationView?.startAnimating()
             } else {
                 customLoadingAnimationView?.stopAnimating()
-                customLoadingAnimationView?.isHidden = true
             }
         } else {
             if (isLoading) {
