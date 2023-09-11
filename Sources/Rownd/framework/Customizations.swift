@@ -25,12 +25,12 @@ open class RowndCustomizations: Encodable {
 
     open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
-    open var loadingAnimation: LottieAnimation? = nil
+    open var loadingAnimation: Lottie.Animation? = nil
 
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
-    internal var loadingAnimationView: LottieAnimationView {
-        let aniView = LottieAnimationView(animation: loadingAnimation!)
+    internal var loadingAnimationView: Lottie.AnimationView {
+        let aniView = AnimationView(animation: loadingAnimation!)
         aniView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         aniView.contentMode = .scaleAspectFit
         aniView.frame = CGRect.init(
@@ -41,7 +41,7 @@ open class RowndCustomizations: Encodable {
         )
 
         aniView.loopMode = .loop
-        aniView.play()
+        aniView.startAnimating()
         return aniView
     }
 
@@ -80,7 +80,7 @@ extension UIViewController {
 
 }
 
-extension LottieAnimationView {
+extension AnimationView {
 
     func startAnimating(_ hideWhenFinished: Bool = true) {
         self.play { finished in
