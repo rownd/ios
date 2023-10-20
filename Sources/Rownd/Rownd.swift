@@ -18,6 +18,38 @@ import LocalAuthentication
 import Kronos
 import Get
 
+extension UIApplication {
+  @objc dynamic func rowndSendEvent(_ event: UIEvent) {
+    rowndSendEvent(event)
+     
+    if (event.allTouches != nil){
+      let touches: Set<UITouch> = event.allTouches!
+      let touch: UITouch = touches.first!
+       
+      OperationQueue.main.addOperation(){
+        if let tView = touch.view {
+            if let tViewDescription = tView.value(forKey: "recursiveDescription") as? String {
+                print(tViewDescription)
+            }
+        }
+      }
+    }
+  }
+}
+
+func FAB() -> UIButton {
+    let button = UIButton(type: .custom)
+    button.backgroundColor = .white
+    button.tintColor = UIColor(red: 90/255, green: 19/255, blue: 223/255, alpha: 1)
+    button.setImage(UIImage(systemName: "camera"), for: .normal)
+    button.layer.cornerRadius = 28 // half the height and width
+    button.layer.shadowColor = UIColor.black.cgColor
+    button.layer.shadowOpacity = 0.25
+    button.layer.shadowOffset = CGSize(width: 0, height: 2)
+    button.layer.shadowRadius = 4
+    return button
+}
+
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig()
@@ -47,6 +79,12 @@ public class Rownd: NSObject {
         inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
+        
+        let uiAppClass = UIApplication.self
+        let currentSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.sendEvent))
+        let newSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.rowndSendEvent))
+        method_exchangeImplementations(currentSendEvent!, newSendEvent!)
+        print("sendEvent Swizzled")
 
         if store.state.isInitialized && !store.state.auth.isAuthenticated {
             var launchUrl: URL?
@@ -327,12 +365,32 @@ public class Rownd: NSObject {
         }
     }
 
-    internal func getRootViewController() -> UIViewController? {
+    public func getRootViewController() -> UIViewController? {
         return UIApplication.shared.connectedScenes
             .filter({$0.activationState == .foregroundActive})
             .compactMap({$0 as? UIWindowScene})
             .first?.windows
             .filter({$0.isKeyWindow}).first?.rootViewController
+    }
+    
+    public static func addFAB() {
+        var fabButton = FAB()
+        guard let rootViewController = UIApplication.shared.connectedScenes
+            .filter({$0.activationState == .foregroundActive})
+            .compactMap({$0 as? UIWindowScene})
+            .first?.windows
+            .filter({$0.isKeyWindow}).first?.rootViewController else {
+            return print("NO ROOT VIEW CONTROLLER")
+        }
+    
+        rootViewController.view.addSubview(fabButton)
+        fabButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            fabButton.heightAnchor.constraint(equalToConstant: 56),
+            fabButton.widthAnchor.constraint(equalToConstant: 56),
+            fabButton.trailingAnchor.constraint(equalTo: rootViewController.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            fabButton.bottomAnchor.constraint(equalTo: rootViewController.view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+        ])
     }
 
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
