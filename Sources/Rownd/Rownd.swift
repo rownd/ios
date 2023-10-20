@@ -16,6 +16,7 @@ import LBBottomSheet
 import GoogleSignIn
 import LocalAuthentication
 import Kronos
+import WasmInterpreter
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -85,6 +86,15 @@ public class Rownd: NSObject {
             if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
                 store.dispatch(UserData.fetch())
             }
+        }
+        
+        // TODO: Removeme
+        do {
+            let engine = try AutomationEngine()
+            let shouldRun = try engine.shouldRun(0)
+            logger.debug("AutomationEngine call to shouldRun result \(String(describing: shouldRun))")
+        } catch {
+            logger.error("AutomationEngine error: \(String(describing: error))")
         }
     }
 

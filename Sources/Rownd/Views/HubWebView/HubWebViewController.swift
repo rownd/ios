@@ -220,7 +220,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .connectPasskey:
                 self.evaluateJavaScript(code: "rownd.connectAuthenticator(\(self.jsFunctionArgsAsJson))", webView: webView)
             case .signIn, .unknown:
-                self.evaluateJavaScript(code: "rownd.requestSignIn(\(self.jsFunctionArgsAsJson))", webView: webView)
+                let tok = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbGllbnRfbjExYWNvZ2Jud3VhZ3B1b25sdGtiaHliX19ib2JieStkcm9wdDFAcm93bmQuaW8iLCJhdWQiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImVtYWlsIjoiYm9iYnkrZHJvcHQxQHJvd25kLmlvIiwiY2xpZW50IjoiY2xpZW50X24xMWFjb2dibnd1YWdwdW9ubHRrYmh5YiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9hcGkvYWRtaW4vcm93bmQvdG9rZW5zL2NyZWF0ZSIsImlhdCI6MTY4NjI1NDI5OSwiZXhwIjoxNjg2MjU0MzU5LCJuYmYiOjE2ODYyNTQyOTksImp0aSI6InNsMHkxbmRydERwbnhnRkQifQ.UoiNVbtilLtExu55SWD9-RT6VO4pykRfPkj_cEUsMY4"
+                self.evaluateJavaScript(code: "window.droptSignIn(\(tok))", webView: webView)
+//                self.evaluateJavaScript(code: "rownd.requestSignIn(\(self.jsFunctionArgsAsJson))", webView: webView)
             case .qrCode:
                 self.evaluateJavaScript(code: "rownd.generateQrCode(\(self.jsFunctionArgsAsJson))", webView: webView)
             case .manageAccount:

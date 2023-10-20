@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "Factory",
+        "repositoryURL": "https://github.com/hmlongco/Factory",
+        "state": {
+          "branch": null,
+          "revision": "39ff6a675cd0272d833d184d35add0f8fddd63de",
+          "version": "1.3.7"
+        }
+      },
+      {
         "package": "Get",
         "repositoryURL": "https://github.com/rownd/Get",
         "state": {
@@ -74,12 +83,39 @@
         }
       },
       {
+        "package": "Kronos",
+        "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
+        "state": {
+          "branch": null,
+          "revision": "b7f54653a8bb503f42b59ab3160eb11f333b9d3f",
+          "version": "4.2.1"
+        }
+      },
+      {
         "package": "LBBottomSheet",
         "repositoryURL": "https://github.com/LunabeeStudio/LBBottomSheet",
         "state": {
           "branch": null,
           "revision": "c62e58bd3dbb808ffe03ea89652622b092b0e3e0",
           "version": "1.0.17"
+        }
+      },
+      {
+        "package": "Lottie",
+        "repositoryURL": "https://github.com/airbnb/lottie-ios",
+        "state": {
+          "branch": null,
+          "revision": "314537ec697719fa33a9d48210f4d06a463286d3",
+          "version": "3.4.3"
+        }
+      },
+      {
+        "package": "Mocker",
+        "repositoryURL": "https://github.com/WeTransfer/Mocker",
+        "state": {
+          "branch": null,
+          "revision": "4384e015cae4916a6828252467a4437173c7ae17",
+          "version": "3.0.1"
         }
       },
       {
@@ -116,6 +152,24 @@
           "branch": null,
           "revision": "185a3165346a03767101c4f62e9a545a0fe0530f",
           "version": "4.0.1"
+        }
+      },
+      {
+        "package": "Synchronized",
+        "repositoryURL": "https://github.com/shareup/synchronized.git",
+        "state": {
+          "branch": null,
+          "revision": "85653e23270ec88ae19f8d494157769487e34aed",
+          "version": "4.0.1"
+        }
+      },
+      {
+        "package": "WasmInterpreter",
+        "repositoryURL": "https://github.com/shareup/wasm-interpreter-apple.git",
+        "state": {
+          "branch": null,
+          "revision": "3a69633a5a8d8d2ede5cfd1c4e45af7d542b4f09",
+          "version": "0.8.1"
         }
       }
     ]

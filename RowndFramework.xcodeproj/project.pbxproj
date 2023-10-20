@@ -162,6 +162,7 @@
 		B3F08945286FD85300057DC2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasskeyCoordinator.swift; sourceTree = "<group>"; };
 		B3F921A529492DB500D3C48F /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		C5D0E2CF2A1271D4002E5D0B /* RowndFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = RowndFramework.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -410,6 +411,7 @@
 		B38A40D628873F9B00FD0813 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C5D0E2CF2A1271D4002E5D0B /* RowndFramework.xcodeproj */,
 				B38A40D728873F9B00FD0813 /* AuthenticationServices.framework */,
 			);
 			name = Frameworks;
@@ -425,6 +427,11 @@
 				B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */,
 			);
 			path = KeyTransfer;
+			sourceTree = "<group>";
+		};
+		C5D0E2D02A1271D4002E5D0B /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -572,6 +579,12 @@
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C5D0E2D02A1271D4002E5D0B /* Products */;
+					ProjectRef = C5D0E2CF2A1271D4002E5D0B /* RowndFramework.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				B374E55728545A1C00955719 /* Rownd */,

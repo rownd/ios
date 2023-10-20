@@ -93,7 +93,12 @@ let package = Package(
             name: "Mocker",
             url: "https://github.com/WeTransfer/Mocker",
             .upToNextMajor(from: "3.0.1")
-        )
+        ),
+        .package(
+            name: "WasmInterpreter",
+            url: "https://github.com/shareup/wasm-interpreter-apple.git",
+            from: "0.8.1"
+        ),
         
     ],
     
@@ -113,7 +118,8 @@ let package = Package(
                 "GoogleSignIn",
                 "Lottie",
                 "Factory",
-                "Kronos"
+                "Kronos",
+                "WasmInterpreter"
             ],
             resources: [
                 .process("Resources")
@@ -136,7 +142,8 @@ let package = Package(
                 "Lottie",
                 "Factory",
                 "Rownd",
-                "Kronos"
+                "Kronos",
+                "WasmInterpreter"
             ]
         )
     ],
