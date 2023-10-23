@@ -30,6 +30,9 @@ public class Rownd: NSObject {
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
     internal static var connectionAction = ConnectionAction()
+    public static func addListener(_ listener: @escaping (String) -> Void) {
+        logger.addListener(listener)
+    }
 
     private override init() {
         super.init()
