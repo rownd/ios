@@ -1,5 +1,12 @@
 
 
+## [2.8.2](https://github.com/rownd/ios/compare/2.8.1...2.8.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* esnure init uiViewController is on main thread ([#60](https://github.com/rownd/ios/issues/60)) ([5508ff8](https://github.com/rownd/ios/commit/5508ff8d99c457318291b2fc7878ca3ce9ffc127))
+
 ## [2.8.1](https://github.com/rownd/ios/compare/2.8.0...2.8.1) (2023-09-11)
 
 
