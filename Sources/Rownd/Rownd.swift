@@ -295,17 +295,8 @@ public class Rownd: NSObject {
     private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
         let hubController = getHubViewController()
 
-//        hubController.targetPage = page
         displayViewControllerOnTop(hubController)
         hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
-
-//        if let jsFnOptions = jsFnOptions {
-//            do {
-//                hubController.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
-//            } catch {
-//                logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
-//            }
-//        }
 
         return hubController
     }
@@ -315,8 +306,16 @@ public class Rownd: NSObject {
         if bottomSheetController.controller is HubViewController {
             return bottomSheetController.controller as! HubViewController
         }
-
-        return HubViewController()
+        
+        if Thread.isMainThread {
+            return HubViewController()
+        } else {
+            var hubViewController: HubViewController?
+            DispatchQueue.main.sync {
+                hubViewController = HubViewController()
+            }
+            return hubViewController!
+        }
     }
 
     internal func getRootViewController() -> UIViewController? {
