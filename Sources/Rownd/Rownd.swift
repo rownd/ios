@@ -25,7 +25,7 @@ extension UIApplication {
     if (event.allTouches != nil){
       let touches: Set<UITouch> = event.allTouches!
       let touch: UITouch = touches.first!
-       
+
       OperationQueue.main.addOperation(){
         if let tView = touch.view {
             if let tViewDescription = tView.value(forKey: "recursiveDescription") as? String {
@@ -35,19 +35,6 @@ extension UIApplication {
       }
     }
   }
-}
-
-func FAB() -> UIButton {
-    let button = UIButton(type: .custom)
-    button.backgroundColor = .white
-    button.tintColor = UIColor(red: 90/255, green: 19/255, blue: 223/255, alpha: 1)
-    button.setImage(UIImage(systemName: "camera"), for: .normal)
-    button.layer.cornerRadius = 28 // half the height and width
-    button.layer.shadowColor = UIColor.black.cgColor
-    button.layer.shadowOpacity = 0.25
-    button.layer.shadowOffset = CGSize(width: 0, height: 2)
-    button.layer.shadowRadius = 4
-    return button
 }
 
 public class Rownd: NSObject {
@@ -63,6 +50,9 @@ public class Rownd: NSObject {
     internal static var authenticator = Authenticator()
     internal let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
+    internal static var mobileAppTagger = MobileAppTagger()
+    internal static var webSocket = RowndWebSocket()
+    internal static var actionOverlayCoordinator = ActionOverlayCoordinator(parent: inst, webSocket: webSocket)
 
     private override init() {
         super.init()
@@ -86,37 +76,36 @@ public class Rownd: NSObject {
         method_exchangeImplementations(currentSendEvent!, newSendEvent!)
         print("sendEvent Swizzled")
 
-        if store.state.isInitialized && !store.state.auth.isAuthenticated {
-            var launchUrl: URL?
-            if let _launchUrl = launchOptions?[.url] as? URL {
-                launchUrl = _launchUrl
-                handleSignInLink(url: launchUrl)
-            } else if UIPasteboard.general.hasStrings {
-                UIPasteboard.general.detectPatterns(for: [UIPasteboard.DetectionPattern.probableWebURL]) { result in
-                    switch result {
-                    case .success(let detectedPatterns):
-                        if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
-                            if var _launchUrl = UIPasteboard.general.string {
-                                if !_launchUrl.starts(with: "http") {
-                                    _launchUrl = "https://\(_launchUrl)"
-                                }
-                                launchUrl = URL(string: _launchUrl)
-                                handleSignInLink(url: launchUrl)
+        
+        var launchUrl: URL?
+        if let _launchUrl = launchOptions?[.url] as? URL {
+            launchUrl = _launchUrl
+            handleSignInLink(url: launchUrl)
+        } else if UIPasteboard.general.hasStrings {
+            UIPasteboard.general.detectPatterns(for: [UIPasteboard.DetectionPattern.probableWebURL]) { result in
+                switch result {
+                case .success(let detectedPatterns):
+                    if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
+                        if var _launchUrl = UIPasteboard.general.string {
+                            if !_launchUrl.starts(with: "http") {
+                                _launchUrl = "https://\(_launchUrl)"
                             }
+                            launchUrl = URL(string: _launchUrl)
+                            handleSignInLink(url: launchUrl)
                         }
-                    default:
-                        break
                     }
+                default:
+                    break
                 }
             }
+        }
 
-            if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
-                GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-                    if error != nil || user == nil {
-                        logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
-                    } else {
-                        logger.debug("Successfully restored previous Google Sign-in")
-                    }
+        if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
+            GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+                if error != nil || user == nil {
+                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
+                } else {
+                    logger.debug("Successfully restored previous Google Sign-in")
                 }
             }
         }
@@ -258,7 +247,6 @@ public class Rownd: NSObject {
         }
 
         return tokenResponse.accessToken
-
     }
 
     public func state() -> Store<RowndState> {
@@ -373,24 +361,72 @@ public class Rownd: NSObject {
             .filter({$0.isKeyWindow}).first?.rootViewController
     }
     
-    public static func addFAB() {
-        var fabButton = FAB()
-        guard let rootViewController = UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
-            .first?.windows
-            .filter({$0.isKeyWindow}).first?.rootViewController else {
-            return print("NO ROOT VIEW CONTROLLER")
+    private static func getUIWindow() -> UIWindow? {
+        let allScenes = UIApplication.shared.connectedScenes
+        for scene in allScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            for window in windowScene.windows where window.isKeyWindow {
+               return window
+            }
         }
+        return nil
+    }
     
-        rootViewController.view.addSubview(fabButton)
-        fabButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            fabButton.heightAnchor.constraint(equalToConstant: 56),
-            fabButton.widthAnchor.constraint(equalToConstant: 56),
-            fabButton.trailingAnchor.constraint(equalTo: rootViewController.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            fabButton.bottomAnchor.constraint(equalTo: rootViewController.view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
-        ])
+    internal static func captureScreenshot() -> UIImage? {
+        let window = getUIWindow()
+        UIGraphicsBeginImageContextWithOptions(window!.frame.size, window!.isOpaque, 0.0)
+        window!.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image;
+    }
+    
+
+    public static func capturePage() -> Void {
+        logger.info("Capturing page...")
+        /// Get the recursiveDescription of the root view UIWindow
+        let rootView = Rownd.getUIWindow()
+        guard let rootViewDescription = rootView?.value(forKey: "recursiveDescription") as? String else {
+            logger.error("Failed to capture page. root view recursiveDescription could not be determined")
+            return
+        }
+        guard let rootViewDescriptionBase64 = rootViewDescription.data(using: .utf8)?.base64EncodedString() else {
+            logger.error("Failed to capture page. root view recursiveDescription could not be encoded")
+            return
+        }
+        
+        /// Take a screenshot
+        let screenshot = Rownd.captureScreenshot()
+        guard let screenshotDataBase64 = screenshot?.pngData()?.base64EncodedString() else {
+            logger.error("Failed to capture page. Unable to take screenshot")
+            return
+        }
+
+        Task { @MainActor in
+            do {
+                logger.info("Using mobile app tagger to capture page...")
+                var _ = try await mobileAppTagger.capturePage(
+                    rootViewDescriptionBase64: rootViewDescriptionBase64,
+                    screenshotDataBase64: screenshotDataBase64
+                )
+                
+                
+            } catch {
+                logger.error("Failed to capture page \(error)")
+            }
+        }
+    }
+    
+    public static func showActionOverlay() -> Void {
+        store.dispatch(ShowActionOverlay(payload: true))
+
+        actionOverlayCoordinator.show()
+    }
+    
+    public static func hideActionOverlay() -> Void {
+        store.dispatch(ShowActionOverlay(payload: false))
+
+        actionOverlayCoordinator.hide()
     }
 
     private func displayViewControllerOnTop(_ viewController: UIViewController) {

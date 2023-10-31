@@ -18,6 +18,7 @@ public struct RowndState: Codable, Hashable {
     public var user = UserState()
     public var passkeys = PasskeyState()
     public var signIn = SignInState()
+    public var showActionOverlay = false
 }
 
 extension RowndState {
@@ -82,11 +83,20 @@ struct InitializeRowndState: Action {
     var payload: RowndState
 }
 
+struct ShowActionOverlay: Action {
+    var payload: Bool
+}
+
 func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
+    let state = state ?? RowndState()
+    
     var newState: RowndState
     switch (action) {
     case let initializeAction as InitializeRowndState:
         newState = initializeAction.payload
+    case let showActionOverlayAction as ShowActionOverlay:
+        newState = state
+        newState.showActionOverlay = showActionOverlayAction.payload
     default:
         newState = RowndState(
             isInitialized: true,
@@ -95,6 +105,7 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
             user: userReducer(action: action, state: state?.user),
             passkeys: passkeyReducer(action: action, state: state?.passkeys),
             signIn: signInReducer(action: action, state: state?.signIn)
+            showActionOverlay: false
         )
 
         RowndState.save(state: newState)

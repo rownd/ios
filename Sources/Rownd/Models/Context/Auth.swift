@@ -226,4 +226,12 @@ extension JWT {
 
         return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
+    
+    func claim(rowndClaim: RowndJWTClaim) -> Claim {
+        return self.claim(name: rowndClaim.rawValue)
+    }
+}
+
+internal enum RowndJWTClaim: String {
+    case isPlatformJwt = "https://auth.rownd.io/is_platform_jwt"
 }

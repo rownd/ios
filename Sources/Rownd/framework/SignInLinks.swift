@@ -7,6 +7,7 @@
 
 import Foundation
 import Get
+import JWTDecode
 
 struct SignInLinkResp: Hashable, Codable {
     public var accessToken: String?
@@ -31,6 +32,41 @@ class SignInLinks {
             }
 
             let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
+
+            
+            /// If the sign-in link completed with a Platform JWT, save it and enable mobile app tagging if requested
+            if let accessToken = authResp.accessToken {
+                let jwt = try decode(jwt: accessToken)
+                if jwt.claim(rowndClaim: RowndJWTClaim.isPlatformJwt).boolean == true {
+                    Rownd.mobileAppTagger.platformAccessToken = accessToken
+                    
+                    let showActionOverlay = signInUrl.valueOf("show_action_overlay")
+                    let webSocketURL = signInUrl.valueOf("web_socket_url")
+                    
+                    guard let showActionOverlay = showActionOverlay else {
+                        return
+                    }
+                    
+                    guard let webSocketURL = webSocketURL else {
+                        logger.warning("missing web_socket_url query param in sign-in link")
+                        return
+                    }
+                    
+                    if showActionOverlay != "true" || webSocketURL == "" {
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        Rownd.showActionOverlay()
+                        do {
+                            try Rownd.webSocket.connect(webSocketURL)
+                        } catch {
+                            logger.error("Failed to show action overlay. Unable to connect to web socket: \(String(describing: error))")
+                        }
+                    }
+                    return
+                }
+            }
 
             DispatchQueue.main.async {
                 store.dispatch(SetAuthState(payload: AuthState(
