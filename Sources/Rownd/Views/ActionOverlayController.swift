@@ -6,24 +6,59 @@
 //
 
 import Foundation
+import ReSwift
 import SwiftUI
+
+// MARK: Coordinator
 
 protocol MobileTagger {
     func capturePage(rootViewDescriptionBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse?
 }
 
+protocol ActionOverlayControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ActionOverlayController) -> ActionOverlayAnchor
+}
 
 // Empty for now
 protocol ActionOverlayControllerDelegate {}
 
-public class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate {
-    let fab = FAB()
+class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate {
     private var webSocket : URLSessionWebSocketTask?
     private var timer: Timer?
     private var rowndWebSocket: RowndWebSocket?
-    
+
     var presentationContextProvider: ActionOverlayControllerPresentationContextProviding?
     var delegate: ActionOverlayControllerDelegate?
+    
+    var viewModel: ActionOverlayViewModelProto? {
+        didSet {
+            self.fillUI()
+        }
+    }
+    
+    func fillUI() {
+        guard let viewModel = viewModel else {
+            return
+        }
+        
+        self.fab.setImage(viewModel.fabImage, for: .normal)
+        self.fab.addTarget(viewModel.fabTarget, action: viewModel.fabAction, for: viewModel.fabTargetControlEvents)
+    }
+    
+    private var fab = {
+        let button = UIButton(type: .custom)
+
+        button.backgroundColor = .white
+        button.tintColor = UIColor(red: 90/255, green: 19/255, blue: 223/255, alpha: 1)
+        button.layer.cornerRadius = 28 // half the height and width
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.25
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowRadius = 4
+        button.isUserInteractionEnabled = true
+
+        return button
+    }()
     
     func show() -> Void {
         guard let presentationContextProvider = presentationContextProvider else {
@@ -42,9 +77,10 @@ public class ActionOverlayController: UIViewController, URLSessionWebSocketDeleg
         
     override public func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.fillUI()
 
         self.view.addSubview(fab)
-        fab.addTarget(self, action: #selector(capturePage), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             fab.heightAnchor.constraint(equalToConstant: 56),
@@ -58,10 +94,6 @@ public class ActionOverlayController: UIViewController, URLSessionWebSocketDeleg
     
     override public func viewDidDisappear(_ animated: Bool) {
         webSocket?.cancel(with: .goingAway, reason: nil)
-    }
-    
-    @objc func capturePage(_ sender: UIButton) {
-        Rownd.capturePage()
     }
 }
 

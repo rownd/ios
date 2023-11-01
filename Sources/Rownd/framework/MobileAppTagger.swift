@@ -13,7 +13,7 @@ import AnyCodable
 class MobileAppTagger {
     var platformAccessToken: String?
 
-    internal func capturePage(rootViewDescriptionBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse? {
+    func capturePage(rootViewDescriptionBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse? {
         guard platformAccessToken != nil else {
             throw ConnectionActionError.customMessage("User needs to be authenticated with a Platform JWT for mobile app tagging")
         }

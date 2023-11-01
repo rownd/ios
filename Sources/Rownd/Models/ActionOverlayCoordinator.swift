@@ -10,16 +10,12 @@ import SwiftUI
 
 internal typealias ActionOverlayAnchor = UIView
 
-protocol ActionOverlayControllerPresentationContextProviding {
-    func presentationAnchor(for controller: ActionOverlayController) -> ActionOverlayAnchor
-}
-
 internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationContextProviding, ActionOverlayControllerDelegate {
     
     private var parent: Rownd
     private var actionOverlayController: ActionOverlayController = ActionOverlayController()
     private var webSocketDelegate: RowndWebSocketDelegate
-    
+        
     init(parent: Rownd, webSocket: RowndWebSocketDelegate) {
         self.parent = parent
         self.webSocketDelegate = webSocket
@@ -28,6 +24,7 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
     func show() -> Void {
         actionOverlayController.presentationContextProvider = self
         actionOverlayController.delegate = self
+        actionOverlayController.viewModel = ActionOverlayViewModel()
         actionOverlayController.show()
     }
     
