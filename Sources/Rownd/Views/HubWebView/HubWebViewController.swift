@@ -171,12 +171,30 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         if navigationAction.targetFrame == nil {
             let url = navigationAction.request.url
             if UIApplication.shared.canOpenURL(url!) {
-                if (url?.absoluteString == "mailto:") {
-                    //Opens inbox to default email
-                    UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
-                } else {
+                if (url?.absoluteString != "mailto:") {
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                    return nil
                 }
+                
+                let gmailUrl = URL(string: "googlegmail://")
+                if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
+                    UIApplication.shared.open(gmailUrl, options: [:], completionHandler: nil)
+                    return nil
+                }
+                
+                let outlookUrl = URL(string: "ms-outlook://")
+                if let outlookUrl = outlookUrl, UIApplication.shared.canOpenURL(outlookUrl) {
+                    UIApplication.shared.open(outlookUrl, options: [:], completionHandler: nil)
+                    return nil
+                }
+
+                let yahooUrl = URL(string: "ymail://")
+                if let yahooUrl = yahooUrl, UIApplication.shared.canOpenURL(yahooUrl) {
+                    UIApplication.shared.open(yahooUrl, options: [:], completionHandler: nil)
+                    return nil
+                }
+                
+                UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
             }
         }
         return nil
