@@ -1,5 +1,12 @@
 
 
+## [2.8.3](https://github.com/rownd/ios/compare/2.8.2...2.8.3) (2023-11-21)
+
+
+### Features
+
+* allow opening gmail, outlook, and yahoo as email providers ([d7e423e](https://github.com/rownd/ios/commit/d7e423eaa8670b1b3ee55da61ac7c8a09605f6e6))
+
 ## [2.8.2](https://github.com/rownd/ios/compare/2.8.1...2.8.2) (2023-10-23)
 
 
