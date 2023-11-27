@@ -60,7 +60,7 @@ class GoogleSignInCoordinator: NSObject {
         )
 
         Task { @MainActor in
-            guard let rootViewController = parent.getRootViewController() else {
+            guard let rootViewController = await parent.getRootViewController() else {
                 logger.error("Failed to retrieve root view controller")
                 return
             }

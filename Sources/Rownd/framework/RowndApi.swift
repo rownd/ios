@@ -58,7 +58,7 @@ class RowndApiClientDelegate : APIClientDelegate {
         request.setValue(Rownd.config.appKey, forHTTPHeaderField: "X-Rownd-App-Key")
 
         do {
-            if store.state.auth.isAuthenticated, let accessToken = try await Rownd.getAccessToken() {
+            if request.value(forHTTPHeaderField: "Authorization") == nil && store.state.auth.isAuthenticated, let accessToken = try await Rownd.getAccessToken() {
                 request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
         } catch {

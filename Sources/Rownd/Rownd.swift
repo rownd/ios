@@ -50,9 +50,7 @@ public class Rownd: NSObject {
     internal static var authenticator = Authenticator()
     internal let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
-    internal static var mobileAppTagger = MobileAppTagger()
-    internal static var webSocket = RowndWebSocket()
-    internal static var actionOverlayCoordinator = ActionOverlayCoordinator(parent: inst, webSocket: webSocket)
+    internal static var actionOverlay = ActionOverlayCoordinator(parent: inst)
 
     private override init() {
         super.init()
@@ -70,11 +68,11 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
         
-        let uiAppClass = UIApplication.self
-        let currentSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.sendEvent))
-        let newSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.rowndSendEvent))
-        method_exchangeImplementations(currentSendEvent!, newSendEvent!)
-        print("sendEvent Swizzled")
+//        let uiAppClass = UIApplication.self
+//        let currentSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.sendEvent))
+//        let newSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.rowndSendEvent))
+//        method_exchangeImplementations(currentSendEvent!, newSendEvent!)
+//        print("sendEvent Swizzled")
 
         
         var launchUrl: URL?
@@ -120,9 +118,9 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func handleSignInLink(url: URL?) -> Bool {
-        if store.state.auth.isAuthenticated {
-            return true
-        }
+//        if store.state.auth.isAuthenticated {
+//            return true
+//        }
 
         if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
             logger.trace("handling url: \(String(describing: url.absoluteString))")
@@ -353,85 +351,44 @@ public class Rownd: NSObject {
         }
     }
 
-    public func getRootViewController() -> UIViewController? {
-        return UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
-            .first?.windows
-            .filter({$0.isKeyWindow}).first?.rootViewController
-    }
-    
-    private static func getUIWindow() -> UIWindow? {
-        let allScenes = UIApplication.shared.connectedScenes
-        for scene in allScenes {
-            guard let windowScene = scene as? UIWindowScene else { continue }
-            for window in windowScene.windows where window.isKeyWindow {
-               return window
-            }
+    public func getRootViewController() async -> UIViewController? {
+        let task = Task { @MainActor in
+            return UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .compactMap({$0 as? UIWindowScene})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first?.rootViewController
         }
-        return nil
+        do {
+            return try await task.result.get()
+        } catch {
+            return nil
+        }
     }
-    
-    internal static func captureScreenshot() -> UIImage? {
-        let window = getUIWindow()
-        UIGraphicsBeginImageContextWithOptions(window!.frame.size, window!.isOpaque, 0.0)
-        window!.layer.render(in: UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image;
-    }
-    
 
     public static func capturePage() -> Void {
-        logger.info("Capturing page...")
-        /// Get the recursiveDescription of the root view UIWindow
-        let rootView = Rownd.getUIWindow()
-        guard let rootViewDescription = rootView?.value(forKey: "recursiveDescription") as? String else {
-            logger.error("Failed to capture page. root view recursiveDescription could not be determined")
-            return
-        }
-        guard let rootViewDescriptionBase64 = rootViewDescription.data(using: .utf8)?.base64EncodedString() else {
-            logger.error("Failed to capture page. root view recursiveDescription could not be encoded")
-            return
-        }
-        
-        /// Take a screenshot
-        let screenshot = Rownd.captureScreenshot()
-        guard let screenshotDataBase64 = screenshot?.pngData()?.base64EncodedString() else {
-            logger.error("Failed to capture page. Unable to take screenshot")
-            return
-        }
-
-        Task { @MainActor in
-            do {
-                logger.info("Using mobile app tagger to capture page...")
-                var _ = try await mobileAppTagger.capturePage(
-                    rootViewDescriptionBase64: rootViewDescriptionBase64,
-                    screenshotDataBase64: screenshotDataBase64
-                )
-                
-                
-            } catch {
-                logger.error("Failed to capture page \(error)")
-            }
+        do {
+            try Rownd.actionOverlay.actions.capturePage()
+        } catch {
+            logger.error("Failed to capture page: \(String(describing: error))")
         }
     }
     
     public static func showActionOverlay() -> Void {
         store.dispatch(ShowActionOverlay(payload: true))
 
-        actionOverlayCoordinator.show()
+        actionOverlay.show()
     }
     
     public static func hideActionOverlay() -> Void {
         store.dispatch(ShowActionOverlay(payload: false))
 
-        actionOverlayCoordinator.hide()
+        actionOverlay.hide()
     }
 
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
         Task { @MainActor in
-            let rootViewController = getRootViewController()
+            let rootViewController = await getRootViewController()
 
             // Don't try to present again if it's already presented
             if bottomSheetController.presentingViewController != nil {

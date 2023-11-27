@@ -38,10 +38,10 @@ class SignInLinks {
             if let accessToken = authResp.accessToken {
                 let jwt = try decode(jwt: accessToken)
                 if jwt.claim(rowndClaim: RowndJWTClaim.isPlatformJwt).boolean == true {
-                    Rownd.mobileAppTagger.platformAccessToken = accessToken
+                    Rownd.actionOverlay.setPlatformAccessToken(accessToken)
                     
-                    let showActionOverlay = signInUrl.valueOf("show_action_overlay")
-                    let webSocketURL = signInUrl.valueOf("web_socket_url")
+                    let showActionOverlay = signInUrl.value(forQueryParam: "show_action_overlay")
+                    let webSocketURL = signInUrl.value(forQueryParam: "web_socket_url")
                     
                     guard let showActionOverlay = showActionOverlay else {
                         return
@@ -55,11 +55,11 @@ class SignInLinks {
                     if showActionOverlay != "true" || webSocketURL == "" {
                         return
                     }
-
-                    DispatchQueue.main.async {
+                    
+                    Task { @MainActor in
                         Rownd.showActionOverlay()
                         do {
-                            try Rownd.webSocket.connect(webSocketURL)
+                            try Rownd.actionOverlay.connect(webSocketURL)
                         } catch {
                             logger.error("Failed to show action overlay. Unable to connect to web socket: \(String(describing: error))")
                         }
@@ -67,8 +67,12 @@ class SignInLinks {
                     return
                 }
             }
+            
+            if store.state.auth.isAuthenticated {
+                return
+            }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 store.dispatch(SetAuthState(payload: AuthState(
                     accessToken: authResp.accessToken,
                     refreshToken: authResp.refreshToken

@@ -32,13 +32,6 @@ import UIKit
 struct RowndHubInteropMessage: Decodable {
     var type: MessageType
     var payload: MessagePayload?
-    
-    static func fromJson(message: String) throws -> RowndHubInteropMessage {
-        let decoder = JSONDecoder()
-        decoder.userInfo[.messageType] = MessageTypeHolder()
-        let result = try decoder.decode(RowndHubInteropMessage.self, from: message.data(using: .utf8)!)
-        return result
-    }
 }
 
 enum MessageType: String, Codable {

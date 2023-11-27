@@ -15,7 +15,7 @@ protocol RowndWebSocketMessageHandlerDelegate {
     func handleMessage(_ result: Result<URLSessionWebSocketTask.Message, any Error>) -> Bool
 }
 
-class RowndWebSocketMessageHandler : RowndWebSocketMessageHandlerDelegate {
+class RowndWebSocketMessageHandler: RowndWebSocketMessageHandlerDelegate {
     func handleMessage(_ result: Result<URLSessionWebSocketTask.Message, any Error>) -> Bool {
         var shouldReceiveNext = false
         switch result {
@@ -25,6 +25,7 @@ class RowndWebSocketMessageHandler : RowndWebSocketMessageHandlerDelegate {
             switch message {
             case .string(let text):
                 logger.debug("Received text message: \(text)")
+                handleStringMessage(text)
             case .data(let data):
                 logger.debug("Received binary message: \(data)")
             @unknown default:
@@ -35,6 +36,24 @@ class RowndWebSocketMessageHandler : RowndWebSocketMessageHandlerDelegate {
         }
         
         return shouldReceiveNext
+    }
+    
+    private func handleStringMessage(_ string: String) -> Void {
+        do {
+            let message = try WebSocketMessage.fromJson(message: string)
+            switch (message.messageType) {
+            case .setActionOverlayState:
+                guard let state = ActionOverlayState(rawValue: message.payload) else {
+                    logger.error("Web socket message included unsupported action overlay state: \(message.payload)")
+                    return
+                }
+                Rownd.actionOverlay.setState(state: state)
+            default:
+                logger.error("Unsupported web socket message \(string)")
+            }
+        } catch {
+            logger.error("Unable to parse web socket message \(string)")
+        }
     }
 }
 
@@ -69,7 +88,7 @@ class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDele
         self.webSocket = _webSocket
         
         try readMessage()
-        keepAlive()
+//        keepAlive()
     }
     
     func disconnect() -> Void {
@@ -139,19 +158,20 @@ class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDele
     }
 }
 
-internal enum WebSocketMessageMessage : String, Encodable {
+internal enum WebSocketMessageMessage: String, Codable {
     case getConnectionId = "get_connection_id"
     case connected = "connected"
     case capturePageSucceeded = "capture_page_succeeded"
     case capturePageFailed = "capture_page_failed"
+    case setActionOverlayState = "set_action_overlay_state"
 }
 
-internal struct WebSocketMessage: Encodable {
-    var message: WebSocketMessageMessage
+internal struct WebSocketMessage: Encodable, Decodable {
+    var messageType: WebSocketMessageMessage
     var payload: String
     
     enum CodingKeys: String, CodingKey {
-        case message = "message"
+        case messageType = "message_type"
         case payload = "payload"
     }
 }

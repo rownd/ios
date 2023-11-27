@@ -79,6 +79,18 @@
 		B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F01B2028ACA43E00EE764B /* HubViewControllerWrapper.swift */; };
 		B3F921A4294927CC00D3C48F /* PasskeyCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */; };
 		B3F921A629492DB500D3C48F /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F921A529492DB500D3C48F /* Logging.swift */; };
+		C563C6C62AF2CE6F00763356 /* ActionOverlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6C42AF2CE6F00763356 /* ActionOverlayViewModel.swift */; };
+		C563C6C72AF2CE6F00763356 /* FloatingActionButtonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6C52AF2CE6F00763356 /* FloatingActionButtonViewModel.swift */; };
+		C563C6CA2AF2CEB800763356 /* ActionOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6C82AF2CEB800763356 /* ActionOverlayController.swift */; };
+		C563C6CB2AF2CEB800763356 /* FloatingActionButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6C92AF2CEB800763356 /* FloatingActionButtonController.swift */; };
+		C563C6CF2AF2CED700763356 /* ActionOverlayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6CC2AF2CED700763356 /* ActionOverlayCoordinator.swift */; };
+		C563C6D02AF2CED700763356 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6CD2AF2CED700763356 /* FloatingActionButton.swift */; };
+		C563C6D12AF2CED700763356 /* ActionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6CE2AF2CED700763356 /* ActionOverlay.swift */; };
+		C563C6D42AF2CF0400763356 /* WebSockets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6D22AF2CF0400763356 /* WebSockets.swift */; };
+		C563C6D52AF2CF0400763356 /* MobileAppTagger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C563C6D32AF2CF0400763356 /* MobileAppTagger.swift */; };
+		C563C6D72AF2CF9E00763356 /* RowndAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C563C6D62AF2CF9E00763356 /* RowndAssets.xcassets */; };
+		C563C6DC2AF2E00400763356 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = C563C6DB2AF2E00400763356 /* camera.png */; };
+		C596DB882AF56AB0009E113C /* Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C596DB872AF56AB0009E113C /* Decodable.swift */; };
 		C5ACD08E28E38D9B00A9F2D9 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */; };
 /* End PBXBuildFile section */
 
@@ -118,7 +130,7 @@
 		B344910828DBA49E00A992E9 /* auth_refresh_response.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = auth_refresh_response.json; sourceTree = "<group>"; };
 		B347C24E2877DAB600935115 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		B347C25028786A8800935115 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		B347C25328786C5C00935115 /* Rownd.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Rownd.podspec; sourceTree = "<group>"; };
 		B347C25528786D8B00935115 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		B347C27428792AD900935115 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B349906528CFCED9004ADF3F /* Customizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Customizations.swift; sourceTree = "<group>"; };
@@ -166,6 +178,18 @@
 		B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasskeyCoordinator.swift; sourceTree = "<group>"; };
 		B3F921A529492DB500D3C48F /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		C301C31B38626FE123AC4B99 /* Pods-Rownd.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rownd.release.xcconfig"; path = "Target Support Files/Pods-Rownd/Pods-Rownd.release.xcconfig"; sourceTree = "<group>"; };
+		C563C6C42AF2CE6F00763356 /* ActionOverlayViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionOverlayViewModel.swift; sourceTree = "<group>"; };
+		C563C6C52AF2CE6F00763356 /* FloatingActionButtonViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButtonViewModel.swift; sourceTree = "<group>"; };
+		C563C6C82AF2CEB800763356 /* ActionOverlayController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionOverlayController.swift; sourceTree = "<group>"; };
+		C563C6C92AF2CEB800763356 /* FloatingActionButtonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButtonController.swift; sourceTree = "<group>"; };
+		C563C6CC2AF2CED700763356 /* ActionOverlayCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionOverlayCoordinator.swift; sourceTree = "<group>"; };
+		C563C6CD2AF2CED700763356 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
+		C563C6CE2AF2CED700763356 /* ActionOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionOverlay.swift; sourceTree = "<group>"; };
+		C563C6D22AF2CF0400763356 /* WebSockets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSockets.swift; sourceTree = "<group>"; };
+		C563C6D32AF2CF0400763356 /* MobileAppTagger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobileAppTagger.swift; sourceTree = "<group>"; };
+		C563C6D62AF2CF9E00763356 /* RowndAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = RowndAssets.xcassets; sourceTree = "<group>"; };
+		C563C6DB2AF2E00400763356 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
+		C596DB872AF56AB0009E113C /* Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decodable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,13 +241,15 @@
 				5639A58F8AF1FD8FBE3DC781 /* Pods-Rownd.debug.xcconfig */,
 				C301C31B38626FE123AC4B99 /* Pods-Rownd.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
 		B302E28B2863A8E5005FD927 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C563C6CE2AF2CED700763356 /* ActionOverlay.swift */,
+				C563C6CC2AF2CED700763356 /* ActionOverlayCoordinator.swift */,
+				C563C6CD2AF2CED700763356 /* FloatingActionButton.swift */,
 				B3F921A3294927CB00D3C48F /* PasskeyCoordinator.swift */,
 				B38A40DE288740CC00FD0813 /* AppleSignUpCoordinator.swift */,
 				B305C58C29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift */,
@@ -234,13 +260,6 @@
 				B36D430C28B4077F0038CF16 /* MagicLink.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		B302E2B52863BCA3005FD927 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		B302E2BE28641F26005FD927 /* Context */ = {
@@ -284,8 +303,10 @@
 		B347C2562878989F00935115 /* Rownd */ = {
 			isa = PBXGroup;
 			children = (
+				C563C6D62AF2CF9E00763356 /* RowndAssets.xcassets */,
+				C563C6DA2AF2DFBC00763356 /* Resources */,
+				C563C6C32AF2CE6F00763356 /* ViewModels */,
 				B302E2C128642329005FD927 /* Rownd.swift */,
-				B302E2B52863BCA3005FD927 /* Resources */,
 				B302E28B2863A8E5005FD927 /* Models */,
 				B374E56228545A2900955719 /* Views */,
 				B374E55A28545A1C00955719 /* framework */,
@@ -331,6 +352,8 @@
 		B374E55A28545A1C00955719 /* framework */ = {
 			isa = PBXGroup;
 			children = (
+				C563C6D32AF2CF0400763356 /* MobileAppTagger.swift */,
+				C563C6D22AF2CF0400763356 /* WebSockets.swift */,
 				B385D49328FD0507005B67C3 /* Authenticator.swift */,
 				B374E5652855872F00955719 /* Color.swift */,
 				B374E55B28545A1C00955719 /* framework.h */,
@@ -347,6 +370,7 @@
 				B36AA915291DF8F1002B3B60 /* Container.swift */,
 				B3F921A529492DB500D3C48F /* Logging.swift */,
 				B39BE51F29DB62ED00F3AEBB /* ArrayExtensions.swift */,
+				C596DB872AF56AB0009E113C /* Decodable.swift */,
 			);
 			path = framework;
 			sourceTree = "<group>";
@@ -354,6 +378,8 @@
 		B374E56228545A2900955719 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C563C6C82AF2CEB800763356 /* ActionOverlayController.swift */,
+				C563C6C92AF2CEB800763356 /* FloatingActionButtonController.swift */,
 				B36AA91A291EFB2F002B3B60 /* Html */,
 				B3F01B0128A8A53000EE764B /* KeyTransfer */,
 				B38A4095287FC0DC00FD0813 /* HubWebView */,
@@ -442,6 +468,23 @@
 				B36D430E28B5CCD20038CF16 /* KeyTransferProgress.swift */,
 			);
 			path = KeyTransfer;
+			sourceTree = "<group>";
+		};
+		C563C6C32AF2CE6F00763356 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C563C6C42AF2CE6F00763356 /* ActionOverlayViewModel.swift */,
+				C563C6C52AF2CE6F00763356 /* FloatingActionButtonViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		C563C6DA2AF2DFBC00763356 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C563C6DB2AF2E00400763356 /* camera.png */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -571,20 +614,20 @@
 			);
 			mainGroup = B374E54E28545A1C00955719;
 			packageReferences = (
-				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */,
-				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */,
+				B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */,
+				B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */,
 				B38A40C72882727E00FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CA288274D800FD0813 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				B38A40CD2883C81D00FD0813 /* XCRemoteSwiftPackageReference "swift-sodium" */,
 				B396004328D4348D00754238 /* XCRemoteSwiftPackageReference "get" */,
 				C5ACD08728E389C500A9F2D9 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				B39ECA9528E242B10055CB60 /* XCRemoteSwiftPackageReference "lottie-ios" */,
-				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */,
-				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */,
-				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */,
+				B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */,
+				B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */,
 				B36AA912291DF829002B3B60 /* XCRemoteSwiftPackageReference "Factory" */,
-				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */,
-				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */,
+				B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */,
+				B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */,
 				DF4CA84829FAADCD00DFDBFB /* XCRemoteSwiftPackageReference "LBBottomSheet" */,
 			);
 			productRefGroup = B374E55928545A1C00955719 /* Products */;
@@ -604,6 +647,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B347C25428786C5C00935115 /* Rownd.podspec in Resources */,
+				C563C6D72AF2CF9E00763356 /* RowndAssets.xcassets in Resources */,
+				C563C6DC2AF2E00400763356 /* camera.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -660,7 +705,10 @@
 				B38A4090287F5B4900FD0813 /* Encodable.swift in Sources */,
 				B305C58D29DC879D00BCC9C2 /* GoogleSignInCoordinator.swift in Sources */,
 				B39BE52029DB62ED00F3AEBB /* ArrayExtensions.swift in Sources */,
+				C563C6C62AF2CE6F00763356 /* ActionOverlayViewModel.swift in Sources */,
 				B3F921A629492DB500D3C48F /* Logging.swift in Sources */,
+				C596DB882AF56AB0009E113C /* Decodable.swift in Sources */,
+				C563C6D42AF2CF0400763356 /* WebSockets.swift in Sources */,
 				B35E1ED12874C9C9007E989F /* HubViewController.swift in Sources */,
 				B349906628CFCED9004ADF3F /* Customizations.swift in Sources */,
 				B38A4089287F28D000FD0813 /* AccountManagerView.swift in Sources */,
@@ -671,9 +719,12 @@
 				B302E2CD2866C75A005FD927 /* Auth.swift in Sources */,
 				B302E2C028641F41005FD927 /* AppConfig.swift in Sources */,
 				B302E2C228642329005FD927 /* Rownd.swift in Sources */,
+				C563C6D52AF2CF0400763356 /* MobileAppTagger.swift in Sources */,
 				B3F01B1028AB607B00EE764B /* SignInLinks.swift in Sources */,
 				B3F01B2128ACA43E00EE764B /* HubViewControllerWrapper.swift in Sources */,
 				B302E2952863A95A005FD927 /* RowndHubInteropMessage.swift in Sources */,
+				C563C6CF2AF2CED700763356 /* ActionOverlayCoordinator.swift in Sources */,
+				C563C6D02AF2CED700763356 /* FloatingActionButton.swift in Sources */,
 				B302E2CF286A4061005FD927 /* ReSwiftObserver.swift in Sources */,
 				B3F01B1F28AC9AF300EE764B /* KeyCodeView.swift in Sources */,
 				B3F921A4294927CC00D3C48F /* PasskeyCoordinator.swift in Sources */,
@@ -682,6 +733,7 @@
 				B3F01B0328A8A60800EE764B /* KeyTransferViewController.swift in Sources */,
 				B38A409E288111F200FD0813 /* BottomSheetController.swift in Sources */,
 				B302E2D1286A4530005FD927 /* Exporter.swift in Sources */,
+				C563C6D12AF2CED700763356 /* ActionOverlay.swift in Sources */,
 				B36AA91C291EFB2F002B3B60 /* NoInternet.swift in Sources */,
 				B38A4087287E720E00FD0813 /* Constants.swift in Sources */,
 				B36D430D28B4077F0038CF16 /* MagicLink.swift in Sources */,
@@ -691,12 +743,15 @@
 				B347C24F2877DAB600935115 /* Encryption.swift in Sources */,
 				B38A4097287FC7BB00FD0813 /* AccountManagerViewController.swift in Sources */,
 				B38A40E02887410300FD0813 /* AppleSignUpCoordinator.swift in Sources */,
+				C563C6CA2AF2CEB800763356 /* ActionOverlayController.swift in Sources */,
 				B374E5662855873100955719 /* Color.swift in Sources */,
 				B302E2BD28641AA9005FD927 /* Context.swift in Sources */,
 				B302E2962863A95A005FD927 /* Storage.swift in Sources */,
 				B302E2CB28662749005FD927 /* APIResource.swift in Sources */,
 				B3F01B0C28AB55B600EE764B /* RowndApi.swift in Sources */,
+				C563C6C72AF2CE6F00763356 /* FloatingActionButtonViewModel.swift in Sources */,
 				B39ECA9E28E2A2B50055CB60 /* LottieSwiftView.swift in Sources */,
+				C563C6CB2AF2CEB800763356 /* FloatingActionButtonController.swift in Sources */,
 				B302E2972863A95A005FD927 /* RowndConfig.swift in Sources */,
 				B347C27528792AD900935115 /* User.swift in Sources */,
 			);
@@ -1082,7 +1137,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */ = {
+		B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift.git";
 			requirement = {
@@ -1090,7 +1145,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */ = {
+		B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
 			requirement = {
@@ -1098,7 +1153,7 @@
 				minimumVersion = 7.0.0;
 			};
 		};
-		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */ = {
+		B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rownd/CodeScanner_Rownd.git";
 			requirement = {
@@ -1106,7 +1161,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */ = {
+		B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
 			requirement = {
@@ -1114,7 +1169,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */ = {
+		B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:WeTransfer/Mocker.git";
 			requirement = {
@@ -1130,7 +1185,7 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */ = {
+		B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MobileNativeFoundation/Kronos.git";
 			requirement = {
@@ -1178,7 +1233,7 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */ = {
+		B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReSwift/ReSwift-Thunk.git";
 			requirement = {
@@ -1207,32 +1262,32 @@
 /* Begin XCSwiftPackageProductDependency section */
 		B302E2BA28641A7A005FD927 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
 			productName = ReSwift;
 		};
 		B30FBD8E28E780BF00216034 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
 		};
 		B30FBD9028E780BF00216034 /* GoogleSignInSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS.git" */;
+			package = B30FBD8D28E780BF00216034 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
 		};
 		B30FBD9328E7811D00216034 /* CodeScanner_Rownd */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd.git" */;
+			package = B30FBD9228E7811D00216034 /* XCRemoteSwiftPackageReference "CodeScanner_Rownd" */;
 			productName = CodeScanner_Rownd;
 		};
 		B347C27A287CB46A00935115 /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode.swift" */;
+			package = B347C279287CB46900935115 /* XCRemoteSwiftPackageReference "JWTDecode" */;
 			productName = JWTDecode;
 		};
 		B36AA90A291D7273002B3B60 /* Mocker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker.git" */;
+			package = B36AA909291D7273002B3B60 /* XCRemoteSwiftPackageReference "Mocker" */;
 			productName = Mocker;
 		};
 		B36AA913291DF829002B3B60 /* Factory */ = {
@@ -1242,7 +1297,7 @@
 		};
 		B3771833293FC39C0055B4A5 /* Kronos */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos.git" */;
+			package = B3771832293FC39C0055B4A5 /* XCRemoteSwiftPackageReference "Kronos" */;
 			productName = Kronos;
 		};
 		B38A40C82882727F00FD0813 /* SwiftKeychainWrapper */ = {
@@ -1272,12 +1327,12 @@
 		};
 		B3B164F5292C13FE002129A7 /* ReSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift.git" */;
+			package = B302E2B928641A7A005FD927 /* XCRemoteSwiftPackageReference "ReSwift" */;
 			productName = ReSwift;
 		};
 		B3B164FC292C1567002129A7 /* ReSwiftThunk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk.git" */;
+			package = B3B164FB292C1566002129A7 /* XCRemoteSwiftPackageReference "ReSwift-Thunk" */;
 			productName = ReSwiftThunk;
 		};
 		C5ACD08D28E38D9B00A9F2D9 /* AnyCodable */ = {
