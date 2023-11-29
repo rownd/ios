@@ -279,6 +279,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .signIn  else { return }
+                let initialJsFunctionArgsAsJson = self.jsFunctionArgsAsJson
                 DispatchQueue.main.async {
                     store.dispatch(store.state.auth.onReceiveAuthTokens(
                         AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
@@ -286,7 +287,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     store.dispatch(ResetSignInState())
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
-                    self?.hubViewController?.hide()
+                    // Close the hub as long as no other rownd api was called
+                    if (initialJsFunctionArgsAsJson == self?.jsFunctionArgsAsJson) {
+                        self?.hubViewController?.hide()
+                    }
                 }
             case .closeHubViewController:
                 DispatchQueue.main.async {
@@ -296,7 +300,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .manageAccount else { return }
                 DispatchQueue.main.async {
-                    store.dispatch(SetUserData(payload: userDataMessage.data))
+                    store.dispatch(SetUserData(data: userDataMessage.data, meta: userDataMessage.meta ?? [:] ))
                 }
                 
             case .triggerSignInWithApple:
@@ -337,10 +341,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
-                DispatchQueue.main.async {
-                    store.dispatch(SetAuthState(payload: AuthState()))
-                    store.dispatch(SetUserData(payload: [:]))
-                }
+                Rownd.signOut()
             case .tryAgain:
                 startLoading()
             case .hubLoaded:
