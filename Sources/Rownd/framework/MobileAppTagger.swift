@@ -44,6 +44,11 @@ class MobileAppTagger {
                     ]
                 )
             ).value
+            
+            var stringResponse = try response.asJsonString()
+            
+            await Rownd.actionOverlay.sendMessage(WebSocketMessage(messageType: WebSocketMessageMessage.capturePageSucceeded, payload: stringResponse))
+            
 
             return response
         } catch {
@@ -76,10 +81,10 @@ internal struct CreatePageResponse: Hashable, Codable {
     public var versionId: String
     public var viewHierarchy: ViewHierarchy
     public var screenshotUrl: String
+    public var id: String
 
     enum CodingKeys: String, CodingKey {
-        case name = "name"
-        case platform = "platform"
+        case name, platform, id
         case versionId = "version_id"
         case viewHierarchy = "view_hierarchy"
         case screenshotUrl = "screenshot_url"

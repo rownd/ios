@@ -42,6 +42,10 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
         webSocketDelegate.disconnect()
     }
     
+    func sendMessage(_ msg: WebSocketMessage) async -> Void {
+        await webSocketDelegate.sendMessage(msg)
+    }
+    
     func presentationAnchor(for controller: ActionOverlayController) async throws -> ActionOverlayAnchor {
         var anchor = try await Task { @MainActor in
             return await parent.getRootViewController()?.view

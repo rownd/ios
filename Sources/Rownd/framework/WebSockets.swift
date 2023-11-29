@@ -111,6 +111,10 @@ class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDele
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         logger.debug("Connected to websocket server")
+        
+        Task {
+            await sendMessage(WebSocketMessage(messageType: WebSocketMessageMessage.connected, payload: "ios"))
+        }
     }
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
