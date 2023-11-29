@@ -22,27 +22,6 @@ protocol ActionOverlayControllerPresentationContextProviding {
 // Empty for now
 protocol ActionOverlayControllerDelegate {}
 
-
-extension UIView {
-    var trailingConstraint: NSLayoutConstraint? {
-        get {
-            return constraints.first(where: {
-                $0.firstAttribute == .trailing && $0.relation == .equal
-            })
-        }
-        set { setNeedsLayout() }
-    }
-
-    var bottomConstraint: NSLayoutConstraint? {
-        get {
-            return constraints.first(where: {
-                $0.firstAttribute == .bottom && $0.relation == .equal
-            })
-        }
-        set { setNeedsLayout() }
-    }
-}
-
 class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate, UIGestureRecognizerDelegate {
     private var webSocket : URLSessionWebSocketTask?
     private var timer: Timer?
@@ -51,8 +30,8 @@ class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate, UI
     var presentationContextProvider: ActionOverlayControllerPresentationContextProviding?
     var delegate: ActionOverlayControllerDelegate?
     
-//    private var trailingConstraint: NSLayoutConstraint!
-//    private var bottomConstraint: NSLayoutConstraint!
+    private var trailingAnchorConstraint: NSLayoutConstraint!
+    private var bottomAnchorConstraint: NSLayoutConstraint!
     
     var viewModel: ActionOverlayViewModelProto? {
         didSet {
@@ -68,35 +47,45 @@ class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate, UI
 
             self.fab.alpha = viewModel.fabAlpha
             self.fab.backgroundColor = viewModel.fabBackgroundColor
+            
             self.fab.setImage(viewModel.fabImage, for: .normal)
+            self.fab.imageEdgeInsets = viewModel.fabImageInsets
+            
             self.fab.addTarget(viewModel.fabTarget, action: viewModel.fabAction, for: viewModel.fabTargetControlEvents)
             
-            //        self.trailingConstraint = self.fab.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: viewModel.fabPosition.x)
-            //        self.bottomConstraint = self.fab.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: viewModel.fabPosition.y)
-            
-            //        NSLayoutConstraint.activate([
-            //            fab.heightAnchor.constraint(equalToConstant: 56),
-            //            fab.widthAnchor.constraint(equalToConstant: 56),
-            ////            self.trailingConstraint,
-            ////            self.bottomConstraint,
-            //            fab.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            //            fab.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
-            //        ])
+            if self.trailingAnchorConstraint != nil {
+                self.trailingAnchorConstraint.constant = viewModel.fabPosition.x
+            } else {
+                self.trailingAnchorConstraint = self.fab.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: viewModel.fabPosition.x)
+            }
+
+            if self.bottomAnchorConstraint != nil {
+                self.bottomAnchorConstraint.constant = viewModel.fabPosition.y
+            } else {
+                self.bottomAnchorConstraint = self.fab.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: viewModel.fabPosition.y)
+            }
+                
+            NSLayoutConstraint.activate([
+                self.fab.heightAnchor.constraint(equalToConstant: 56),
+                self.fab.widthAnchor.constraint(equalToConstant: 56),
+                self.trailingAnchorConstraint,
+                self.bottomAnchorConstraint
+            ])
         }
     }
     
     private var fab = {
         let button = UIButton(type: .custom)
 
-        button.backgroundColor = .white
-        button.tintColor = UIColor(red: 90/255, green: 19/255, blue: 223/255, alpha: 1)
         button.layer.cornerRadius = 28 // half the height and width
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.25
         button.layer.shadowOffset = CGSize(width: 0, height: 2)
         button.layer.shadowRadius = 4
         button.isUserInteractionEnabled = true
-
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.contentMode = .scaleAspectFit
+        
         return button
     }()
     
@@ -127,20 +116,7 @@ class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate, UI
         self.fillUI()
 
         self.view.addSubview(fab)
-        
-        fab.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            fab.heightAnchor.constraint(equalToConstant: 56),
-            fab.widthAnchor.constraint(equalToConstant: 56),
-//            self.trailingConstraint,
-//            self.bottomConstraint,
-//            fab.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: viewModel.fabPosition.x),
-//            fab.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: viewModel.fabPosition.y)
-            fab.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            fab.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
-        ])
-        
+                        
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(fabLongPressed))
         longPressGesture.delegate = self
         self.fab.addGestureRecognizer(longPressGesture)
@@ -162,16 +138,20 @@ class ActionOverlayController: UIViewController, URLSessionWebSocketDelegate, UI
     }
 
     @objc func fabDragged(sender: UIPanGestureRecognizer) {
+        guard let viewModel = self.viewModel else {
+            return
+        }
+
         let translation = sender.translation(in: self.view)
+        let newX = viewModel.fabPosition.x + translation.x
+        let newY = viewModel.fabPosition.y + translation.y
 
         if sender.state == .changed {
-            self.fab.trailingConstraint?.constant += translation.x
-            self.fab.bottomConstraint?.constant += translation.y
-//            self.viewModel?.fabPosition.x += translation.x
-//            self.viewModel?.fabPosition.y += translation.y
-//            self.trailingConstraint.constant += translation.x
-//            self.bottomConstraint.constant += translation.y
+            self.viewModel?.fabPosition.x = newX > -16 ? -16 : newX
+            self.viewModel?.fabPosition.y = newY > -16 ? -16 : newY
             sender.setTranslation(.zero, in: self.view)
         }
+        
+//        print("newX \(newX), newY \(newY)")
     }
 }

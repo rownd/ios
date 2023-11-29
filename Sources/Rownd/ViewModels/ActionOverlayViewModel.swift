@@ -11,6 +11,7 @@ import SwiftUI
 protocol ActionOverlayViewModelProto {
     var state: ActionOverlayState { get set }
     var fabImage: UIImage? { get }
+    var fabImageInsets: UIEdgeInsets { get }
     var fabTarget: Any { get }
     var fabAction: Selector { get }
     var fabTargetControlEvents: UIControl.Event { get }
@@ -27,16 +28,20 @@ enum ActionOverlayState: String {
 
 class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     var state: ActionOverlayState
+    lazy var fab: FloatingActionButtonViewModel = {
+        return FloatingActionButtonViewModel(parent: self)
+    }()
     var fabImage: UIImage? {
         get { return self.determineFabImage() }
+    }
+    var fabImageInsets: UIEdgeInsets {
+        get { return self.determineFabImageInsets() }
     }
     lazy var fabTarget: Any = { return self }()
     lazy var fabAction: Selector = { return #selector(self.handleClick) }()
     var fabTargetControlEvents: UIControl.Event
     var fabPosition: CGPoint = CGPoint(x: -16, y: -16)
-    var fabBackgroundColor: UIColor {
-        get { return self.determineFabBackgroundColor() }
-    }
+    var fabBackgroundColor: UIColor = .white
     var fabAlpha: CGFloat {
         get { return self.state == .capturingPage ? 0.0 : 1.0 }
     }
@@ -46,40 +51,38 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
         self.fabTargetControlEvents = .touchUpInside
     }
     
-    fileprivate func determineFabBackgroundColor() -> UIColor {
-        switch self.state {
-        case .ready:
-            return .yellow
-        case .capturePage:
-            return .purple
-        case .success:
-            return .green
-        case .failure:
-            return .red
-        default:
-            return .white
-        }
-    }
-    
     fileprivate func determineFabImage() -> UIImage? {
         switch self.state {
         case .capturePage:
-//            return UIImage(named: "camera", in: Bundle(for: Rownd.self), compatibleWith: nil)
-            return UIImage(named: "camera", in: Bundle(for: Rownd.self), compatibleWith: nil)
+            let image = UIImage(named: "camera", in: Bundle.module, compatibleWith: nil)
+            return image?.withTintColor(UIColor.rowndPurple)
         case .success:
-//            return UIImage(named: "success", in: Bundle(for: Rownd.self), compatibleWith: nil)
-            return UIImage(named: "camera", in: Bundle(for: Rownd.self), compatibleWith: nil)
+            let image = UIImage(named: "checkmark", in: Bundle.module, compatibleWith: nil)
+            return image?.withTintColor(UIColor.systemGreen)
         case .failure:
-//            return UIImage(named: "failure", in: Bundle(for: Rownd.self), compatibleWith: nil)
-            return UIImage(named: "camera", in: Bundle(for: Rownd.self), compatibleWith: nil)
+            let image = UIImage(named: "close--filled", in: Bundle.module, compatibleWith: nil)
+            return image?.withTintColor(UIColor.systemRed)
         default:
-//            return UIImage(named: "rownd", in: Bundle(for: Rownd.self), compatibleWith: nil)
-            return UIImage(named: "camera", in: Bundle(for: Rownd.self), compatibleWith: nil)
-
+            let image = UIImage(named: "rownd", in: Bundle.module, compatibleWith: nil)
+            return image?.withTintColor(UIColor.rowndPurple)
+        }
+    }
+    
+    fileprivate func determineFabImageInsets() -> UIEdgeInsets {
+        switch self.state {
+        case .capturePage:
+            return UIEdgeInsets(top: 14, left: 12, bottom: 14, right: 12)
+        default:
+            return UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         }
     }
     
     @objc func handleClick(_ sender: UIButton) {
-        Rownd.capturePage()
+        switch self.state {
+        case .capturePage:
+            Rownd.capturePage()
+        default:
+            return
+        }
     }
 }

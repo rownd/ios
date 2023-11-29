@@ -10,7 +10,7 @@ import Foundation
 public final class MockedData {
 //    public static let botAvatarImageResponseHead: Data = try! Data(contentsOf: Bundle(for: MockedData.self).url(forResource: "Resources/Responses/bot-avatar-image-head", withExtension: "data")!)
 //    public static let botAvatarImageFileUrl: URL = Bundle(for: MockedData.self).url(forResource: "wetransfer_bot_avater", withExtension: "png")!
-    public static let refreshTokenResponse: URL = Bundle.module.url(forResource: "auth_refresh_response", withExtension: "json")!
+//    public static let refreshTokenResponse: URL = Bundle.module.url(forResource: "auth_refresh_response", withExtension: "json")!
 }
 
 extension Bundle {
