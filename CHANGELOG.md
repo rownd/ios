@@ -1,5 +1,51 @@
 
 
+## [2.8.3](https://github.com/rownd/ios/compare/2.8.2...2.8.3) (2023-11-21)
+
+
+### Features
+
+* allow opening gmail, outlook, and yahoo as email providers ([d7e423e](https://github.com/rownd/ios/commit/d7e423eaa8670b1b3ee55da61ac7c8a09605f6e6))
+
+## [2.8.2](https://github.com/rownd/ios/compare/2.8.1...2.8.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* esnure init uiViewController is on main thread ([#60](https://github.com/rownd/ios/issues/60)) ([5508ff8](https://github.com/rownd/ios/commit/5508ff8d99c457318291b2fc7878ca3ce9ffc127))
+
+## [2.8.1](https://github.com/rownd/ios/compare/2.8.0...2.8.1) (2023-09-11)
+
+
+### Bug Fixes
+
+* downgrade lottie version for current customer ([#58](https://github.com/rownd/ios/issues/58)) ([7d93894](https://github.com/rownd/ios/commit/7d938941364698790e634b7578bbdf136ba9b6e7))
+* library fixes for lottie pod ([96df1bf](https://github.com/rownd/ios/commit/96df1bf70f1cd79fb9f8b676d9654587e24d6b2f))
+
+# [2.8.0](https://github.com/rownd/ios/compare/2.7.0...2.8.0) (2023-09-07)
+
+
+### Bug Fixes
+
+* error message wording ([b07b709](https://github.com/rownd/ios/commit/b07b709167f1f030701f1a208923efe920ab481c))
+
+
+### Features
+
+* rownd firebase api for grabbing firebase idToken for authenticated user ([82ad694](https://github.com/rownd/ios/commit/82ad694090269eafb14186f4621b3e7ffecd5e34))
+
+# [2.7.0](https://github.com/rownd/ios/compare/2.6.1...2.7.0) (2023-08-21)
+
+
+### Bug Fixes
+
+* bumped podspec version ([cf8a217](https://github.com/rownd/ios/commit/cf8a217bfb8640239ca85bb1219a2af1692dda19))
+
+
+### Features
+
+* bumped lottie version to 4.2.0 ([1aa1681](https://github.com/rownd/ios/commit/1aa16819a4e30d08ce2909aa75d7142adcacef1c))
+
 ## [2.6.1](https://github.com/rownd/ios/compare/2.6.0...2.6.1) (2023-06-13)
 
 ## [2.5.4](https://github.com/rownd/ios/compare/2.5.3...2.5.4) (2023-04-25)
