@@ -32,7 +32,6 @@ class KeyTransferViewController : UIViewController, BottomSheetControllerProtoco
 
     lazy var contentView: UIHostingController<KeyTransferView> = UIHostingController(rootView: KeyTransferView(
         parentViewController: self,
-        setupKeyTransfer: self.setupKeyTransfer,
         receiveKeyTransfer: self.receiveKeyTransfer,
         keyState: self.keyState
     ))
@@ -72,26 +71,6 @@ class KeyTransferViewController : UIViewController, BottomSheetControllerProtoco
         }
 
         hostController.dismiss(animated: true)
-    }
-
-    private func setupKeyTransfer() {
-        do {
-            let keyId = try Rownd.user.getKeyId()
-            let key = RowndEncryption.loadKey(keyId: keyId)
-            keyState.key = key?.asData().base64EncodedString() ?? "Error"
-        } catch {
-            logger.error("Failed to load key for transfer: \(String(describing: error))")
-            keyState.key = "Error"
-        }
-
-        Task {
-            do {
-                let magicLink: MagicLink = try await Rownd.apiClient.send(Get.Request(url: URL(string: "/me/auth/magic")!, method: "post")).value
-                keyState.signInLink = magicLink.link
-            } catch {
-                logger.error("Failed to fetch magic link: \(String(describing: error))")
-            }
-        }
     }
 
     private func receiveKeyTransfer(_ url: String) {
