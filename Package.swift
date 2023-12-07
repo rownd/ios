@@ -55,11 +55,6 @@ let package = Package(
             .upToNextMajor(from: "4.0.1")
         ),
         .package(
-            name: "Sodium",
-            url: "https://github.com/jedisct1/swift-sodium",
-            .upToNextMajor(from: "0.9.1")
-        ),
-        .package(
             name: "CodeScanner_Rownd",
             url: "https://github.com/rownd/CodeScanner_Rownd",
             .upToNextMajor(from: "2.1.2")
@@ -107,7 +102,6 @@ let package = Package(
                 "JWTDecode",
                 "LBBottomSheet",
                 "SwiftKeychainWrapper",
-                "Sodium",
                 "CodeScanner_Rownd",
                 "Get",
                 "GoogleSignIn",
@@ -129,7 +123,6 @@ let package = Package(
                 "JWTDecode",
                 "LBBottomSheet",
                 "SwiftKeychainWrapper",
-                "Sodium",
                 "CodeScanner_Rownd",
                 "Get",
                 "GoogleSignIn",
