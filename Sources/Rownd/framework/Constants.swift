@@ -46,3 +46,6 @@ func getFrameowrkFeatures() -> String {
 let DEFAULT_API_USER_AGENT = "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
 
 let DEFAULT_WEB_USER_AGENT = "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
+
+let BACKGROUND_LIGHT = UIColor.white
+let BACKGROUND_DARK = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
