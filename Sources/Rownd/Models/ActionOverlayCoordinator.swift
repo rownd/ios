@@ -10,11 +10,11 @@ import SwiftUI
 
 internal typealias ActionOverlayAnchor = UIView
 
-internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationContextProviding, ActionOverlayControllerDelegate {
+internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationContextProviding, ActionOverlayControllerDelegate, RowndWebSocketSessionDelegate {
     
     private var parent: Rownd
     private var mobileAppTagger = MobileAppTagger()
-    private var webSocketDelegate: RowndWebSocketDelegate = RowndWebSocket()
+    lazy private var webSocket: RowndWebSocket = { return RowndWebSocket(sessionDelegate: self) }()
     private var actionOverlayController: ActionOverlayController?
     lazy internal var actions = { return Actions(self) }()
         
@@ -35,15 +35,15 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
     }
     
     func connect(_ url: String) throws -> Void {
-        try webSocketDelegate.connect(url)
+        try webSocket.connect(url)
     }
     
     func disconnect() -> Void {
-        webSocketDelegate.disconnect()
+        webSocket.disconnect()
     }
     
-    func sendMessage(_ msg: WebSocketMessage) async -> Void {
-        await webSocketDelegate.sendMessage(msg)
+    func sendMessage(_ msgType: WebSocketMessageMessage, payload: Encodable) async -> Void {
+        await webSocket.sendMessage(msgType, payload: payload)
     }
     
     func presentationAnchor(for controller: ActionOverlayController) async throws -> ActionOverlayAnchor {
@@ -82,6 +82,20 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
             }
         }
     }
+    
+    // MARK: - RowndWebSocketSessionDelegate methods
+
+    func session(ws: RowndWebSocket, didOpenWithProtocol protocol: String?) {
+        // Websocket connection successfully opened
+        // TODO: Do something in the future?
+    }
+
+    func session(ws: RowndWebSocket, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        // Websocket connection closed. Hide the action overlay.
+        Task { @MainActor in
+            self.hide()
+        }
+    }
             
     class Actions {
         private var parent: ActionOverlayCoordinator
@@ -95,6 +109,7 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
             Task {
                 /// Get the recursiveDescription of the root view UIWindow
                 let rootView = try await getUIWindow()
+                
                 guard let rootViewDescription = rootView?.value(forKey: "recursiveDescription") as? String else {
                     logger.error("Failed to capture page. root view recursiveDescription could not be determined")
                     return

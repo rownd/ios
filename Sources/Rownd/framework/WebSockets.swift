@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AnyCodable
 
 enum WebSocketError: Error {
     case invalidUrl, readOnDisconnectedSocket
@@ -25,7 +26,7 @@ class RowndWebSocketMessageHandler: RowndWebSocketMessageHandlerDelegate {
             switch message {
             case .string(let text):
                 logger.debug("Received text message: \(text)")
-                handleStringMessage(text)
+                shouldReceiveNext = handleStringMessage(text)
             case .data(let data):
                 logger.debug("Received binary message: \(data)")
             @unknown default:
@@ -38,43 +39,56 @@ class RowndWebSocketMessageHandler: RowndWebSocketMessageHandlerDelegate {
         return shouldReceiveNext
     }
     
-    private func handleStringMessage(_ string: String) -> Void {
+    private func handleStringMessage(_ string: String) -> Bool {
+        var shouldReceiveNext = true
         do {
             let message = try WebSocketMessage.fromJson(message: string)
             switch (message.messageType) {
             case .setActionOverlayState:
-                guard let state = ActionOverlayState(rawValue: message.payload) else {
+                let payload = try PayloadSetActionOverlayState.fromJson(message: message.payload)
+                guard let state = ActionOverlayState(rawValue: payload.state) else {
                     logger.error("Web socket message included unsupported action overlay state: \(message.payload)")
-                    return
+                    break
                 }
                 Rownd.actionOverlay.setState(state: state)
+            case .connected:
+                break
+            case .close:
+                Rownd.actionOverlay.disconnect()
+                shouldReceiveNext = false
+                break
             default:
                 logger.error("Unsupported web socket message \(string)")
+                break
             }
         } catch {
             logger.error("Unable to parse web socket message \(string)")
         }
+        return shouldReceiveNext
     }
 }
 
-protocol RowndWebSocketDelegate {
-    func connect(_ url: String) throws -> Void
-    func disconnect() -> Void
-    func sendMessage(_ msg: WebSocketMessage) async -> Void
-    var connected: Bool { get }
+protocol RowndWebSocketSessionDelegate {
+    func session(ws: RowndWebSocket, didOpenWithProtocol protocol: String?) -> Void
+    func session(ws: RowndWebSocket, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) -> Void
 }
 
-class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDelegate {
+class RowndWebSocket : NSObject, URLSessionWebSocketDelegate {
     private lazy var session: URLSession = {
         return URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
     }()
     private var webSocket: URLSessionWebSocketTask?
     private var timer: Timer?
     private var messageHandler: RowndWebSocketMessageHandlerDelegate = RowndWebSocketMessageHandler()
+    private var sessionDelegate: RowndWebSocketSessionDelegate?
     var connected: Bool {
         get {
             return webSocket?.state == .running
         }
+    }
+    
+    init(sessionDelegate: RowndWebSocketSessionDelegate?) {
+        self.sessionDelegate = sessionDelegate
     }
     
     func connect(_ url: String) throws -> Void {
@@ -97,8 +111,10 @@ class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDele
         webSocket = nil
     }
     
-    func sendMessage(_ msg: WebSocketMessage) async -> Void {
+    func sendMessage(_ msgType: WebSocketMessageMessage, payload: Encodable) async -> Void {
         do {
+            let payloadString = try payload.asJsonString()
+            let msg = WebSocketMessage(messageType: msgType, payload: payloadString)
             let taskMessage = try URLSessionWebSocketTask.Message.string(msg.asJsonString())
             try await webSocket?.send(taskMessage)
             return
@@ -109,16 +125,20 @@ class RowndWebSocket : NSObject, RowndWebSocketDelegate, URLSessionWebSocketDele
     
     // MARK: - URLSessionWebSocketDelegate impl
     
-    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol proto: String?) {
         logger.debug("Connected to websocket server")
         
+        
         Task {
-            await sendMessage(WebSocketMessage(messageType: WebSocketMessageMessage.connected, payload: "ios"))
+            await sendMessage(WebSocketMessageMessage.connected, payload: PayloadConnected(platform: "ios"))
         }
+        
+        self.sessionDelegate?.session(ws: self, didOpenWithProtocol: proto)
     }
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         logger.debug("Disconnect from websocket Server \(String(describing: reason))")
+        self.sessionDelegate?.session(ws: self, didCloseWith: closeCode, reason: reason)
     }
         
     private func keepAlive() {
@@ -168,14 +188,38 @@ internal enum WebSocketMessageMessage: String, Codable {
     case capturePageSucceeded = "capture_page_succeeded"
     case capturePageFailed = "capture_page_failed"
     case setActionOverlayState = "set_action_overlay_state"
+    case close = "close"
 }
 
-internal struct WebSocketMessage: Encodable, Decodable {
+internal struct WebSocketMessage: Codable {
     var messageType: WebSocketMessageMessage
     var payload: String
     
     enum CodingKeys: String, CodingKey {
         case messageType = "message_type"
         case payload = "payload"
+    }
+}
+
+// MARK: - web socket message payloads
+
+internal struct PayloadSetActionOverlayState: Codable {
+    var state: String
+    enum CodingKeys: String, CodingKey {
+        case state = "state"
+    }
+}
+
+internal struct PayloadConnected: Codable {
+    var platform: String
+    enum CodingKeys: String, CodingKey {
+        case platform = "platform"
+    }
+}
+
+internal struct PayloadCapturePage: Codable {
+    var page: CreatePageResponse
+    enum CodingKeys: String, CodingKey {
+        case page = "page"
     }
 }

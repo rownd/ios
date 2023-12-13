@@ -20,7 +20,7 @@ protocol ActionOverlayViewModelProto {
     var fabAlpha: CGFloat { get }
 }
 
-enum ActionOverlayState: String {
+enum ActionOverlayState: String, Codable {
     case initializing, ready, success, failure
     case capturePage = "capture_page"
     case capturingPage = "capturing_page"
@@ -47,7 +47,7 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     }
     
     override init() {
-        self.state = .initializing
+        self.state = .ready
         self.fabTargetControlEvents = .touchUpInside
     }
     

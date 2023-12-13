@@ -44,12 +44,9 @@ class MobileAppTagger {
                     ]
                 )
             ).value
+                        
+            await Rownd.actionOverlay.sendMessage(WebSocketMessageMessage.capturePageSucceeded, payload: PayloadCapturePage(page: response))
             
-            var stringResponse = try response.asJsonString()
-            
-            await Rownd.actionOverlay.sendMessage(WebSocketMessage(messageType: WebSocketMessageMessage.capturePageSucceeded, payload: stringResponse))
-            
-
             return response
         } catch {
            throw error

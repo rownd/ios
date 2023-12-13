@@ -100,11 +100,11 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     default:
         newState = RowndState(
             isInitialized: true,
-            appConfig: appConfigReducer(action: action, state: state?.appConfig),
-            auth: authReducer(action: action, state: state?.auth),
-            user: userReducer(action: action, state: state?.user),
-            passkeys: passkeyReducer(action: action, state: state?.passkeys),
-            signIn: signInReducer(action: action, state: state?.signIn)
+            appConfig: appConfigReducer(action: action, state: state.appConfig),
+            auth: authReducer(action: action, state: state.auth),
+            user: userReducer(action: action, state: state.user),
+            passkeys: passkeyReducer(action: action, state: state.passkeys),
+            signIn: signInReducer(action: action, state: state.signIn),
             showActionOverlay: false
         )
 
