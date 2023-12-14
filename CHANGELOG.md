@@ -1,5 +1,26 @@
 
 
+# [2.9.0](https://github.com/rownd/ios/compare/2.8.3...2.9.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* enforce dark/light background from appConfig ([#64](https://github.com/rownd/ios/issues/64)) ([217aa79](https://github.com/rownd/ios/commit/217aa79c3c0514d3c612f5c2d9ece6c456e669f6))
+* removed ios automation id ([f1f6fcf](https://github.com/rownd/ios/commit/f1f6fcf84bea9e28359553f55281f2bfbc7bacfc))
+
+
+### Features
+
+* **app-config:** added automations to app-config ([52da0f0](https://github.com/rownd/ios/commit/52da0f06d6b205a76b7bf2c20580ceed58ac0c9a))
+* **automations:** added automations ([26bf1b2](https://github.com/rownd/ios/commit/26bf1b21f2e91c8e16c98b669cead1cb4b6eb280))
+* **meta data:** added ability to save and fetch meta data ([d5f8440](https://github.com/rownd/ios/commit/d5f8440dee562651a28dc2b50ed1bb3ac38f3985))
+* **meta data:** added ability to save and fetch meta data ([c036d41](https://github.com/rownd/ios/commit/c036d4104a892891a8dfc95e79b9fba76e1ca1a3))
+* **passkeys:** passkey reducer ([6d73b46](https://github.com/rownd/ios/commit/6d73b462326507b5f56ba385b6542c26c8fd48af))
+* **passkeys:** passkey reducer ([08b03ee](https://github.com/rownd/ios/commit/08b03eeb546a30f2f698efb738b1ce01b4f64777))
+* prevent hub from closing if another rownd api was called ([65012bc](https://github.com/rownd/ios/commit/65012bc0de21dd4411d20eda98e73f5a96569976))
+* removed sodium package ([#63](https://github.com/rownd/ios/issues/63)) ([13b1da7](https://github.com/rownd/ios/commit/13b1da70752e14f75db50b4305739e45f88ebd9e))
+* **utils:** debounce and time utils ([3049038](https://github.com/rownd/ios/commit/30490381b9cfd4725e4fe34e7b8c4006f67df9d4))
+
 ## [2.8.3](https://github.com/rownd/ios/compare/2.8.2...2.8.3) (2023-11-21)
 
 
