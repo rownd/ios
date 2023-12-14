@@ -192,10 +192,8 @@ public class Rownd: NSObject {
         }
     }
 
-    public static func transferEncryptionKey() {
-        DispatchQueue.main.async {
-            inst.displayViewControllerOnTop(KeyTransferViewController())
-        }
+    public static func transferEncryptionKey() throws {
+        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 
     public static func manageAccount() {
@@ -380,60 +378,16 @@ public class UserPropAccess {
         store.state.user.set(field: field, value: value)
     }
 
-    public func isEncryptionPossible() -> Bool {
-        do {
-            let key = RowndEncryption.loadKey(keyId: try getKeyId())
-
-            guard let _ = key else {
-                return false
-            }
-
-            return true
-        } catch {
-            return false
-        }
+    public func isEncryptionPossible() throws {
+        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 
-    public func encrypt(plaintext: String) throws -> String {
-        return try RowndEncryption.encrypt(plaintext: plaintext, withKeyId: try getKeyId())
+    public func encrypt(plaintext: String) throws {
+        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 
-    public func decrypt(ciphertext: String) throws -> String {
-        return try RowndEncryption.decrypt(ciphertext: ciphertext, withKeyId: try getKeyId())
-    }
-
-    // MARK: User module internal methods
-    internal func getKeyId() throws -> String {
-        return try getKeyId(user: store.state.user)
-    }
-
-    internal func getKeyId(user: UserState) throws -> String {
-        let userId: String? = user.get(field: "user_id")
-
-        guard let userId = userId else {
-            throw RowndError("An encryption key was requested, but the user has not been loaded yet. Are you signed in?")
-        }
-
-        return userId
-    }
-
-    internal func ensureEncryptionKey(user: UserState) -> String? {
-        do {
-            let keyId = try getKeyId(user: user)
-
-            let key = RowndEncryption.loadKey(keyId: keyId)
-
-            guard let _ = key else {
-                let key = RowndEncryption.generateKey()
-                RowndEncryption.storeKey(key: key, keyId: keyId)
-                return keyId
-            }
-
-            return keyId
-        } catch {
-            logger.error("Failed to ensure that an encryption key exists: \(String(describing: error))")
-            return nil
-        }
+    public func decrypt(ciphertext: String) throws {
+        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 }
 

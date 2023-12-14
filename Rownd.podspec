@@ -24,7 +24,6 @@ Pod::Spec.new do |s|
   s.dependency 'JWTDecode', '~> 3.0.0'
   s.dependency 'ReSwift', '~> 6.1.0'
   s.dependency 'ReSwiftThunk', '~> 2.0.1'
-  s.dependency 'Sodium', '~> 0.9.1'
   s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
   s.dependency 'Get', '~> 2.0.1'

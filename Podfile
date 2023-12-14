@@ -13,7 +13,6 @@ target 'Rownd' do
   pod 'JWTDecode', '~> 2.6.3'
   pod 'ReSwift', '~> 6.1.0'
   pod 'ReSwiftThunk', '~> 2.0.1'
-  pod 'Sodium', '~> 0.9.1'
   pod 'SwiftKeychainWrapper', '~> 4.0.1'
   pod 'GoogleSignIn', '~> 7.0.0'
   pod 'lottie-ios', '~> 4.2.0'

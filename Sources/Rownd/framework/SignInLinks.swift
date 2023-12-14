@@ -26,22 +26,11 @@ class SignInLinks {
     static func signInWithLink(_ url: URL) async throws {
         do {
             var signInUrl = url
-            var encKey: String?
             if let fragment = signInUrl.fragment {
-                encKey = fragment
                 signInUrl = URL(string: signInUrl.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? signInUrl
             }
 
             let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
-
-            if let encKey = encKey {
-                RowndEncryption.deleteKey(keyId: authResp.appUserId)
-                let storedSuccessfully = try RowndEncryption.storeKey(key: encKey, keyId: authResp.appUserId)
-
-                if !storedSuccessfully {
-                    throw EncryptionError("Failed to store encryption key in keychain")
-                }
-            }
 
             DispatchQueue.main.async {
                 store.dispatch(SetAuthState(payload: AuthState(

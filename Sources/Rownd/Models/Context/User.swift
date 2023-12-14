@@ -69,50 +69,6 @@ extension UserState: Codable {
             store.dispatch(UserData.saveMetaData(meta))
         }
     }
-
-    internal func dataAsEncrypted(_ userData: Dictionary<String, AnyCodable>) -> Dictionary<String, AnyCodable> {
-        let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
-
-        var data: Dictionary<String, AnyCodable> = [:].merging(userData) { (current, _) in current }
-
-        if let encKeyId = encKeyId {
-            // Decrypt user fields
-            for (key, value) in data {
-                if store.state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value.value as? String {
-                    do {
-                        let encrypted: String = try RowndEncryption.encrypt(plaintext: value, withKeyId: encKeyId)
-                        data[key] = AnyCodable.init(encrypted)
-                    } catch {
-                        logger.trace("Failed to encrypt user data value. Error: \(String(describing: error))")
-                    }
-                }
-            }
-        }
-
-        return data
-    }
-
-    internal func dataAsDecrypted(_ userData: Dictionary<String, AnyCodable>) -> Dictionary<String, AnyCodable> {
-        let encKeyId = Rownd.user.ensureEncryptionKey(user: self)
-
-        var data: Dictionary<String, AnyCodable> = [:].merging(userData) { (current, _) in current }
-
-        if let encKeyId = encKeyId {
-            // Decrypt user fields
-            for (key, value) in data {
-                if store.state.appConfig.schema?[key]?.encryption?.state == .enabled, let value = value.value as? String {
-                    do {
-                        let decrypted: String = try RowndEncryption.decrypt(ciphertext: value, withKeyId: encKeyId)
-                        data[key] = AnyCodable.init(decrypted)
-                    } catch {
-                        logger.trace("Failed to decrypt user data value. Error: \(String(describing: error))")
-                    }
-                }
-            }
-        }
-
-        return data
-    }
 }
 
 struct SetUserState: Action {
@@ -209,7 +165,7 @@ class UserData {
                     logger.debug("Decoded user response: \(String(describing: user))")
 
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(data: user?.dataAsDecrypted(user?.data ?? [:]) ?? [:] , meta: user?.dataAsDecrypted(user?.meta ?? [:]) ?? [:]))
+                        dispatch(SetUserData(data: user?.data ?? [:] , meta: user?.meta ?? [:]))
                     }
                 } catch {
                     logger.error("Failed to retrieve user: \(String(describing: error))")
@@ -257,7 +213,7 @@ class UserData {
                 var updatedUserState = UserState()
                 updatedUserState.data = data
                 
-                let userDataPayload = UserDataPayload(data: updatedUserState.dataAsEncrypted(updatedUserState.data))
+                let userDataPayload = UserDataPayload(data: data)
                 
                 do {
                     let user = try await Rownd.apiClient.send(Request<UserState?>(
@@ -269,7 +225,7 @@ class UserData {
                     logger.debug("Decoded user response: \(String(describing: user))")
                     
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(data: user?.dataAsDecrypted(user?.data ?? [:]) ?? [:], meta: state.user.meta))
+                        dispatch(SetUserData(data: user?.data ?? [:], meta: state.user.meta))
                     }
                 } catch {
                     logger.error("Failed to save user profile: \(String(describing: error))")
@@ -299,7 +255,7 @@ class UserData {
                     let response = try await Rownd.apiClient.send(Request<UserMetaDataResponse?>(
                         path: "/me/meta",
                         method: .put,
-                        body: UserMetaDataPayload(meta: UserState().dataAsEncrypted(meta))
+                        body: UserMetaDataPayload(meta: meta)
                     )).value
                     
                     logger.debug("Saved Rownd meta data: \(String(describing: response))")
