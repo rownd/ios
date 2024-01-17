@@ -17,8 +17,12 @@ class GoogleSignInCoordinator: NSObject {
         self.parent = parent
         super.init()
     }
-
+    
     func signIn(_ intent: RowndSignInIntent?) async {
+        await signIn(intent, hint: nil)
+    }
+
+    func signIn(_ intent: RowndSignInIntent?, hint: String?) async {
         let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
         guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
@@ -63,7 +67,8 @@ class GoogleSignInCoordinator: NSObject {
 
             do {
                 let result = try await GIDSignIn.sharedInstance.signIn(
-                    withPresenting: rootViewController
+                    withPresenting: rootViewController,
+                    hint: hint
                 )
 
                 guard let idToken = result.user.idToken else {

@@ -24,7 +24,7 @@ public class Rownd: NSObject {
 
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
-    private static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
+    internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
     internal var bottomSheetController: BottomSheetController = BottomSheetController()
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client

@@ -160,9 +160,10 @@ enum MessagePayload: Decodable {
     
     public struct TriggerSignInWithGoogleMessage: Codable {
         var intent: RowndSignInIntent? = nil
+        var hint: String? = nil
         
         enum CodingKeys: String, CodingKey {
-            case intent
+            case intent, hint
         }
     }
     
