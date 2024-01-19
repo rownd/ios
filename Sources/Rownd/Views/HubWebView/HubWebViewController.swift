@@ -317,18 +317,12 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 )
                 
             case .triggerSignInWithGoogle:
-                //self.hubViewController?.height()
                 var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage? = nil
                 if case .triggerSignInWithGoogle(let message) = hubMessage.payload {
                     signInWithGoogleMessage = message
                 }
-//                self.hubViewController?.hide()
-                Rownd.requestSignIn(
-                    with: .googleId,
-                    signInOptions: RowndSignInOptions(
-                        intent: signInWithGoogleMessage?.intent
-                    )
-                )
+                Rownd.requestSignIn(with: RowndSignInHint.googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage?.intent, hint: signInWithGoogleMessage?.hint))
+
             case .triggerSignUpWithPasskey:
                 HubWebViewController.passkeyCoordinator?.registerPasskey()
                 break
