@@ -143,7 +143,8 @@ public class Rownd: NSObject {
         case .googleId:
             Task {
                 await googleSignInCoordinator.signIn(
-                    signInOptions?.intent
+                    signInOptions?.intent,
+                    hint: signInOptions?.hint
                 )
                 completion?()
             }
@@ -409,16 +410,19 @@ public enum RowndConnectSignInHint {
 }
 
 public struct RowndSignInOptions: Encodable {
-    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect, intent: RowndSignInIntent? = nil) {
+    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect, intent: RowndSignInIntent? = nil, hint: String? = nil) {
         self.postSignInRedirect = postSignInRedirect
         self.intent = intent
+        self.hint = hint
     }
 
     public var postSignInRedirect: String? = Rownd.config.postSignInRedirect
     public var intent: RowndSignInIntent?
+    public var hint: String?
 
     enum CodingKeys: String, CodingKey {
         case intent
+        case hint
         case postSignInRedirect = "post_login_redirect"
     }
 }
