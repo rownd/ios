@@ -1,5 +1,17 @@
 
 
+## [3.0.1](https://github.com/rownd/ios/compare/3.0.0...3.0.1) (2024-01-23)
+
+
+### Bug Fixes
+
+* moved google sign-in hint public ([fbd88a3](https://github.com/rownd/ios/commit/fbd88a355eb54947cfdde5e8aaf0b6a259ecab26))
+
+
+### Features
+
+* pass down google sign in hint ([cb5ccc5](https://github.com/rownd/ios/commit/cb5ccc5d6c596f876edac56785f4a6e9f77a322b))
+
 # [3.0.0](https://github.com/rownd/ios/compare/2.9.0...3.0.0) (2023-12-14)
 
 # [2.9.0](https://github.com/rownd/ios/compare/2.8.3...2.9.0) (2023-12-14)
