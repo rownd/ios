@@ -8,7 +8,6 @@
 import Foundation
 import AnyCodable
 
-
 public struct RowndAutomation: Hashable {
     public var id: String
     public var name: String
@@ -41,7 +40,7 @@ extension RowndAutomationAction: Codable {
     }
 }
 
-public enum RowndAutomationActionType: String, Codable {
+public enum RowndAutomationActionType: String {
     case requireAuthentication = "REQUIRE_AUTHENTICATION"
     case promptForPasskey = "PROMPT_FOR_PASSKEY"
     case signOut = "SIGN_OUT"
@@ -49,6 +48,13 @@ public enum RowndAutomationActionType: String, Codable {
     case redirect = "REDIRECT"
     case promptForInput = "PROMPT_FOR_INPUT"
     case none = "NONE"
+    case unknown
+}
+
+extension RowndAutomationActionType: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try RowndAutomationActionType(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+    }
 }
 
 public struct RowndAutomationRule: Hashable {
@@ -71,7 +77,7 @@ public enum RowndAutomationRuleEntityRule: String, Codable {
     case scope = "scope"
 }
 
-public enum RowndAutomationRuleCondition: String, Codable {
+public enum RowndAutomationRuleCondition: String {
     case equals = "EQUALS"
     case notEquals = "NOT_EQUALS"
     case contains = "CONTAINS"
@@ -84,6 +90,13 @@ public enum RowndAutomationRuleCondition: String, Codable {
     case greaterThanEqual = "GREATER_THAN_EQUAL"
     case lessThan = "LESS_THAN"
     case lessThanEqual = "LESS_THAN_EQUAL"
+    case unknown
+}
+
+extension RowndAutomationRuleCondition: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try RowndAutomationRuleCondition(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+    }
 }
 
 
@@ -99,11 +112,18 @@ extension RowndAutomationTrigger: Codable {
     }
 }
 
-public enum RowndAutomationTriggerType: String, Codable {
+public enum RowndAutomationTriggerType: String {
     case time = "TIME"
     case url = "URL"
     case event = "EVENT"
     case htmlSelector = "HTML_SELECTOR"
     case htmlSelectorVisible = "HTML_SELECTOR_VISIBLE"
     case mobileEvent = "MOBILE_EVENT"
+    case unknown
+}
+
+extension RowndAutomationTriggerType: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try RowndAutomationTriggerType(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+    }
 }
