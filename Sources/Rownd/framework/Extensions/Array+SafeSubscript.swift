@@ -1,5 +1,5 @@
 //
-//  ArrayExtensions.swift
+//  Array+IsEqualTolerance.swift
 //  Rownd
 //
 //  Created by Matt Hamann on 4/3/23.

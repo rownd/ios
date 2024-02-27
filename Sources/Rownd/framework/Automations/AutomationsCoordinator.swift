@@ -36,8 +36,9 @@ func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<Strin
 }
 
 public class AutomationsCoordinator: NSObject, StoreSubscriber {
+    private var state: AutomationStoreState?
     public typealias StoreSubscriberStateType = AutomationStoreState
-    let debouncer = Debouncer(delay: 0.5) // 500ms
+    let debouncer = Debouncer()
     
     override init() {
         super.init()
@@ -49,12 +50,13 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     public func newState(state: AutomationStoreState) {
+        self.state = state
         guard state.automations != nil else {
             return
         }
         
-        debouncer.debounce {
-            self.processAutomations(state)
+        debouncer.debounce(interval: 0.5) {
+            self.processAutomations()
         }
     }
     
@@ -62,26 +64,37 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
        store.unsubscribe(self)
     }
     
-    public func processAutomations(_ state: AutomationStoreState) {
+    private func processAutomations(_ state: AutomationStoreState, lastClickTarget: String?) {
         guard let automations = state.automations else {
             return
         }
         for automation in automations {
-            processAutomation(automation: automation, state: state)
+            processAutomation(automation: automation, state: state, lastClickTarget: lastClickTarget)
         }
     }
     
-    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState) {
-        logger.log("Automation: \(automation.name)")
+    public func processAutomations() {
+        self.processAutomations(lastClickTarget: nil)
+    }
+    
+    public func processAutomations(lastClickTarget: String?) {
+        guard let state = self.state else {
+            return
+        }
+        self.processAutomations(state, lastClickTarget: lastClickTarget)
+    }
+    
+    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState, lastClickTarget: String?) {
+        logger.log("Processing automation: \(automation.name) (\(automation.id))")
         if (automation.state != RowndAutomationState.enabled) {
-            logger.log("Automation is disabled: \(automation.name)")
+            logger.log("Automation is disabled: \(automation.name) (\(automation.id))")
             return
         }
         
-        let willAutomationRun = shouldAutomationRun(automation: automation, state: state)
+        let willAutomationRun = shouldAutomationRun(automation: automation, state: state, lastClickTarget: lastClickTarget)
         
         if (!willAutomationRun) {
-            logger.log("Automation does not need to run: \(automation.name)")
+            logger.log("Automation does not need to run: \(automation.name) (\(automation.id))")
             return
         }
         
@@ -133,13 +146,18 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         return automationMeta
     }
     
-    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) -> Bool {
+    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState, lastClickTarget: String?) -> Bool {
         let automationMetaData = determineAutomationMetaData(state)
-        let ruleResult = automation.rules.allSatisfy {
-            let rule = $0.self
-            let userData = rule.entityType == RowndAutomationRuleEntityRule.metadata ? automationMetaData : state.user.data
-            let result = evaluateRule(userData: userData, rule: rule)
-            return result
+        let ruleResult = automation.rules.allSatisfy { _rule in
+            let rule = _rule.self
+            switch rule.entityType {
+            case .metadata, .userData:
+                let userData = rule.entityType == RowndAutomationRuleEntityRule.metadata ? automationMetaData : state.user.data
+                return evaluateRule(userData: userData, rule: rule)
+            case .scope:
+                return true
+//              // TODO: Implement
+            }
         }
         
         var triggerResult = true
@@ -150,6 +168,14 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             let finalResult = ruleResult && triggerResult
             
             return finalResult
+        }
+        
+        if let clickTrigger = automation.triggers.first(where: { $0.type == .mobileEvent }) {
+            if clickTrigger.target == lastClickTarget ?? "" {
+                return true
+            } else {
+                print("\(clickTrigger.target ?? "") does not equal \(lastClickTarget ?? "")")
+            }
         }
         
         return false // Currently only working with time triggers

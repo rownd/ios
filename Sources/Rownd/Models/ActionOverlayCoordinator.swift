@@ -32,6 +32,7 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
     
     func hide() -> Void {
         actionOverlayController?.hide()
+        actionOverlayController = nil
     }
     
     func connect(_ url: String) throws -> Void {
@@ -107,20 +108,23 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
         func capturePage() -> Void {
             self.parent.setState(state: .capturingPage)
             Task {
-                /// Get the recursiveDescription of the root view UIWindow
-                let rootView = try await getUIWindow()
-                
-                guard let rootViewDescription = rootView?.value(forKey: "recursiveDescription") as? String else {
-                    logger.error("Failed to capture page. root view recursiveDescription could not be determined")
+                guard let rowndTree = await RowndTreeSerialization.serializeTree() else {
+                    logger.error("Failed to capture page. Tree serialiation failed")
                     return
                 }
-                let rootViewDescriptionBase64 = rootViewDescription.data(using: .utf8)?.base64EncodedString()
+                
+                let viewHierarchyString = try rowndTree.asJsonString()
+                guard let viewHierarchyStringBase64 = viewHierarchyString.data(using: .utf8)?.base64EncodedString() else {
+                    logger.error("Failed to capture page. Failed to encode view hierarchy string")
+                    return
+                }
+                                
                 
                 /// Take a screenshot
                 let screenshot = try await captureScreenshot()
                 let screenshotDataBase64 = screenshot?.pngData()?.base64EncodedString()
                 
-                guard let rootViewDescriptionBase64 = rootViewDescriptionBase64 else {
+                guard let _ = viewHierarchyStringBase64 as String? else {
                     logger.error("Failed to capture page. root view recursiveDescription could not be encoded")
                     return
                 }
@@ -131,7 +135,7 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
                 }
                 
                 do {
-                    var _ = try await self.parent.mobileAppTagger.capturePage(rootViewDescriptionBase64: rootViewDescriptionBase64, screenshotDataBase64: screenshotDataBase64)
+                    var _ = try await self.parent.mobileAppTagger.capturePage(viewHierarchyStringBase64: viewHierarchyStringBase64, screenshotDataBase64: screenshotDataBase64)
                 } catch {
                     logger.error("Failed to capture page \(error)")
                     self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
@@ -144,24 +148,10 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
     }
     
     // MARK: - Static main thread UI helper functions
-
-    internal static func getUIWindow() async throws -> UIWindow? {
-        let task = Task { @MainActor () -> UIWindow? in
-            let allScenes = UIApplication.shared.connectedScenes
-            for scene in allScenes {
-                guard let windowScene = scene as? UIWindowScene else { continue }
-                for window in windowScene.windows where window.isKeyWindow {
-                   return window
-                }
-            }
-            return nil
-        }
-        return try await task.result.get()
-    }
     
     internal static func captureScreenshot() async throws -> UIImage? {
         let task = Task { @MainActor () -> UIImage? in
-            let window = try await getUIWindow()
+            let window = try await RowndDeviceUtils.mainWindow()
             UIGraphicsBeginImageContextWithOptions(window!.frame.size, window!.isOpaque, 0.0)
             window!.layer.render(in: UIGraphicsGetCurrentContext()!)
             let image = UIGraphicsGetImageFromCurrentImageContext()

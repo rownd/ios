@@ -12,7 +12,7 @@ import SwiftUI
 // MARK: Coordinator
 
 protocol MobileTagger {
-    func capturePage(rootViewDescriptionBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse?
+    func capturePage(viewHierarchyStringBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse?
 }
 
 protocol ActionOverlayControllerPresentationContextProviding {

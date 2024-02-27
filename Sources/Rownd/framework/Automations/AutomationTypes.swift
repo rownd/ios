@@ -17,11 +17,12 @@ public struct RowndAutomation: Hashable {
     public var actions: [RowndAutomationAction]
     public var rules: [RowndAutomationRule]
     public var triggers: [RowndAutomationTrigger]
+    public var platform: String
 }
 
 extension RowndAutomation: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, name, template, state, actions, rules, triggers
+        case id, name, template, state, actions, rules, triggers, platform
     }
 }
 
@@ -67,6 +68,7 @@ extension RowndAutomationRule: Codable {
 public enum RowndAutomationRuleEntityRule: String, Codable {
     case metadata
     case userData = "user_data"
+    case scope = "scope"
 }
 
 public enum RowndAutomationRuleCondition: String, Codable {
@@ -103,4 +105,5 @@ public enum RowndAutomationTriggerType: String, Codable {
     case event = "EVENT"
     case htmlSelector = "HTML_SELECTOR"
     case htmlSelectorVisible = "HTML_SELECTOR_VISIBLE"
+    case mobileEvent = "MOBILE_EVENT"
 }

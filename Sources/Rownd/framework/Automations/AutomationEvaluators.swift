@@ -22,6 +22,10 @@ internal func evaluateRule(userData: Dictionary<String, AnyCodable>, rule: Rownd
     return result
 }
 
+internal func evaluateRule(viewHierarchy: String, rule: RowndAutomationRule) -> Bool {
+    return viewHierarchy == "todo"
+}
+
 func conditionEvaluatorsEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: EQUALS")
     guard let dataValue = data[attribute], let attributeValue = value else {

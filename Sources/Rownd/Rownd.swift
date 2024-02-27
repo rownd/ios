@@ -18,25 +18,6 @@ import LocalAuthentication
 import Kronos
 import Get
 
-extension UIApplication {
-  @objc dynamic func rowndSendEvent(_ event: UIEvent) {
-    rowndSendEvent(event)
-     
-    if (event.allTouches != nil){
-      let touches: Set<UITouch> = event.allTouches!
-      let touch: UITouch = touches.first!
-
-      OperationQueue.main.addOperation(){
-        if let tView = touch.view {
-            if let tViewDescription = tView.value(forKey: "recursiveDescription") as? String {
-                print(tViewDescription)
-            }
-        }
-      }
-    }
-  }
-}
-
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
     public static var config: RowndConfig = RowndConfig()
@@ -48,7 +29,7 @@ public class Rownd: NSObject {
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
-    internal let automationsCoordinator = AutomationsCoordinator()
+    internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
     internal static var actionOverlay = ActionOverlayCoordinator(parent: inst)
 
@@ -67,13 +48,6 @@ public class Rownd: NSObject {
         inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
-        
-//        let uiAppClass = UIApplication.self
-//        let currentSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.sendEvent))
-//        let newSendEvent = class_getInstanceMethod(uiAppClass, #selector(uiAppClass.rowndSendEvent))
-//        method_exchangeImplementations(currentSendEvent!, newSendEvent!)
-//        print("sendEvent Swizzled")
-
         
         var launchUrl: URL?
         if let _launchUrl = launchOptions?[.url] as? URL {
@@ -113,6 +87,18 @@ public class Rownd: NSObject {
             if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
                 store.dispatch(UserData.fetch())
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
+            }
+        }
+        
+        Observer.shared.startObservingLayoutChanges()
+        
+        Task {
+            do {
+                let tree = await RowndTreeSerialization.serializeTree()
+                if let tree = tree {
+                    let treeString = try tree.asJsonString()
+                    logger.debug("\(treeString)")
+                }
             }
         }
     }
@@ -405,7 +391,6 @@ public class Rownd: NSObject {
             }
         }
     }
-
 }
 
 public class UserPropAccess {

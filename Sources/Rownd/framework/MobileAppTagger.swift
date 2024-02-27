@@ -13,7 +13,7 @@ import AnyCodable
 class MobileAppTagger {
     var platformAccessToken: String?
 
-    func capturePage(rootViewDescriptionBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse? {
+    func capturePage(viewHierarchyStringBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse? {
         guard platformAccessToken != nil else {
             throw ConnectionActionError.customMessage("User needs to be authenticated with a Platform JWT for mobile app tagging")
         }
@@ -29,7 +29,7 @@ class MobileAppTagger {
                 name: "New Page",
                 platform: "ios",
                 versionName: releaseVersionNumber,
-                viewHierarchyStringBase64: rootViewDescriptionBase64,
+                viewHierarchyStringBase64: viewHierarchyStringBase64,
                 screenshotBase64: screenshotDataBase64,
                 screenshotMimeType: "image/png"
             )
@@ -76,14 +76,16 @@ internal struct CreatePageResponse: Hashable, Codable {
     public var name: String
     public var platform: String
     public var versionId: String
-    public var viewHierarchy: ViewHierarchy
+    public var viewHierarchyStringBase64: String
+    public var viewHierarchyJson: ViewHierarchy
     public var screenshotUrl: String
     public var id: String
 
     enum CodingKeys: String, CodingKey {
         case name, platform, id
         case versionId = "version_id"
-        case viewHierarchy = "view_hierarchy"
+        case viewHierarchyStringBase64 = "view_hierarchy_string_base64"
+        case viewHierarchyJson = "view_hierarchy_json"
         case screenshotUrl = "screenshot_url"
     }
 }

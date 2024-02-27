@@ -18,6 +18,7 @@ public struct RowndConfig: Encodable {
     public var postSignInRedirect: String? = "NATIVE_APP"
     public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
+    public var debugAutomations = false
     
     func toJson() -> String {
         let encoder = JSONEncoder()

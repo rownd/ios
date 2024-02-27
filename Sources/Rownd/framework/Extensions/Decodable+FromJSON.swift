@@ -1,5 +1,5 @@
 //
-//  Decodable.swift
+//  Decodable+FromJSON.swift
 //  Rownd
 //
 //  Created by Bobby Radford on 11/3/23.
