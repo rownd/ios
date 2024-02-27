@@ -1,5 +1,12 @@
 
 
+## [3.0.2](https://github.com/rownd/ios/compare/3.0.1...3.0.2) (2024-02-27)
+
+
+### Bug Fixes
+
+* app config not loading when unknown automations are present ([e0bab57](https://github.com/rownd/ios/commit/e0bab57d6bcb33fba35f0bc0c3d5d5122b0df160))
+
 ## [3.0.1](https://github.com/rownd/ios/compare/3.0.0...3.0.1) (2024-01-23)
 
 
