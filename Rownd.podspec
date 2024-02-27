@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.dependency 'LBBottomSheet', '~> 1.1.7'
   s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
   s.dependency 'JWTDecode', '~> 3.0.0'
-  s.dependency 'ReSwift', '~> 6.1.0'
+  s.dependency 'ReSwift', '~> 6.1.1'
   s.dependency 'ReSwiftThunk', '~> 2.0.1'
   s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
@@ -35,4 +35,5 @@ Pod::Spec.new do |s|
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'
   s.swift_versions   = [ "5.5", "5.4", "5.3", "5.2", "5.0" ]
+
 end
