@@ -32,6 +32,11 @@ public class Rownd: NSObject {
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
     internal static var actionOverlay = ActionOverlayCoordinator(parent: inst)
+    
+    // Run processAutomations() every second to support time-based automations
+    internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+        Rownd.automationsCoordinator.processAutomations()
+    }
 
     private override init() {
         super.init()

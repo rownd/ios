@@ -14,9 +14,9 @@ public struct RowndAutomation: Hashable {
     public var template: String
     public var state: RowndAutomationState
     public var actions: [RowndAutomationAction]
-    public var rules: [RowndAutomationRule]
+    public var rules: [RowndAutomationRuleUnknown]
     public var triggers: [RowndAutomationTrigger]
-    public var platform: String
+    public var platform: RowndAutomationPlatform
 }
 
 extension RowndAutomation: Codable {
@@ -25,8 +25,24 @@ extension RowndAutomation: Codable {
     }
 }
 
-public enum RowndAutomationState: String, Codable {
-    case enabled, disabled
+public enum RowndAutomationState: String {
+    case enabled, disabled, unknown
+}
+
+extension RowndAutomationState: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try RowndAutomationState(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+    }
+}
+
+public enum RowndAutomationPlatform: String {
+    case ios, android, web, unknown
+}
+
+extension RowndAutomationPlatform: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try RowndAutomationPlatform(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+    }
 }
 
 public struct RowndAutomationAction: Hashable {
@@ -57,14 +73,44 @@ extension RowndAutomationActionType: Codable {
     }
 }
 
-public struct RowndAutomationRule: Hashable {
+protocol RowndAutomationRuleProto {}
+
+public enum RowndAutomationRuleUnknown: RowndAutomationRuleProto {
+    case or(RowndAutomationOrRule)
+    case rule(RowndAutomationRule)
+    case unknown
+}
+
+extension RowndAutomationRuleUnknown: Hashable, Codable {
+    enum CodingKeys: CodingKey {
+        case or, rule
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let r = try? RowndAutomationOrRule(from: decoder) {
+            self = .or(r)
+        } else if let r = try? RowndAutomationRule(from: decoder) {
+            self = .rule(r)
+        } else {
+            self = .unknown
+        }
+    }
+}
+
+public struct RowndAutomationOrRule: RowndAutomationRuleProto, Hashable, Codable {
+    public var or: [RowndAutomationRuleUnknown]
+
+    enum CodingKeys: String, CodingKey {
+        case or = "$or"
+    }
+}
+
+public struct RowndAutomationRule: RowndAutomationRuleProto, Hashable, Codable {
     public var attribute: String
     public var entityType: RowndAutomationRuleEntityRule
     public var condition: RowndAutomationRuleCondition
     public var value: AnyCodable?
-}
 
-extension RowndAutomationRule: Codable {
     enum CodingKeys: String, CodingKey {
         case attribute, condition, value
         case entityType = "entity_type"

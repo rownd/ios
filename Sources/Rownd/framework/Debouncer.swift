@@ -8,39 +8,20 @@
 import Foundation
 
 class Debouncer {
-//    private var debounceWorkItem: DispatchWorkItem?
-    private var timer: Timer?
+    private var workItem: DispatchWorkItem?
+    private let delay: TimeInterval
+    private let queue: DispatchQueue
 
-    func debounce(interval: TimeInterval, action: @escaping () -> Void) {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { _ in
-            print ("Debounce this...")
-            action()
-        }
+    init(delay: TimeInterval, queue: DispatchQueue = .main) {
+        self.delay = delay
+        self.queue = queue
+    }
 
-//        // Cancel the previous work item if it exists
-//        debounceWorkItem?.cancel()
-//
-//        // Create a new work item with the specified action
-//        let newWorkItem = DispatchWorkItem {
-//            action()
-//        }
-//
-//        // Save the new work item
-//        debounceWorkItem = newWorkItem
-
-        // Schedule the new work item after the specified interval
-//        Task {
-//            do {
-//                try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000)) // Convert seconds to nanoseconds
-//                guard let workItem = debounceWorkItem else {
-//                    return
-//                }
-//                if !workItem.isCancelled {
-//                    workItem.perform()
-//                }
-//            }
-//        }
+    func debounce(action: @escaping () -> Void) {
+        workItem?.cancel()
+        let workItem = DispatchWorkItem(block: action)
+        self.workItem = workItem
+        queue.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
 }
 

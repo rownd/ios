@@ -38,7 +38,7 @@ func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<Strin
 public class AutomationsCoordinator: NSObject, StoreSubscriber {
     private var state: AutomationStoreState?
     public typealias StoreSubscriberStateType = AutomationStoreState
-    let debouncer = Debouncer()
+    let debouncer = Debouncer(delay: 0.5) // 500ms
     
     override init() {
         super.init()
@@ -51,47 +51,47 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     
     public func newState(state: AutomationStoreState) {
         self.state = state
-        guard state.automations != nil else {
-            return
-        }
-        
-        debouncer.debounce(interval: 0.5) {
-            self.processAutomations()
-        }
+        self.processAutomations()
     }
     
     deinit {
        store.unsubscribe(self)
     }
-    
-    private func processAutomations(_ state: AutomationStoreState, lastClickTarget: String?) {
+
+    private func processAutomations(_ state: AutomationStoreState) {
         guard let automations = state.automations else {
             return
         }
+    
         for automation in automations {
-            processAutomation(automation: automation, state: state, lastClickTarget: lastClickTarget)
+            processAutomation(automation: automation, state: state)
         }
     }
-    
+
     public func processAutomations() {
-        self.processAutomations(lastClickTarget: nil)
+        debouncer.debounce(action: processAutomationsNow)
     }
     
-    public func processAutomations(lastClickTarget: String?) {
+    private func processAutomationsNow() {
         guard let state = self.state else {
             return
         }
-        self.processAutomations(state, lastClickTarget: lastClickTarget)
+        self.processAutomations(state)
     }
-    
-    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState, lastClickTarget: String?) {
+        
+    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState) {
         logger.log("Processing automation: \(automation.name) (\(automation.id))")
+        if automation.platform != .ios {
+            logger.log("Automation is not an iOS automation")
+            return
+        }
+
         if (automation.state != RowndAutomationState.enabled) {
             logger.log("Automation is disabled: \(automation.name) (\(automation.id))")
             return
         }
         
-        let willAutomationRun = shouldAutomationRun(automation: automation, state: state, lastClickTarget: lastClickTarget)
+        let willAutomationRun = shouldAutomationRun(automation: automation, state: state)
         
         if (!willAutomationRun) {
             logger.log("Automation does not need to run: \(automation.name) (\(automation.id))")
@@ -114,7 +114,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         
         // Save automatino action in meta data
         let lastRunId = computeLastRunId(automation)
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let date = Clock.now ?? Date()
             let dateFormatter = ISO8601DateFormatter()
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -146,19 +146,41 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         return automationMeta
     }
     
-    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState, lastClickTarget: String?) -> Bool {
-        let automationMetaData = determineAutomationMetaData(state)
-        let ruleResult = automation.rules.allSatisfy { _rule in
-            let rule = _rule.self
-            switch rule.entityType {
+    private func processRule(rule: RowndAutomationRuleUnknown, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+        switch rule {
+        case .rule(let _rule):
+            switch _rule.entityType {
             case .metadata, .userData:
-                let userData = rule.entityType == RowndAutomationRuleEntityRule.metadata ? automationMetaData : state.user.data
-                return evaluateRule(userData: userData, rule: rule)
+                let userData = _rule.entityType == RowndAutomationRuleEntityRule.metadata ? metaData : state?.user.data
+                return evaluateRule(userData: userData, rule: _rule)
             case .scope:
+                // TODO: implement
                 return true
-//              // TODO: Implement
             }
+        case .or(let _rule):
+            return processRuleSet(rules: _rule.or, op: .or, metaData: metaData)
+        case .unknown:
+            logger.warning("Unknown automation rule skipped")
+            return false
         }
+    }
+
+    private enum RuleSetEvalOperator {
+        case and, or
+    }
+
+    private func processRuleSet(rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+        switch op {
+        case .and:
+            return rules.allSatisfy { rule in processRule(rule: rule, metaData: metaData) }
+        case .or:
+            return rules.first { rule in processRule(rule: rule, metaData: metaData) } != nil
+        }
+    }
+    
+    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) -> Bool {
+        let automationMetaData = determineAutomationMetaData(state)
+        let ruleResult = processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
         
         var triggerResult = true
         if let timeTrigger = automation.triggers.first(where: { $0.type == RowndAutomationTriggerType.time }) {
@@ -168,14 +190,6 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             let finalResult = ruleResult && triggerResult
             
             return finalResult
-        }
-        
-        if let clickTrigger = automation.triggers.first(where: { $0.type == .mobileEvent }) {
-            if clickTrigger.target == lastClickTarget ?? "" {
-                return true
-            } else {
-                print("\(clickTrigger.target ?? "") does not equal \(lastClickTarget ?? "")")
-            }
         }
         
         return false // Currently only working with time triggers
