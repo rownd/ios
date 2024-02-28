@@ -8,26 +8,20 @@
 import Foundation
 
 class Debouncer {
-    private var lastFireTime = DispatchTime.now()
-    private let delay: Double
     private var workItem: DispatchWorkItem?
+    private let delay: TimeInterval
+    private let queue: DispatchQueue
 
-    init(delay: Double) {
+    init(delay: TimeInterval, queue: DispatchQueue = .main) {
         self.delay = delay
+        self.queue = queue
     }
 
-    func debounce(action: @escaping (() -> Void)) {
+    func debounce(action: @escaping () -> Void) {
         workItem?.cancel()
-        lastFireTime = DispatchTime.now()
-        workItem = DispatchWorkItem { [weak self] in
-            if let strongSelf = self,
-                DispatchTime.now() >= strongSelf.lastFireTime + strongSelf.delay {
-                action()
-            }
-        }
-        if let workItem = workItem {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
-        }
+        let workItem = DispatchWorkItem(block: action)
+        self.workItem = workItem
+        queue.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
 }
 
