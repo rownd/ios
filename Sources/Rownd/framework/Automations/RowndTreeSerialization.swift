@@ -9,12 +9,12 @@ import Foundation
 import AnyCodable
 import SwiftUI
 
-struct RowndScreen: Codable {
+internal struct RowndScreen: Hashable, Codable {
     var retroactiveScreenData: RowndRetroScreenData
     var tree: [UIViewMetadata]
 }
 
-struct RowndRetroScreenData: Codable {
+internal struct RowndRetroScreenData: Hashable, Codable {
     var swiftUIIdentifier: String?
     var texts: [String]
     var retroactiveScreenId: String

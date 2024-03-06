@@ -72,54 +72,5 @@ internal struct CreatePagePayload: Encodable {
     }
 }
 
-internal struct CreatePageResponse: Hashable, Codable {
-    public var name: String
-    public var platform: String
-    public var versionId: String
-    public var viewHierarchyStringBase64: String
-    public var viewHierarchyJson: ViewHierarchy
-    public var screenshotUrl: String
-    public var id: String
+typealias CreatePageResponse = MobileAppPage
 
-    enum CodingKeys: String, CodingKey {
-        case name, platform, id
-        case versionId = "version_id"
-        case viewHierarchyStringBase64 = "view_hierarchy_string_base64"
-        case viewHierarchyJson = "view_hierarchy_json"
-        case screenshotUrl = "screenshot_url"
-    }
-}
-
-internal struct ViewHierarchy: Hashable, Codable {
-    public var item: String
-    public var children: AnyCodable
-    public var depth: Int
-    public var frame: Frame
-    public var name: String
-    public var layer: String
-
-    enum CodingKeys: String, CodingKey {
-        case item = "item"
-        case children = "children"
-        case depth = "depth"
-        case frame = "frame"
-        case name = "name"
-        case layer = "layer"
-    }
-}
-
-internal struct Frame: Hashable, Codable {
-    public var frame: AnyCodable
-    public var x: Int
-    public var y: Int
-    public var width: Int
-    public var height: Int
-
-    enum CodingKeys: String, CodingKey {
-        case frame = "frame"
-        case x = "x"
-        case y = "y"
-        case width = "width"
-        case height = "height"
-    }
-}

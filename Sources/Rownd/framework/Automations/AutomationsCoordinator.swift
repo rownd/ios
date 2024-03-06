@@ -13,20 +13,22 @@ import AnyCodable
 public struct AutomationStoreState {
     var user: UserState
     var automations: [RowndAutomation]?
+    var pages: Dictionary<String, MobileAppPage>
+    var versions: Dictionary<String, MobileAppVersion>
     var auth: AuthState
     var passkeys: PasskeyState
 }
 
 func computeLastRunId(_ automation: RowndAutomation) -> String {
     let lastRunId = "automation_\(automation.id)_last_run"
-    logger.log("Last run id: \(lastRunId)")
+    autoLogger.log("Last run id: \(lastRunId)")
     return lastRunId
 }
 
 func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>) -> Date? {
     let lastRunId = computeLastRunId(automation)
     if let lastRunDate = meta[lastRunId] {
-        logger.log("Last run date: \(lastRunDate)")
+        autoLogger.log("Last run date: \(lastRunDate)")
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         let date = dateFormatter.date(from: "\(lastRunDate)")
@@ -44,7 +46,14 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         super.init()
         store.subscribe(self) {
             $0.select{
-                AutomationStoreState(user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth, passkeys: $0.passkeys)
+                AutomationStoreState(
+                    user: $0.user,
+                    automations: $0.appConfig.config?.automations,
+                    pages: $0.pages.pages,
+                    versions: $0.versions.versions,
+                    auth: $0.auth,
+                    passkeys: $0.passkeys
+                )
             }
         }
     }
@@ -64,7 +73,9 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         }
     
         for automation in automations {
-            processAutomation(automation: automation, state: state)
+            Task {
+                await processAutomation(automation: automation, state: state)
+            }
         }
     }
 
@@ -79,22 +90,22 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         self.processAutomations(state)
     }
         
-    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState) {
-        logger.log("Processing automation: \(automation.name) (\(automation.id))")
+    public func processAutomation(automation: RowndAutomation, state: AutomationStoreState) async {
+        autoLogger.log("Processing automation: \(automation.name) (\(automation.id))")
         if automation.platform != .ios {
-            logger.log("Automation is not an iOS automation")
+            autoLogger.log("Automation is not an iOS automation")
             return
         }
 
         if (automation.state != RowndAutomationState.enabled) {
-            logger.log("Automation is disabled: \(automation.name) (\(automation.id))")
+            autoLogger.log("Automation is disabled: \(automation.name) (\(automation.id))")
             return
         }
         
-        let willAutomationRun = shouldAutomationRun(automation: automation, state: state)
+        let willAutomationRun = await shouldAutomationRun(automation: automation, state: state)
         
         if (!willAutomationRun) {
-            logger.log("Automation does not need to run: \(automation.name) (\(automation.id))")
+            autoLogger.log("Automation does not need to run: \(automation.name) (\(automation.id))")
             return
         }
         
@@ -106,7 +117,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     
     public func invokeAction(type: RowndAutomationActionType, args: Dictionary<String, AnyCodable>?, automation: RowndAutomation) {
         guard let actionFn = AutomationActors[type] else {
-            logger.log("Automation action function not found for action type \(type.rawValue)")
+            autoLogger.log("Automation action function not found for action type \(type.rawValue)")
             return
         }
         
@@ -141,26 +152,42 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         
         additionalAutomationMeta.forEach{ (k,v) in automationMeta[k] = v }
         
-        logger.log("Meta data: \(automationMeta)")
+        autoLogger.log("Meta data: \(automationMeta)")
         
         return automationMeta
     }
     
-    private func processRule(rule: RowndAutomationRuleUnknown, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+    private func processRule(rule: RowndAutomationRuleUnknown, metaData: Dictionary<String, AnyCodable>?) async -> Bool {
         switch rule {
         case .rule(let _rule):
             switch _rule.entityType {
             case .metadata, .userData:
                 let userData = _rule.entityType == RowndAutomationRuleEntityRule.metadata ? metaData : state?.user.data
+                guard let userData = userData else {
+                    autoLogger.warning("User data not available during automation rule evaluation")
+                    return false
+                }
                 return evaluateRule(userData: userData, rule: _rule)
             case .scope:
-                // TODO: implement
-                return true
+                var page: MobileAppPage?
+                var version: MobileAppVersion?
+                if _rule.attribute == "mobile_page" {
+                    guard let pageId = _rule.value else {
+                        autoLogger.warning("Automation rule for mobile_page scope missing page ID value")
+                        return false
+                    }
+                    guard let p = state?.pages["\(pageId)"] else {
+                        autoLogger.warning("Automation rule references page ID that is unknown: \(pageId)")
+                        return false
+                    }
+                    page = p
+                }
+                return await evaluateScopeRule(rule: _rule, page: page, version: version)
             }
         case .or(let _rule):
-            return processRuleSet(rules: _rule.or, op: .or, metaData: metaData)
+            return await processRuleSet(rules: _rule.or, op: .or, metaData: metaData)
         case .unknown:
-            logger.warning("Unknown automation rule skipped")
+            autoLogger.warning("Unknown automation rule skipped")
             return false
         }
     }
@@ -169,23 +196,71 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         case and, or
     }
 
-    private func processRuleSet(rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+    private func processRuleSet(rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and, metaData: Dictionary<String, AnyCodable>?) async -> Bool {
         switch op {
         case .and:
-            return rules.allSatisfy { rule in processRule(rule: rule, metaData: metaData) }
+            return await withTaskGroup(of: Bool.self) { group in
+                do {
+                    for rule in rules {
+                        group.addTask {
+                            await self.processRule(rule: rule, metaData: metaData)
+                        }
+                    }
+                
+                    var results = [Bool]()
+                    for try await result in group {
+                        results.append(result)
+                    }
+
+                    return results.allSatisfy { $0 }
+                } catch {
+                    return false
+                }
+            }
+            
         case .or:
-            return rules.first { rule in processRule(rule: rule, metaData: metaData) } != nil
+            return await withTaskGroup(of: Bool.self) { group in
+                do {
+                    for rule in rules {
+                        group.addTask {
+                            await self.processRule(rule: rule, metaData: metaData)
+                        }
+                    }
+                
+                    var results = [Bool]()
+                    for try await result in group {
+                        if result {
+                            // Return true on the first true result
+                            return true
+                        }
+                    }
+
+                    return false
+                } catch {
+                    return false
+                }
+            }
         }
     }
     
-    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) -> Bool {
+    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) async -> Bool {
         let automationMetaData = determineAutomationMetaData(state)
-        let ruleResult = processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
+        let ruleResult = await processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
         
         var triggerResult = true
-        if let timeTrigger = automation.triggers.first(where: { $0.type == RowndAutomationTriggerType.time }) {
+        if let timeTrigger = automation.triggers.first(where: { $0.type == .time }) {
             let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
             triggerResult = shouldTrigger(trigger: timeTrigger, lastRunTimestamp: lastRunTimestamp)
+            
+            let finalResult = ruleResult && triggerResult
+            
+            return finalResult
+        }
+        
+        /// For now, always accept  `MOBILE_EVENT` `"page_visit"` triggers
+        if let pageVisitTrigger = automation.triggers.first(where: { $0.type == .mobileEvent }) {
+            let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
+            triggerResult = shouldTrigger(trigger: pageVisitTrigger, lastRunTimestamp: lastRunTimestamp)
             
             let finalResult = ruleResult && triggerResult
             
@@ -197,20 +272,23 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     
     public func shouldTrigger(trigger: RowndAutomationTrigger, lastRunTimestamp: Date?) -> Bool {
         switch trigger.type {
-            case RowndAutomationTriggerType.time:
-                guard let lastRunTimestamp = lastRunTimestamp else {
-                    return true
-                }
-            
-                guard let triggerFrequency = stringToSeconds(trigger.value) else {
-                    return false
-                }
-            
-                let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
-                let currentDate = Clock.now ?? Date()
-                return currentDate > dateOfNextPrompt
-            default:
+        case .time:
+            guard let lastRunTimestamp = lastRunTimestamp else {
+                return true
+            }
+        
+            guard let triggerFrequency = stringToSeconds(trigger.value) else {
                 return false
+            }
+        
+            let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
+            let currentDate = Clock.now ?? Date()
+            return currentDate > dateOfNextPrompt
+        case .mobileEvent:
+            /// For now, always accept  `MOBILE_EVENT` `"page_visit"` triggers
+            return trigger.value == "page_visit"
+        default:
+            return false
         }
     }
 }

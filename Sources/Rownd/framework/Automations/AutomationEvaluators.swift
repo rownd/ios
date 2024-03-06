@@ -8,11 +8,7 @@
 import Foundation
 import AnyCodable
 
-internal func evaluateRule(userData: Dictionary<String, AnyCodable>?, rule: RowndAutomationRule) -> Bool {
-    guard let userData = userData else {
-        logger.error("User data not available during automation rule evaluation")
-        return false
-    }
+internal func evaluateRule(userData: Dictionary<String, AnyCodable>, rule: RowndAutomationRule) -> Bool {
     guard let userDataValue = userData[rule.attribute] else {
         logger.log("Attribute not found: \(rule.attribute)")
         return false
@@ -21,17 +17,31 @@ internal func evaluateRule(userData: Dictionary<String, AnyCodable>?, rule: Rown
     let conditionEvalFun = conditionEvaluators[rule.condition]
     let result = conditionEvalFun?(userData, rule.attribute, rule.value) ?? false
     
-    logger.log("Rule (Attribute, attribute value, rule value, and result): \(rule.attribute), \(userDataValue), \(rule.value ?? "N/A"), \(result)")
+    autoLogger.log("Rule (Attribute, attribute value, rule value, and result): \(rule.attribute), \(userDataValue), \(rule.value ?? "N/A"), \(result)")
 
     return result
 }
 
-internal func evaluateRule(viewHierarchy: String, rule: RowndAutomationRule) -> Bool {
-    return viewHierarchy == "todo"
+/// TODO: This needs dramatic updates in the future. For now, we are only evaluating
+/// a page scope based on matching texts found in teh view hierarchy. Eventually, pages should
+/// contain a rule set property that declares how they should be identified. For instance, a page could
+/// have a ruleset that says, "one specific text must be found" or "my `swiftUIIdentiifier` value
+/// AND some specific text must both be foundn on the current page".
+internal func evaluateScopeRule(rule: RowndAutomationRule, page: MobileAppPage?, version: MobileAppVersion?) async -> Bool {
+    let currentPage = await RowndTreeSerialization.serializeTree()
+    guard let currentPage = currentPage else {
+        return false
+    }
+    
+    guard let expectedTexts = page?.viewHierarchy.retroactiveScreenData.texts else {
+        return false
+    }
+    
+    return currentPage.retroactiveScreenData.texts.elementsEqual(expectedTexts)
 }
 
 func conditionEvaluatorsEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: EQUALS")
+    autoLogger.log("Condition: EQUALS")
     guard let dataValue = data[attribute], let attributeValue = value else {
         return false
     }
@@ -40,7 +50,7 @@ func conditionEvaluatorsEquals(data: Dictionary<String, AnyCodable>, attribute: 
 }
 
 func conditionEvaluatorsNotEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: NOT_EQUALS")
+    autoLogger.log("Condition: NOT_EQUALS")
     guard let dataValue = data[attribute], let attributeValue = value else {
         return false
     }
@@ -48,7 +58,7 @@ func conditionEvaluatorsNotEquals(data: Dictionary<String, AnyCodable>, attribut
 }
 
 func conditionEvaluatorsContains(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: CONTAINS")
+    autoLogger.log("Condition: CONTAINS")
     guard let dataValue = data[attribute] else {
         return false
     }
@@ -56,7 +66,7 @@ func conditionEvaluatorsContains(data: Dictionary<String, AnyCodable>, attribute
 }
 
 func conditionEvaluatorsNotContains(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: NOT_CONTAINS")
+    autoLogger.log("Condition: NOT_CONTAINS")
     guard let dataValue = data[attribute] else {
         return false
     }
@@ -64,7 +74,7 @@ func conditionEvaluatorsNotContains(data: Dictionary<String, AnyCodable>, attrib
 }
 
 func conditionEvaluatorsIn(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: IN")
+    autoLogger.log("Condition: IN")
     guard let dataValue = data[attribute] else {
         return false
     }
@@ -72,7 +82,7 @@ func conditionEvaluatorsIn(data: Dictionary<String, AnyCodable>, attribute: Stri
 }
 
 func conditionEvaluatorsNotIn(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: NOT_IN")
+    autoLogger.log("Condition: NOT_IN")
     guard let dataValue = data[attribute] else {
         return false
     }
@@ -80,12 +90,12 @@ func conditionEvaluatorsNotIn(data: Dictionary<String, AnyCodable>, attribute: S
 }
 
 func conditionEvaluatorsExists(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: EXISTS")
+    autoLogger.log("Condition: EXISTS")
     return data[attribute] != nil
 }
 
 func conditionEvaluatorsNotExists(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    logger.log("Condition: NOT_EXISTS")
+    autoLogger.log("Condition: NOT_EXISTS")
     return data[attribute] == nil
 }
 

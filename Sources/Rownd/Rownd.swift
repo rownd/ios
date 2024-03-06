@@ -53,6 +53,7 @@ public class Rownd: NSObject {
         inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
+        await inst.loadAutomations() // TODO: Problem with awaiting? As in, would this be too slow on startup
         
         var launchUrl: URL?
         if let _launchUrl = launchOptions?[.url] as? URL {
@@ -304,7 +305,34 @@ public class Rownd: NSObject {
                 store.dispatch(AppConfig.requestAppState())
             }
         }
+    }
+    
+    private func loadAutomations() async {
+        guard let appid = store.state.appConfig.id else {
+            return
+        }
 
+        if !store.state.pages.loaded {
+            let pages = await PagesData.fetch(appId: appid)
+            Task { @MainActor in
+                store.dispatch(SetPages(payload: pages ?? store.state.pages.pages))
+            }
+        } else {
+            Task { @MainActor in
+                store.dispatch(PagesData.requestPagesData())
+            }
+        }
+        
+        if !store.state.versions.loaded {
+            let versions = await VersionsData.fetch(appId: appid)
+            Task { @MainActor in
+                store.dispatch(SetVersions(payload: versions ?? store.state.versions.versions))
+            }
+        } else {
+            Task { @MainActor in
+                store.dispatch(VersionsData.requestVersionsData())
+            }
+        }
     }
 
     private func inflateStoreCache() {

@@ -202,7 +202,7 @@ internal extension UIView {
     }
 }
 
-internal struct UIViewMetadata: Codable {
+internal struct UIViewMetadata: Hashable, Codable {
     var textBase64: String?
     var position: Position
     var clickable: Bool
@@ -251,27 +251,27 @@ internal struct UIViewMetadata: Codable {
     }
 }
 
-internal struct AccessibilityData: Codable {
+internal struct AccessibilityData: Hashable, Codable {
     var label: String?
 }
 
-internal struct Position: Codable {
+internal struct Position: Hashable, Codable {
     var top: CGFloat
     var width: CGFloat
     var left: CGFloat
     var height: CGFloat
 }
 
-internal struct RetroElementTexts: Codable {
+internal struct RetroElementTexts: Hashable, Codable {
     var accessibility: RetroElementTextsAccessibility?
 }
 
-internal struct RetroElementTextsAccessibility: Codable {
+internal struct RetroElementTextsAccessibility: Hashable, Codable {
     var labelBase64: String?
     var identifierBase64: String?
 }
 
-internal struct RetroElementInfo: Codable {
+internal struct RetroElementInfo: Hashable, Codable {
     var superClass: String?
     var triggeredByCode: Int?
     var currentClass: String
