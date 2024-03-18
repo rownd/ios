@@ -31,18 +31,18 @@ extension WKWebView {
         }), let superclass = target.superclass else {
             return
         }
-
+        
         let noInputAccessoryViewClassName = "\(superclass)_NoInputAccessoryView"
         var newClass: AnyClass? = NSClassFromString(noInputAccessoryViewClassName)
-
+        
         if newClass == nil, let targetClass = object_getClass(target), let classNameCString = noInputAccessoryViewClassName.cString(using: .ascii) {
             newClass = objc_allocateClassPair(targetClass, classNameCString, 0)
-
+            
             if let newClass = newClass {
                 objc_registerClassPair(newClass)
             }
         }
-
+        
         guard let noInputAccessoryClass = newClass, let originalMethod = class_getInstanceMethod(InputAccessoryHackHelper.self, #selector(getter: InputAccessoryHackHelper.inputAccessoryView)) else {
             return
         }
@@ -83,7 +83,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         webView.customUserAgent = DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
-        webView.scrollView.isScrollEnabled = false
+        //        webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
     }
     
@@ -91,13 +91,13 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         self.url = url
         self.startLoading()
     }
-
+    
     private func startLoading() {
         guard let url = self.url else { return }
-
+        
         // Skip loading if already begun
         if webView.isLoading { return }
-
+        
         var hubRequest = URLRequest(url: url)
         hubRequest.timeoutInterval = 10
         webView.load(hubRequest)
@@ -106,20 +106,20 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-//        if let presentation = sheetPresentationController {
-//            presentation.detents = [.medium(), .large()]
-//            presentation.prefersGrabberVisible = true
-//        }
+        //        if let presentation = sheetPresentationController {
+        //            presentation.detents = [.medium(), .large()]
+        //            presentation.prefersGrabberVisible = true
+        //        }
     }
     
     public override func loadView() {
-//        let webConfiguration = WKWebViewConfiguration()
+        //        let webConfiguration = WKWebViewConfiguration()
         
         // Receive messages from Hub JS
-//        let userController = WKUserContentController()
+        //        let userController = WKUserContentController()
         
         // Init WebView
-//        webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        //        webView = WKWebView(frame: .zero, configuration: webConfiguration)
         
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
@@ -137,7 +137,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     private static var passkeyCoordinator: PasskeyCoordinator? = PasskeyCoordinator()
-
+    
     private func evaluateJavaScript(code: String, webView: WKWebView) {
         
         let wrappedJs = """
@@ -149,9 +149,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }]);
             }
         """
-
+        
         logger.trace("Evaluating script: \(code)")
-
+        
         Task { @MainActor in
             webView.evaluateJavaScript(wrappedJs) { (result, error) in
                 logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
@@ -161,9 +161,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         }
     }
-
+    
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-//        hubViewController?.setLoading(true)
+        //        hubViewController?.setLoading(true)
     }
     
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
@@ -187,7 +187,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     UIApplication.shared.open(outlookUrl, options: [:], completionHandler: nil)
                     return nil
                 }
-
+                
                 let yahooUrl = URL(string: "ymail://")
                 if let yahooUrl = yahooUrl, UIApplication.shared.canOpenURL(yahooUrl) {
                     UIApplication.shared.open(yahooUrl, options: [:], completionHandler: nil)
@@ -203,7 +203,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
-
+        
         webViewOnLoad(webView: webView, targetPage: nil, jsFnOptions: nil)
     }
     
@@ -252,7 +252,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
     }
-
+    
     private func setFeatureFlagsJS() {
         let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
         let code = """
@@ -262,7 +262,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         """
         evaluateJavaScript(code: code, webView: webView)
     }
-
+    
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         //This function handles the events coming from javascript. We'll configure the javascript side of this later.
         //We can access properties through the message body, like this:
@@ -308,7 +308,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 if case .triggerSignInWithApple(let message) = hubMessage.payload {
                     signInWithAppleMessage = message
                 }
-//                self.hubViewController?.hide()
+                //                self.hubViewController?.hide()
                 Rownd.requestSignIn(
                     with: .appleId,
                     signInOptions: RowndSignInOptions(
@@ -322,14 +322,14 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     signInWithGoogleMessage = message
                 }
                 Rownd.requestSignIn(with: RowndSignInHint.googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage?.intent, hint: signInWithGoogleMessage?.hint))
-
+                
             case .triggerSignUpWithPasskey:
                 HubWebViewController.passkeyCoordinator?.registerPasskey()
                 break
                 
             case .triggerSignInWithPasskey:
                 Rownd.requestSignIn(with: .passkey)
-
+                
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
@@ -340,7 +340,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 startLoading()
             case .hubLoaded:
                 self.animateInContent()
-            
+                
             case .hubResize:
                 guard case .hubResize(let hubResizeMessage) = hubMessage.payload else { return }
                 if let doubleValue = Double(hubResizeMessage.height ?? "") {
@@ -370,6 +370,85 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         UIView.animate(withDuration: 1.0) {
             self.webView.alpha = 1.0
             self.hubViewController?.setLoading(false)
+        }
+    }
+    
+    public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        if challenge.protectionSpace.authenticationMethod != NSURLAuthenticationMethodServerTrust {
+            
+            NSLog("SelfSignedCert: Unexpected authentication method \(challenge.protectionSpace.authenticationMethod)");
+            completionHandler(.rejectProtectionSpace, .none)
+        }
+        
+        guard let trust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.rejectProtectionSpace, .none)
+            return
+        }
+        
+        // First load our extra root-CAs to be trusted from the app bundle.
+        let rootCa = "dod_pke_chain"
+        let certType = "der"
+        guard let rootCaPath = Bundle(for: HubWebViewController.self).path(forResource: rootCa, ofType: certType), let rootCaData = NSData(contentsOfFile: rootCaPath) else {
+            
+            completionHandler(.rejectProtectionSpace, .none)
+            return
+        }
+        let rootCert = SecCertificateCreateWithData(nil, rootCaData)
+        SecTrustSetAnchorCertificates(trust, [rootCert] as CFArray)
+        SecTrustSetAnchorCertificatesOnly(trust, false)
+        
+        evaluateTrust(trust: trust) { (trustResult) in
+            
+            self.evaluateTrustResult(trust:trust, trustResult: trustResult, tryToFixTrust: true, completionHandler: completionHandler)
+        }
+    }
+    
+    private func evaluateTrust(trust:SecTrust, completionHandler: @escaping (_ trustResult:SecTrustResultType) -> Void) {
+        
+        var trustResult: SecTrustResultType = SecTrustResultType.invalid
+        if #available(iOS 13.0, *) {
+            
+            if (SecTrustEvaluateWithError(trust, nil)) {
+                
+                trustResult = SecTrustResultType.proceed;
+            } else {
+                SecTrustGetTrustResult(trust, &trustResult)
+            }
+            
+        } else {
+            SecTrustEvaluate(trust, &trustResult)
+        }
+        
+        completionHandler(trustResult);
+    }
+    
+    private func evaluateTrustResult(trust:SecTrust, trustResult:SecTrustResultType, tryToFixTrust:Bool, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        switch trustResult {
+        case SecTrustResultType.unspecified,
+            SecTrustResultType.proceed:
+            
+            // Trust certificate.
+            let credential = URLCredential(trust: trust)
+            completionHandler(.useCredential, credential);
+            
+        case SecTrustResultType.recoverableTrustFailure:
+            
+            if (!tryToFixTrust) {
+                completionHandler(.rejectProtectionSpace, .none)
+                return
+            }
+            
+            // Fix the result if it's a recoverable trust failure
+            let errDataRef = SecTrustCopyExceptions(trust)
+            SecTrustSetExceptions(trust, errDataRef)
+            evaluateTrust(trust: trust) { (trustResult) in
+                self.evaluateTrustResult(trust:trust, trustResult: trustResult, tryToFixTrust: false, completionHandler: completionHandler)
+            }
+        default:
+            // We reject the challenge
+            completionHandler(.rejectProtectionSpace, .none)
         }
     }
 }
