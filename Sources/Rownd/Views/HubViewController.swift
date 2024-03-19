@@ -23,7 +23,7 @@ protocol HubViewProtocol {
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
     @objc var preferredHeightInBottomSheet: CGFloat = UIScreen.main.bounds.height * 0.3
     var activityIndicator = UIActivityIndicatorView(style: .large)
-    var customLoadingAnimationView: Lottie.AnimationView?
+    var customLoadingAnimationView: LottieAnimationView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: BottomSheetController?

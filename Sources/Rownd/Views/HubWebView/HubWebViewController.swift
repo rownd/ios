@@ -153,11 +153,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         logger.trace("Evaluating script: \(code)")
         
         Task { @MainActor in
-            webView.evaluateJavaScript(wrappedJs) { (result, error) in
+            do {
+                let result = try await webView.evaluateJavaScript(wrappedJs)
                 logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
-                if error != nil {
-                    logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
-                }
+            } catch {
+                logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
             }
         }
     }
@@ -166,8 +166,21 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         //        hubViewController?.setLoading(true)
     }
     
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        
+        let presentableUrls = [
+            "https://www.google.com/recaptcha",
+            Rownd.config.baseUrl
+        ]
+        if let url = navigationAction.request.url, !presentableUrls.contains(where: { url.absoluteString.starts(with: $0) == true }), await UIApplication.shared.open(url) {
+            return .cancel
+        } else {
+            return .allow
+        }
+    }
+    
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        //This function is called whenever the Webview attempts to navigate to a different url
+        // This function is called whenever the Webview attempts to navigate to a different url
         if navigationAction.targetFrame == nil {
             let url = navigationAction.request.url
             if UIApplication.shared.canOpenURL(url!) {
@@ -370,85 +383,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         UIView.animate(withDuration: 1.0) {
             self.webView.alpha = 1.0
             self.hubViewController?.setLoading(false)
-        }
-    }
-    
-    public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        if challenge.protectionSpace.authenticationMethod != NSURLAuthenticationMethodServerTrust {
-            
-            NSLog("SelfSignedCert: Unexpected authentication method \(challenge.protectionSpace.authenticationMethod)");
-            completionHandler(.rejectProtectionSpace, .none)
-        }
-        
-        guard let trust = challenge.protectionSpace.serverTrust else {
-            completionHandler(.rejectProtectionSpace, .none)
-            return
-        }
-        
-        // First load our extra root-CAs to be trusted from the app bundle.
-        let rootCa = "dod_pke_chain"
-        let certType = "der"
-        guard let rootCaPath = Bundle(for: HubWebViewController.self).path(forResource: rootCa, ofType: certType), let rootCaData = NSData(contentsOfFile: rootCaPath) else {
-            
-            completionHandler(.rejectProtectionSpace, .none)
-            return
-        }
-        let rootCert = SecCertificateCreateWithData(nil, rootCaData)
-        SecTrustSetAnchorCertificates(trust, [rootCert] as CFArray)
-        SecTrustSetAnchorCertificatesOnly(trust, false)
-        
-        evaluateTrust(trust: trust) { (trustResult) in
-            
-            self.evaluateTrustResult(trust:trust, trustResult: trustResult, tryToFixTrust: true, completionHandler: completionHandler)
-        }
-    }
-    
-    private func evaluateTrust(trust:SecTrust, completionHandler: @escaping (_ trustResult:SecTrustResultType) -> Void) {
-        
-        var trustResult: SecTrustResultType = SecTrustResultType.invalid
-        if #available(iOS 13.0, *) {
-            
-            if (SecTrustEvaluateWithError(trust, nil)) {
-                
-                trustResult = SecTrustResultType.proceed;
-            } else {
-                SecTrustGetTrustResult(trust, &trustResult)
-            }
-            
-        } else {
-            SecTrustEvaluate(trust, &trustResult)
-        }
-        
-        completionHandler(trustResult);
-    }
-    
-    private func evaluateTrustResult(trust:SecTrust, trustResult:SecTrustResultType, tryToFixTrust:Bool, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        switch trustResult {
-        case SecTrustResultType.unspecified,
-            SecTrustResultType.proceed:
-            
-            // Trust certificate.
-            let credential = URLCredential(trust: trust)
-            completionHandler(.useCredential, credential);
-            
-        case SecTrustResultType.recoverableTrustFailure:
-            
-            if (!tryToFixTrust) {
-                completionHandler(.rejectProtectionSpace, .none)
-                return
-            }
-            
-            // Fix the result if it's a recoverable trust failure
-            let errDataRef = SecTrustCopyExceptions(trust)
-            SecTrustSetExceptions(trust, errDataRef)
-            evaluateTrust(trust: trust) { (trustResult) in
-                self.evaluateTrustResult(trust:trust, trustResult: trustResult, tryToFixTrust: false, completionHandler: completionHandler)
-            }
-        default:
-            // We reject the challenge
-            completionHandler(.rejectProtectionSpace, .none)
         }
     }
 }

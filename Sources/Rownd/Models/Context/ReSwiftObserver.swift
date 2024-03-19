@@ -61,9 +61,9 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
     
     public let objectDidChange = PassthroughSubject<DidChangeSubject<T>,Never>()
     
-    public struct DidChangeSubject<T> {
-        let old: T
-        let new: T
+    public struct DidChangeSubject<S> {
+        let old: S
+        let new: S
     }
 }
 
@@ -153,9 +153,9 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     public let objectWillChange = PassthroughSubject<ChangeSubject<Derived>,Never>()
     public let objectDidChange = PassthroughSubject<ChangeSubject<Derived>,Never>()
     
-    public struct ChangeSubject<Derived> {
-        let old: Derived
-        let new: Derived
+    public struct ChangeSubject<DerivedSub> {
+        let old: DerivedSub
+        let new: DerivedSub
     }
 }
 

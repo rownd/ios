@@ -73,12 +73,11 @@ public class Rownd: NSObject {
             }
 
             if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
-                GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-                    if error != nil || user == nil {
-                        logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
-                    } else {
-                        logger.debug("Successfully restored previous Google Sign-in")
-                    }
+                do {
+                    let _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+                    logger.debug("Successfully restored previous Google Sign-in")
+                } catch {
+                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
                 }
             }
         }
@@ -180,8 +179,6 @@ public class Rownd: NSObject {
                     logger.log("Need to be authenticated to Connect another method")
                     requestSignIn()
                 }
-            default:
-                logger.log("Connect Authenticator hint is not available")
         }
     }
 
