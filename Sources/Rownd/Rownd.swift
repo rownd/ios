@@ -29,8 +29,13 @@ public class Rownd: NSObject {
     private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
-    internal let automationsCoordinator = AutomationsCoordinator()
+    internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
+    
+    // Run processAutomations() every second to support time-based automations
+    internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+        Rownd.automationsCoordinator.processAutomations()
+    }
 
     private override init() {
         super.init()

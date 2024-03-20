@@ -8,7 +8,11 @@
 import Foundation
 import AnyCodable
 
-internal func evaluateRule(userData: Dictionary<String, AnyCodable>, rule: RowndAutomationRule) -> Bool {
+internal func evaluateRule(userData: Dictionary<String, AnyCodable>?, rule: RowndAutomationRule) -> Bool {
+    guard let userData = userData else {
+        logger.error("User data not available during automation rule evaluation")
+        return false
+    }
     guard let userDataValue = userData[rule.attribute] else {
         logger.log("Attribute not found: \(rule.attribute)")
         return false

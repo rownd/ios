@@ -36,6 +36,7 @@ func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<Strin
 }
 
 public class AutomationsCoordinator: NSObject, StoreSubscriber {
+    private var state: AutomationStoreState?
     public typealias StoreSubscriberStateType = AutomationStoreState
     let debouncer = Debouncer(delay: 0.5) // 500ms
     
@@ -49,30 +50,42 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     public func newState(state: AutomationStoreState) {
-        guard state.automations != nil else {
-            return
-        }
-        
-        debouncer.debounce {
-            self.processAutomations(state)
-        }
+        self.state = state
+        self.processAutomations()
     }
     
     deinit {
        store.unsubscribe(self)
     }
-    
-    public func processAutomations(_ state: AutomationStoreState) {
+
+    private func processAutomations(_ state: AutomationStoreState) {
         guard let automations = state.automations else {
             return
         }
+    
         for automation in automations {
             processAutomation(automation: automation, state: state)
         }
     }
+
+    public func processAutomations() {
+        debouncer.debounce(action: processAutomationsNow)
+    }
+    
+    private func processAutomationsNow() {
+        guard let state = self.state else {
+            return
+        }
+        self.processAutomations(state)
+    }
     
     public func processAutomation(automation: RowndAutomation, state: AutomationStoreState) {
-        logger.log("Automation: \(automation.name)")
+        logger.log("Processing automation: \(automation.name) (\(automation.id))")
+        if automation.platform != .ios {
+            logger.log("Automation is not an iOS automation")
+            return
+        }
+
         if (automation.state != RowndAutomationState.enabled) {
             logger.log("Automation is disabled: \(automation.name)")
             return
@@ -101,7 +114,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         
         // Save automatino action in meta data
         let lastRunId = computeLastRunId(automation)
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let date = Clock.now ?? Date()
             let dateFormatter = ISO8601DateFormatter()
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -133,14 +146,38 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         return automationMeta
     }
     
+    private func processRule(rule: RowndAutomationRuleUnknown, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+        switch rule {
+        case .rule(let _rule):
+            switch _rule.entityType {
+            case .metadata, .userData:
+                let userData = _rule.entityType == RowndAutomationRuleEntityRule.metadata ? metaData : state?.user.data
+                return evaluateRule(userData: userData, rule: _rule)
+            }
+        case .or(let _rule):
+            return processRuleSet(rules: _rule.or, op: .or, metaData: metaData)
+        case .unknown:
+            logger.warning("Unknown automation rule skipped")
+            return false
+        }
+    }
+
+    private enum RuleSetEvalOperator {
+        case and, or
+    }
+
+    private func processRuleSet(rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and, metaData: Dictionary<String, AnyCodable>?) -> Bool {
+        switch op {
+        case .and:
+            return rules.allSatisfy { rule in processRule(rule: rule, metaData: metaData) }
+        case .or:
+            return rules.first { rule in processRule(rule: rule, metaData: metaData) } != nil
+        }
+    }
+    
     public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) -> Bool {
         let automationMetaData = determineAutomationMetaData(state)
-        let ruleResult = automation.rules.allSatisfy {
-            let rule = $0.self
-            let userData = rule.entityType == RowndAutomationRuleEntityRule.metadata ? automationMetaData : state.user.data
-            let result = evaluateRule(userData: userData, rule: rule)
-            return result
-        }
+        let ruleResult = processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
         
         var triggerResult = true
         if let timeTrigger = automation.triggers.first(where: { $0.type == RowndAutomationTriggerType.time }) {
