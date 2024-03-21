@@ -8,6 +8,7 @@
 import Foundation
 import AnyCodable
 import SwiftUI
+import Accessibility
 
 internal extension UIView {
     
@@ -27,6 +28,7 @@ internal extension UIView {
     }
     
     var rownd_textFromView: String? {
+        
         if let label = self as? UILabel {
             if let text = label.text {
                 return text
@@ -85,7 +87,7 @@ internal extension UIView {
         if !self.rownd_isSwiftUIView {
             return nil
         }
-        
+                
         return self.rownd_accessibilityLabel
     }
     
