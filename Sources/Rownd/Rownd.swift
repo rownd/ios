@@ -33,6 +33,8 @@ public class Rownd: NSObject {
     internal static var connectionAction = ConnectionAction()
     internal static var actionOverlay = ActionOverlayCoordinator(parent: inst)
     
+    
+    
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
         Rownd.automationsCoordinator.processAutomations()
@@ -410,7 +412,7 @@ public class Rownd: NSObject {
             let rootViewController = await getRootViewController()
 
             // Don't try to present again if it's already presented
-            if bottomSheetController.presentingViewController != nil {
+            if self.bottomSheetController.presentingViewController != nil {
                 return
             }
 
@@ -420,6 +422,7 @@ public class Rownd: NSObject {
             bottomSheetController.modalPresentationStyle = .overFullScreen
 
             DispatchQueue.main.async {
+//                rootViewController?.presentAsBottomSheet(self.bottomSheetController)
                 rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
             }
         }

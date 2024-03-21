@@ -22,7 +22,7 @@ internal class RowndAutoHelper {
         guard let accessibilityElements = hostingView.accessibilityElements else {
             return nil
         }
-        
+                
         var element: NSObject?
         for _element in accessibilityElements {
             guard let elementNSObject = _element as? NSObject, elementNSObject.isAccessibilityElement else {
