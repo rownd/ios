@@ -86,7 +86,7 @@ internal extension UIView {
         if !self.rownd_isSwiftUIView {
             return nil
         }
-                
+
         return self.rownd_accessibilityLabel
     }
     
@@ -130,6 +130,10 @@ internal extension UIView {
             return self.accessibilityLabel
         }
         
+        if String(describing: type(of: self)).starts(with: "_UIHostingView") {
+            self.accessibilityActivate()
+        }
+
         let attributes = RowndAutoHelper.extractAccessibilityAttributesFrom(swiftUIView: self)
         return attributes?.label
     }
