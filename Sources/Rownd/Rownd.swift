@@ -167,7 +167,7 @@ public class Rownd: NSObject {
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         connectAuthenticator(with: with, completion: completion, args: nil)
     }
-    
+
     internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: Dictionary<String, AnyCodable>?) {
         switch with {
             case .passkey:
@@ -197,7 +197,7 @@ public class Rownd: NSObject {
     public static func manageAccount() {
         _ = inst.displayHub(.manageAccount)
     }
-    
+
     public class firebase {
         public static func getIdToken() async throws -> String {
             return try await connectionAction.getFirebaseIdToken()
@@ -312,7 +312,7 @@ public class Rownd: NSObject {
         if bottomSheetController.controller is HubViewController {
             return bottomSheetController.controller as! HubViewController
         }
-        
+
         if Thread.isMainThread {
             return HubViewController()
         } else {
@@ -350,6 +350,10 @@ public class Rownd: NSObject {
                 rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
             }
         }
+    }
+
+    internal static func isDisplayingHub() -> Bool {
+        return inst.bottomSheetController.controller != nil && inst.bottomSheetController.presentingViewController != nil
     }
 
 }
@@ -473,7 +477,7 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
                 "error": AnyCodable(error)
         ]
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case status, type, error
         case biometricType = "biometric_type"

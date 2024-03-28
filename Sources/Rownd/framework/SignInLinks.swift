@@ -31,9 +31,11 @@ class SignInLinks {
             }
 
             Task { @MainActor in
-                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .completing
-                ))
+                if Rownd.isDisplayingHub() {
+                    Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                        loginStep: .completing
+                    ))
+                }
             }
             let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
 
@@ -44,18 +46,22 @@ class SignInLinks {
                 )))
 
                 store.dispatch(UserData.fetch())
-                
+
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
-                
-                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .success
-                ))
+
+                if Rownd.isDisplayingHub() {
+                    Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                        loginStep: .success
+                    ))
+                }
             }
         } catch {
             Task { @MainActor in
-                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .error
-                ))
+                if Rownd.isDisplayingHub() {
+                    Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                        loginStep: .error
+                    ))
+                }
             }
             logger.error("Auto sign-in failed: \(String(describing: error))")
             throw SignInError("Auto sign-in failed: \(error.localizedDescription)")

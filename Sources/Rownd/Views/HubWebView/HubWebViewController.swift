@@ -31,18 +31,18 @@ extension WKWebView {
         }), let superclass = target.superclass else {
             return
         }
-        
+
         let noInputAccessoryViewClassName = "\(superclass)_NoInputAccessoryView"
         var newClass: AnyClass? = NSClassFromString(noInputAccessoryViewClassName)
-        
+
         if newClass == nil, let targetClass = object_getClass(target), let classNameCString = noInputAccessoryViewClassName.cString(using: .ascii) {
             newClass = objc_allocateClassPair(targetClass, classNameCString, 0)
-            
+
             if let newClass = newClass {
                 objc_registerClassPair(newClass)
             }
         }
-        
+
         guard let noInputAccessoryClass = newClass, let originalMethod = class_getInstanceMethod(InputAccessoryHackHelper.self, #selector(getter: InputAccessoryHackHelper.inputAccessoryView)) else {
             return
         }
@@ -52,75 +52,61 @@ extension WKWebView {
 }
 
 public class HubWebViewController: UIViewController, WKUIDelegate {
-    
+
     let webConfiguration = WKWebViewConfiguration()
     let userController = WKUserContentController()
     lazy var webView: WKWebView = WKWebView(frame: .zero, configuration: webConfiguration)
-    
+
     var url: URL? = nil
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
-    
+
     init() {
         super.init(nibName: nil, bundle: nil)
         setup()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(nibName: nil, bundle: nil)
         setup()
     }
-    
+
     private func setup() {
         userController.add(self, name: "rowndIosSDK")
         webConfiguration.userContentController = userController
-        
+
         // Request mobile view
         let pref = WKWebpagePreferences.init()
         pref.preferredContentMode = .mobile
         webConfiguration.defaultWebpagePreferences = pref
-        
+
         webView.customUserAgent = DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
-        //        webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
     }
-    
+
     func setUrl(url: URL) {
         self.url = url
         self.startLoading()
     }
-    
+
     private func startLoading() {
         guard let url = self.url else { return }
-        
+
         // Skip loading if already begun
         if webView.isLoading { return }
-        
+
         var hubRequest = URLRequest(url: url)
         hubRequest.timeoutInterval = 10
         webView.load(hubRequest)
     }
-    
+
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        //        if let presentation = sheetPresentationController {
-        //            presentation.detents = [.medium(), .large()]
-        //            presentation.prefersGrabberVisible = true
-        //        }
     }
-    
+
     public override func loadView() {
-        //        let webConfiguration = WKWebViewConfiguration()
-        
-        // Receive messages from Hub JS
-        //        let userController = WKUserContentController()
-        
-        // Init WebView
-        //        webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        
         webView.backgroundColor = UIColor.clear
         webView.scrollView.backgroundColor = UIColor.clear
         webView.hack_removeInputAccessory()
@@ -128,7 +114,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         self.modalPresentationStyle = .pageSheet
         view = webView
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         startLoading()
@@ -137,9 +123,8 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 
 extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     private static var passkeyCoordinator: PasskeyCoordinator? = PasskeyCoordinator()
-    
+
     private func evaluateJavaScript(code: String, webView: WKWebView) {
-        
         let wrappedJs = """
             if (typeof rownd !== 'undefined') {
                 \(code)
@@ -149,9 +134,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }]);
             }
         """
-        
+
         logger.trace("Evaluating script: \(code)")
-        
+
         Task { @MainActor in
             do {
                 let result = try await webView.evaluateJavaScript(wrappedJs)
@@ -161,13 +146,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         }
     }
-    
-    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        //        hubViewController?.setLoading(true)
-    }
-    
+
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        
         let presentableUrls = [
             "https://www.google.com/recaptcha",
             Rownd.config.baseUrl
@@ -178,7 +158,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             return .allow
         }
     }
-    
+
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         // This function is called whenever the Webview attempts to navigate to a different url
         if navigationAction.targetFrame == nil {
@@ -188,44 +168,44 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                     return nil
                 }
-                
+
                 let gmailUrl = URL(string: "googlegmail://")
                 if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
                     UIApplication.shared.open(gmailUrl, options: [:], completionHandler: nil)
                     return nil
                 }
-                
+
                 let outlookUrl = URL(string: "ms-outlook://")
                 if let outlookUrl = outlookUrl, UIApplication.shared.canOpenURL(outlookUrl) {
                     UIApplication.shared.open(outlookUrl, options: [:], completionHandler: nil)
                     return nil
                 }
-                
+
                 let yahooUrl = URL(string: "ymail://")
                 if let yahooUrl = yahooUrl, UIApplication.shared.canOpenURL(yahooUrl) {
                     UIApplication.shared.open(yahooUrl, options: [:], completionHandler: nil)
                     return nil
                 }
-                
+
                 UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
             }
         }
         return nil
     }
-    
+
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
-        
+
         webViewOnLoad(webView: webView, targetPage: nil, jsFnOptions: nil)
     }
-    
+
     public func webViewOnLoad(webView: WKWebView, targetPage: HubPageSelector?, jsFnOptions: Encodable?) {
         Task { @MainActor in
             webView.isOpaque = false
             webView.backgroundColor = UIColor.clear
             webView.scrollView.backgroundColor = UIColor.clear
-            
+
             let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
             if (webViewOrigin != Rownd.config.baseUrl) {
                 // Only disable loading if webView is not from hub
@@ -236,7 +216,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             }
             self.setFeatureFlagsJS()
-            
+
             if let jsFnOptions = jsFnOptions {
                 do {
                     self.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
@@ -244,7 +224,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
                 }
             }
-            
+
             switch (targetPage ?? self.hubViewController?.targetPage) {
             case .signOut:
                 self.evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
@@ -261,11 +241,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         }
     }
-    
+
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
     }
-    
+
     private func setFeatureFlagsJS() {
         let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
         let code = """
@@ -275,19 +255,19 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         """
         evaluateJavaScript(code: code, webView: webView)
     }
-    
+
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         //This function handles the events coming from javascript. We'll configure the javascript side of this later.
         //We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
-        
+
         logger.trace("Received message from hub: \(response)")
-        
+
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)
-            
+
             logger.debug("Received message from hub with type: \(String(describing: hubMessage.type))")
-            
+
             switch hubMessage.type {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
@@ -315,7 +295,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 DispatchQueue.main.async {
                     store.dispatch(SetUserData(data: userDataMessage.data, meta: userDataMessage.meta ?? [:] ))
                 }
-                
+
             case .triggerSignInWithApple:
                 var signInWithAppleMessage: MessagePayload.TriggerSignInWithAppleMessage? = nil
                 if case .triggerSignInWithApple(let message) = hubMessage.payload {
@@ -328,21 +308,21 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                         intent: signInWithAppleMessage?.intent
                     )
                 )
-                
+
             case .triggerSignInWithGoogle:
                 var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage? = nil
                 if case .triggerSignInWithGoogle(let message) = hubMessage.payload {
                     signInWithGoogleMessage = message
                 }
                 Rownd.requestSignIn(with: RowndSignInHint.googleId, signInOptions: RowndSignInOptions(intent: signInWithGoogleMessage?.intent, hint: signInWithGoogleMessage?.hint))
-                
+
             case .triggerSignUpWithPasskey:
                 HubWebViewController.passkeyCoordinator?.registerPasskey()
                 break
-                
+
             case .triggerSignInWithPasskey:
                 Rownd.requestSignIn(with: .passkey)
-                
+
             case .signOut:
                 guard hubViewController?.targetPage == .signOut  else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
@@ -353,7 +333,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 startLoading()
             case .hubLoaded:
                 self.animateInContent()
-                
+
             case .hubResize:
                 guard case .hubResize(let hubResizeMessage) = hubMessage.payload else { return }
                 if let doubleValue = Double(hubResizeMessage.height ?? "") {
@@ -362,7 +342,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 } else {
                     logger.error("Invalid string format for Hub Resize.")
                 }
-                
+
             case .canTouchBackgroundToDismiss:
                 guard case .canTouchBackgroundToDismiss(let canDismissMessage) = hubMessage.payload else { return }
                 if (canDismissMessage.enable == "false") {
@@ -378,7 +358,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             logger.error("Failed to decode incoming interop message: \(String(describing: error))")
         }
     }
-    
+
     private func animateInContent() {
         UIView.animate(withDuration: 1.0) {
             self.webView.alpha = 1.0
