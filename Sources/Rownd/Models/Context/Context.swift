@@ -8,11 +8,13 @@
 import Foundation
 import ReSwift
 import ReSwiftThunk
+import Kronos
 
 fileprivate let STORAGE_STATE_KEY = "RowndState"
 
 public struct RowndState: Codable, Hashable {
-    public var isInitialized = false
+    public var isStateLoaded = false
+    internal var isClockSynced = Clock.now != nil
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
@@ -24,13 +26,17 @@ extension RowndState {
     enum CodingKeys: String, CodingKey {
         case appConfig, auth, user, signIn, passkeys
     }
+    
+    public var isInitialized: Bool {
+        return isStateLoaded && isClockSynced
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         appConfig = try container.decode(AppConfigState.self, forKey: .appConfig)
         auth = try container.decode(AuthState.self, forKey: .auth)
         user = try container.decode(UserState.self, forKey: .user)
-        passkeys = try container.decode(PasskeyState.self, forKey: .passkeys)
+        passkeys = try container.decodeIfPresent(PasskeyState.self, forKey: .passkeys) ?? PasskeyState()
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
     }
 
@@ -53,7 +59,7 @@ extension RowndState {
                 RowndState.self,
                 from: (existingStateStr.data(using: .utf8) ?? Data())
             )
-            decoded.isInitialized = true
+            decoded.isStateLoaded = true
             DispatchQueue.main.async {
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
@@ -82,14 +88,27 @@ struct InitializeRowndState: Action {
     var payload: RowndState
 }
 
+struct SetClockSync: Action {
+    var isClockSynced: Bool
+}
+
 func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     var newState: RowndState
     switch (action) {
     case let initializeAction as InitializeRowndState:
         newState = initializeAction.payload
+    case let clockSyncAction as SetClockSync:
+        newState = RowndState(
+            isStateLoaded: state?.isStateLoaded ?? false,
+            isClockSynced: clockSyncAction.isClockSynced,
+            appConfig: appConfigReducer(action: action, state: state?.appConfig),
+            auth: authReducer(action: action, state: state?.auth),
+            user: userReducer(action: action, state: state?.user),
+            signIn: signInReducer(action: action, state: state?.signIn)
+        )
     default:
         newState = RowndState(
-            isInitialized: true,
+            isStateLoaded: true,
             appConfig: appConfigReducer(action: action, state: state?.appConfig),
             auth: authReducer(action: action, state: state?.auth),
             user: userReducer(action: action, state: state?.user),

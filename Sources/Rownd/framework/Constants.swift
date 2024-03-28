@@ -7,18 +7,14 @@
 
 import Foundation
 import UIKit
+import Kronos
 
 func getFrameworkBundle() -> Bundle {
     return Bundle(for: Rownd.self)
 }
 
 func getFrameworkVersion() -> String {
-    var bundleVersion = "unknown"
-    if let _bundleVersion = getFrameworkBundle().infoDictionary?["CFBundleShortVersionString"] as? String {
-        bundleVersion = _bundleVersion
-    }
-    
-    return bundleVersion
+    return SDK_VERSION
 }
 
 struct FrameworkFeature: Codable {
@@ -41,11 +37,24 @@ func getFrameowrkFeatures() -> String {
     }
 }
 
-
-
-let DEFAULT_API_USER_AGENT = "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
-
-let DEFAULT_WEB_USER_AGENT = "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform=\(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
-
-let BACKGROUND_LIGHT = UIColor.white
-let BACKGROUND_DARK = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
+struct Constants {
+    static private let formatter = ISO8601DateFormatter()
+    
+    static let BACKGROUND_LIGHT = UIColor.white
+    static let BACKGROUND_DARK = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
+    
+    static var DEFAULT_API_USER_AGENT: String {
+        get {
+            let currentTime = Clock.now ?? Date()
+            let timeSource = Clock.now != nil ? "ntp" : "local"
+            
+            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString); Timestamp: \(formatter.string(from: currentTime)) TimeSource: \(timeSource))"
+        }
+    }
+    
+    static var DEFAULT_WEB_USER_AGENT: String {
+        get {
+            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language=Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
+        }
+    }
+}

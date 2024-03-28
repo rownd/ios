@@ -79,11 +79,14 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         let pref = WKWebpagePreferences.init()
         pref.preferredContentMode = .mobile
         webConfiguration.defaultWebpagePreferences = pref
-
-        webView.customUserAgent = DEFAULT_WEB_USER_AGENT
+        
+        webView.customUserAgent = Constants.DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.isOpaque = false
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
     }
 
     func setUrl(url: URL) {

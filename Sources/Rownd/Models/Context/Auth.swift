@@ -15,6 +15,13 @@ import Get
 
 fileprivate let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
 
+public enum AccessTokenValidity: String, Codable {
+    case pending = "pending"
+    case valid = "valid"
+    case expired = "expired"
+    case notPresent = "not_present"
+}
+
 public struct AuthState: Hashable {
     public var isLoading: Bool = false
     public var accessToken: String?
@@ -27,9 +34,33 @@ extension AuthState: Codable {
     public var isAuthenticated: Bool {
         return accessToken != nil
     }
+    
+    public var accessTokenValidity: AccessTokenValidity {
+        guard let accessToken = accessToken else {
+            return .notPresent
+        }
+        
+        guard store.state.isClockSynced, !isLoading else {
+            return .pending
+        }
+        
+        do {
+            let jwt = try decode(jwt: accessToken)
+            
+            let currentDate = Clock.now ?? Date()
+            logger.debug("MARK: Comparing token expiration date")
+            guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
+                return .expired
+            }
+            
+            return !jwt.ntpExpired && (currentDateWithMargin < expiresAt) ? .valid : .expired
+        } catch {
+            return .expired
+        }
+    }
 
     public var isAccessTokenValid: Bool {
-        guard let accessToken = accessToken else {
+        guard let accessToken = accessToken, !isLoading, store.state.isClockSynced else {
             return false
         }
 
@@ -37,6 +68,7 @@ extension AuthState: Codable {
             let jwt = try decode(jwt: accessToken)
             
             let currentDate = Clock.now ?? Date()
+            logger.debug("MARK: Comparing token expiration date")
             guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
                 return false
             }
@@ -223,7 +255,9 @@ extension JWT {
         guard let ntpDate = ntpDate else {
             return self.expired
         }
-
+        
+        // Token is expired if the token expiration timestamp is less than the current timestamp (minus a 60 second buffer)
+        
         return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
 }

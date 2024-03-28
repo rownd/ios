@@ -15,18 +15,18 @@ open class RowndCustomizations: Encodable {
     open var sheetBackgroundColor: UIColor {
         let darkMode = store.state.appConfig.config?.hub?.customizations?.darkMode
         if (darkMode == "enabled") {
-            return BACKGROUND_DARK
+            return Constants.BACKGROUND_DARK
         }
         if (darkMode == "disabled") {
-            return BACKGROUND_LIGHT
+            return Constants.BACKGROUND_LIGHT
         }
         switch(UIViewController().colorScheme) {
         case .light, .unspecified:
-            return BACKGROUND_LIGHT
+            return Constants.BACKGROUND_LIGHT
         case .dark:
-            return BACKGROUND_DARK
+            return Constants.BACKGROUND_DARK
         @unknown default:
-            return BACKGROUND_LIGHT
+            return Constants.BACKGROUND_LIGHT
         }
     }
 

@@ -17,7 +17,7 @@ public struct UserState: Hashable {
     public var isErrored: Bool = false
     public var errorMessage: String?
     public var data: Dictionary<String, AnyCodable> = [:]
-    public var meta: Dictionary<String, AnyCodable> = [:]
+    public var meta: Dictionary<String, AnyCodable>? = [:]
     public var redacted: [String]?
 }
 
@@ -63,7 +63,7 @@ extension UserState: Codable {
     }
     
     internal func setMetaData(field: String, value: AnyCodable) ->  Void {
-        var meta = self.meta
+        var meta = self.meta ?? [:]
         meta[field] = value
         DispatchQueue.main.async {
             store.dispatch(UserData.saveMetaData(meta))
@@ -81,7 +81,7 @@ struct SetUserLoading: Action {
 
 struct SetUserData: Action {
     var data: Dictionary<String, AnyCodable> = [:]
-    var meta: Dictionary<String, AnyCodable> = [:]
+    var meta: Dictionary<String, AnyCodable>? = [:]
 }
 
 struct SetUserError: Action {
@@ -95,7 +95,7 @@ func userReducer(action: Action, state: UserState?) -> UserState {
     switch action {
     case let action as SetUserData:
         state.data = action.data
-        state.meta = action.meta
+        state.meta = action.meta ?? [:]
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
     case let action as SetUserState:

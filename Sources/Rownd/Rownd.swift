@@ -41,7 +41,20 @@ public class Rownd: NSObject {
         super.init()
 
         // Start NTP sync
-        Clock.sync(from: "time.cloudflare.com")
+        Clock.sync(from: "time.cloudflare.com", completion:  { date, offset in
+            logger.debug("NTP sync complete. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
+            
+            if !store.state.isClockSynced {
+                store.dispatch(SetClockSync(isClockSynced: true))
+            }
+        })
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if !store.state.isClockSynced {
+                logger.warning("NTP clock not synced after initial delay")
+                store.dispatch(SetClockSync(isClockSynced: true))
+            }
+        }
     }
 
     public static func configure(launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, appKey: String?) async {

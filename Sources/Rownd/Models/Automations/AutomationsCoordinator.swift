@@ -23,9 +23,9 @@ func computeLastRunId(_ automation: RowndAutomation) -> String {
     return lastRunId
 }
 
-func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>) -> Date? {
+func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>?) -> Date? {
     let lastRunId = computeLastRunId(automation)
-    if let lastRunDate = meta[lastRunId] {
+    if let lastRunDate = meta?[lastRunId] {
         logger.log("Last run date: \(lastRunDate)")
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -124,7 +124,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     public func determineAutomationMetaData(_ state: AutomationStoreState) -> Dictionary<String, AnyCodable> {
-        var automationMeta = state.user.meta
+        var automationMeta = state.user.meta ?? [:]
 
         var hasPasskeys = false
         if let passkeyCount = state.passkeys.registration?.count {
@@ -135,7 +135,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             "is_authenticated": AnyCodable(state.auth.isAccessTokenValid),
             "is_verified": AnyCodable(state.auth.isVerifiedUser ?? false),
             "are_passkeys_initialized": AnyCodable(state.passkeys.isInitialized),
-            "has_prompted_for_passkey": AnyCodable(state.user.meta["last_passkey_registration_prompt"] != nil),
+            "has_prompted_for_passkey": AnyCodable(state.user.meta?["last_passkey_registration_prompt"] != nil),
             "has_passkeys": AnyCodable(hasPasskeys)
         ]
         

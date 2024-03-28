@@ -27,7 +27,7 @@ internal func tokenApiFactory() -> APIClient {
 
 fileprivate class TokenApiClientDelegate : APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
-        request.setValue(DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
+        request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
     }
 
     // Handle refresh token non-400 response codes
