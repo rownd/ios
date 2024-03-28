@@ -48,6 +48,8 @@ extension LAContext {
                 return .touchID
             case .faceID:
                 return .faceID
+            case .opticID:
+                return .faceID
             @unknown default:
                 return .none
             }
@@ -109,7 +111,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     )
                 )
                 
-                let appName = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
+                let _ = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
                 // Username priority in order Email, phone, or UID
                 var userName = "unknown user"
                 let email = store.state.user.data["email"] != nil ? String(describing: store.state.user.data["email"]!) : ""

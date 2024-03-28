@@ -78,12 +78,11 @@ public class Rownd: NSObject {
             }
 
             if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
-                GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-                    if error != nil || user == nil {
-                        logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
-                    } else {
-                        logger.debug("Successfully restored previous Google Sign-in")
-                    }
+                do {
+                    let _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+                    logger.debug("Successfully restored previous Google Sign-in")
+                } catch {
+                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
                 }
             }
         }
@@ -173,7 +172,7 @@ public class Rownd: NSObject {
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         connectAuthenticator(with: with, completion: completion, args: nil)
     }
-    
+
     internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: Dictionary<String, AnyCodable>?) {
         switch with {
             case .passkey:
@@ -185,8 +184,6 @@ public class Rownd: NSObject {
                     logger.log("Need to be authenticated to Connect another method")
                     requestSignIn()
                 }
-            default:
-                logger.log("Connect Authenticator hint is not available")
         }
     }
 
@@ -205,7 +202,7 @@ public class Rownd: NSObject {
     public static func manageAccount() {
         _ = inst.displayHub(.manageAccount)
     }
-    
+
     public class firebase {
         public static func getIdToken() async throws -> String {
             return try await connectionAction.getFirebaseIdToken()
@@ -320,7 +317,7 @@ public class Rownd: NSObject {
         if bottomSheetController.controller is HubViewController {
             return bottomSheetController.controller as! HubViewController
         }
-        
+
         if Thread.isMainThread {
             return HubViewController()
         } else {
@@ -358,6 +355,10 @@ public class Rownd: NSObject {
                 rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
             }
         }
+    }
+
+    internal static func isDisplayingHub() -> Bool {
+        return inst.bottomSheetController.controller != nil && inst.bottomSheetController.presentingViewController != nil
     }
 
 }
@@ -481,7 +482,7 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
                 "error": AnyCodable(error)
         ]
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case status, type, error
         case biometricType = "biometric_type"
