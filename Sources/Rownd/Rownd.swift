@@ -216,8 +216,8 @@ public class Rownd: NSObject {
         throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 
-    public static func manageAccount() {
-        _ = inst.displayHub(.manageAccount)
+    public static func manageAccount(jsFnOptions: Dictionary<String, AnyCodable>?) {
+        _ = inst.displayHub(.manageAccount, jsFnOptions: jsFnOptions)
     }
     
     public class firebase {

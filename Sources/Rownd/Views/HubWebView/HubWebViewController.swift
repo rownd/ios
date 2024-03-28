@@ -242,7 +242,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .qrCode:
                 self.evaluateJavaScript(code: "rownd.generateQrCode(\(self.jsFunctionArgsAsJson))", webView: webView)
             case .manageAccount:
-                self.evaluateJavaScript(code: "rownd.user.manageAccount()", webView: webView)
+                self.evaluateJavaScript(code: "rownd.user.manageAccount(\(self.jsFunctionArgsAsJson))", webView: webView)
             case .none:
                 return
             }

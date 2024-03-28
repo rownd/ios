@@ -32,7 +32,12 @@ func AutomationActorRequireAuthentication(_ args: Dictionary<String, AnyCodable>
     }
 }
 
+func AutomationActorOpenProfile(_ args: Dictionary<String, AnyCodable>?) -> Void {
+    Rownd.manageAccount(jsFnOptions: args)
+}
+
 public let AutomationActors: [RowndAutomationActionType: ( Dictionary<String, AnyCodable>? ) -> Void] = [
     RowndAutomationActionType.promptForPasskey: AutomationActorPasskey,
-    RowndAutomationActionType.requireAuthentication: AutomationActorRequireAuthentication
+    RowndAutomationActionType.requireAuthentication: AutomationActorRequireAuthentication,
+    RowndAutomationActionType.openProfile: AutomationActorOpenProfile,
 ]

@@ -63,6 +63,7 @@ public enum RowndAutomationActionType: String {
     case requireVerification = "REQUIRE_VERIFICATION"
     case redirect = "REDIRECT"
     case promptForInput = "PROMPT_FOR_INPUT"
+    case openProfile = "OPEN_PROFILE"
     case none = "NONE"
     case unknown
 }

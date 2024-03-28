@@ -34,7 +34,7 @@ open class RowndCustomizations: Encodable {
 
     open var loadingAnimation: Lottie.Animation? = nil
 
-    public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
+    public var defaultFontSize: CGFloat = UIFont.preferredFont(forTextStyle: .body).pointSize - 5
 
     internal var loadingAnimationView: Lottie.AnimationView {
         let aniView = AnimationView(animation: loadingAnimation!)
