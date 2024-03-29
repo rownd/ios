@@ -9,6 +9,7 @@ import Foundation
 import Get
 import ReSwift
 import ReSwiftThunk
+import AnyCodable
 
 public struct PagesState: Hashable, Codable {
     var loaded: Bool = false
@@ -62,6 +63,7 @@ struct MobileAppPage: Hashable {
     public var appId: String
     public var createdAt: String
     public var createdBy: String
+    public var rules: [MobileAppPageRuleUnknown]?
 }
 
 extension MobileAppPage: Codable {
@@ -71,6 +73,60 @@ extension MobileAppPage: Codable {
         case appId = "app_id"
         case createdAt = "created_at"
         case createdBy = "created_by"
+    }
+}
+
+protocol MobileAppPageRuleProto {}
+
+public enum MobileAppPageRuleUnknown: MobileAppPageRuleProto {
+    case or(MobileAppPageOrRule)
+    case rule(MobileAppPageRule)
+    case and(MobileAppPageAndRule)
+    case unknown
+}
+
+extension MobileAppPageRuleUnknown: Hashable, Codable {
+    enum CodingKeys: CodingKey {
+        case or, rule, and
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let r = try? MobileAppPageOrRule(from: decoder) {
+            self = .or(r)
+        } else if let r = try? MobileAppPageAndRule(from: decoder) {
+            self = .and(r)
+        } else if let r = try? MobileAppPageRule(from: decoder) {
+            self = .rule(r)
+        } else {
+            self = .unknown
+        }
+    }
+}
+
+public struct MobileAppPageOrRule: MobileAppPageRuleProto, Hashable, Codable {
+    public var or: [MobileAppPageRuleUnknown]
+
+    enum CodingKeys: String, CodingKey {
+        case or = "$or"
+    }
+}
+
+public struct MobileAppPageAndRule: MobileAppPageRuleProto, Hashable, Codable {
+    public var and: [MobileAppPageRuleUnknown]
+
+    enum CodingKeys: String, CodingKey {
+        case and = "$and"
+    }
+}
+
+public struct MobileAppPageRule: MobileAppPageRuleProto, Hashable, Codable {
+    public var value: AnyCodable?
+    public var _operator: String?
+    public var operand: String?
+
+    enum CodingKeys: String, CodingKey {
+        case value, operand
+        case _operator = "operator"
     }
 }
 
