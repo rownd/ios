@@ -44,15 +44,15 @@ public class Rownd: NSObject {
         Clock.sync(from: "time.cloudflare.com", completion:  { date, offset in
             logger.debug("NTP sync complete. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
             
-            if !store.state.isClockSynced {
-                store.dispatch(SetClockSync(isClockSynced: true))
+            if store.state.clockSyncState != .synced {
+                store.dispatch(SetClockSync(clockSyncState: .synced))
             }
         })
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            if !store.state.isClockSynced {
+            if store.state.clockSyncState == .waiting {
                 logger.warning("NTP clock not synced after initial delay")
-                store.dispatch(SetClockSync(isClockSynced: true))
+                store.dispatch(SetClockSync(clockSyncState: .unknown))
             }
         }
     }

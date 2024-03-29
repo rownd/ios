@@ -22,7 +22,7 @@ struct FrameworkFeature: Codable {
     var enabled: String
 }
 
-func getFrameowrkFeatures() -> String {
+func getFrameworkFeatures() -> String {
     let frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
     
     let encoder = JSONEncoder()
@@ -45,16 +45,22 @@ struct Constants {
     
     static var DEFAULT_API_USER_AGENT: String {
         get {
-            let currentTime = Clock.now ?? Date()
-            let timeSource = Clock.now != nil ? "ntp" : "local"
-            
-            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString); Timestamp: \(formatter.string(from: currentTime)) TimeSource: \(timeSource))"
+            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString))"
         }
     }
     
     static var DEFAULT_WEB_USER_AGENT: String {
         get {
-            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language=Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString);)"
+            return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language=Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString))"
+        }
+    }
+
+    static var TIME_META_HEADER_NAME = "X-Rownd-Time-Meta"
+    static var TIME_META_HEADER: String {
+        get {
+            let currentTime = Clock.now ?? Date()
+            let timeSource = Clock.now != nil ? "ntp" : "local"
+            return "timestamp=\(formatter.string(from: currentTime))&timesource=\(timeSource)"
         }
     }
 }

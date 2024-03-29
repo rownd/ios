@@ -14,7 +14,7 @@ fileprivate let STORAGE_STATE_KEY = "RowndState"
 
 public struct RowndState: Codable, Hashable {
     public var isStateLoaded = false
-    internal var isClockSynced = Clock.now != nil
+    internal var clockSyncState: ClockSyncState = Clock.now != nil ? .synced : .waiting
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
@@ -28,7 +28,7 @@ extension RowndState {
     }
     
     public var isInitialized: Bool {
-        return isStateLoaded && isClockSynced
+        return isStateLoaded && clockSyncState != .waiting
     }
 
     public init(from decoder: Decoder) throws {
@@ -43,7 +43,6 @@ extension RowndState {
     static func save(state: RowndState) {
         Task {
             if let encoded = try? state.toJson() {
-                //            logger.trace("storing: \(encoded)")
                 Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
             }
         }
@@ -60,6 +59,7 @@ extension RowndState {
                 from: (existingStateStr.data(using: .utf8) ?? Data())
             )
             decoded.isStateLoaded = true
+            decoded.clockSyncState = Clock.now != nil ? .synced : .waiting
             DispatchQueue.main.async {
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
@@ -89,7 +89,7 @@ struct InitializeRowndState: Action {
 }
 
 struct SetClockSync: Action {
-    var isClockSynced: Bool
+    var clockSyncState: ClockSyncState
 }
 
 func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
@@ -98,14 +98,8 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     case let initializeAction as InitializeRowndState:
         newState = initializeAction.payload
     case let clockSyncAction as SetClockSync:
-        newState = RowndState(
-            isStateLoaded: state?.isStateLoaded ?? false,
-            isClockSynced: clockSyncAction.isClockSynced,
-            appConfig: appConfigReducer(action: action, state: state?.appConfig),
-            auth: authReducer(action: action, state: state?.auth),
-            user: userReducer(action: action, state: state?.user),
-            signIn: signInReducer(action: action, state: state?.signIn)
-        )
+        newState = state ?? store.state
+        newState.clockSyncState = clockSyncAction.clockSyncState
     default:
         newState = RowndState(
             isStateLoaded: true,

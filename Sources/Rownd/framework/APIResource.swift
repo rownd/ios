@@ -36,6 +36,7 @@ extension APIResource {
 
         return localHeaders.merging([
             "X-Rownd-App-Key": Rownd.config.appKey,
+            Constants.TIME_META_HEADER_NAME: Constants.TIME_META_HEADER,
             "User-Agent": Constants.DEFAULT_API_USER_AGENT
         ]) { (current, _) in current }
     }

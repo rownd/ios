@@ -27,6 +27,7 @@ internal func tokenApiFactory() -> APIClient {
 
 fileprivate class TokenApiClientDelegate : APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
+        request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
     }
 

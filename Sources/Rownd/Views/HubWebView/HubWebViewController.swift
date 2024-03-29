@@ -250,7 +250,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     }
 
     private func setFeatureFlagsJS() {
-        let frameworkFeaturesString = String(describing: getFrameowrkFeatures())
+        let frameworkFeaturesString = String(describing: getFrameworkFeatures())
         let code = """
             if (rownd?.setSessionStorage) {
                 rownd.setSessionStorage("rph_feature_flags\",`\(frameworkFeaturesString)`)
