@@ -30,7 +30,7 @@ struct KeyTransferView : View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading) {
 
-                        if store.state.auth.isAuthenticated {
+                        if Context.currentContext.store.state.auth.isAuthenticated {
                             Text("Your encryption key is already saved to your iCloud keychain. To view your key or transfer it to another device, tap below.")
                                 .fixedSize(horizontal: false, vertical: true)
 

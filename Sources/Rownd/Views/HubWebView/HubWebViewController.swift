@@ -83,6 +83,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         webView.customUserAgent = Constants.DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
+        webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
         if #available(iOS 16.4, *) {
             webView.isInspectable = true
@@ -140,11 +141,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
         logger.trace("Evaluating script: \(code)")
 
-        Task { @MainActor in
-            do {
-                let result = try await webView.evaluateJavaScript(wrappedJs)
+        let result = webView.evaluateJavaScript(wrappedJs) { (result, error) in
+            if error == nil {
                 logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
-            } catch {
+            } else {
                 logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
             }
         }
@@ -196,7 +196,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         return nil
     }
 
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation) {
         //This function is called when the webview finishes navigating to the webpage.
         //We use this to send data to the webview when it's loaded.
 
@@ -245,7 +245,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         }
     }
 
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
+        let store = Context.currentContext.store
         webView.loadHTMLString(NoInternetHTML(appConfig: store.state.appConfig), baseURL: nil)
     }
 
@@ -265,6 +266,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         guard let response = message.body as? String else { return }
 
         logger.trace("Received message from hub: \(response)")
+        
+        let store = Context.currentContext.store
 
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)

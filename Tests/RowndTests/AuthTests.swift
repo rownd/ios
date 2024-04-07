@@ -26,9 +26,12 @@ class AuthTests: XCTestCase {
                 $0.delegate = tokenApiConfig.delegate
             }
         }
+        let store = Context.currentContext.store
+        store.dispatch(SetClockSync(clockSyncState: .synced))
     }
     
     func testRefreshToken() throws {
+        let store = Context.currentContext.store
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: generateJwt(expires: NSDate().timeIntervalSince1970), // this will be expired
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
@@ -70,6 +73,7 @@ class AuthTests: XCTestCase {
     }
     
     func testMultipleAuthenticatedReqeustsWithExpiredAccessToken() throws {
+        let store = Context.currentContext.store
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
@@ -85,7 +89,7 @@ class AuthTests: XCTestCase {
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            dataType: .json,
+            contentType: .json,
             statusCode: 200,
             data: [
                 .post : try JSONEncoder().encode(responseData)
@@ -129,6 +133,7 @@ class AuthTests: XCTestCase {
     }
     
     func testRefreshTokenRetryWithHttpErrors() throws {
+        let store = Context.currentContext.store
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
@@ -144,7 +149,7 @@ class AuthTests: XCTestCase {
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            dataType: .json,
+            contentType: .json,
             statusCode: 500,
             data: [
                 .post : try JSONEncoder().encode(["error": "Something went wrong"])
@@ -157,7 +162,7 @@ class AuthTests: XCTestCase {
                 do {
                     Mock(
                         url: URL(string: "https://api.rownd.io/hub/auth/token")!,
-                        dataType: .json,
+                        contentType: .json,
                         statusCode: 200,
                         data: [
                             .post : try JSONEncoder().encode(responseData)
@@ -189,6 +194,7 @@ class AuthTests: XCTestCase {
     }
     
     func testRefreshTokenThrowsWhenOfflineShouldNotSignOut() throws {
+        let store = Context.currentContext.store
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
@@ -202,7 +208,7 @@ class AuthTests: XCTestCase {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            dataType: .json,
+            contentType: .json,
             statusCode: 200,
             data: [
                 .post : try JSONEncoder().encode(responseData)
@@ -226,11 +232,11 @@ class AuthTests: XCTestCase {
         waitForExpectations(timeout: 10, handler: nil)
     }
     
-    func testSignOutWhenRefreshTokenIsAlreadyConsumed() throws {
+    func testSignOutWhenRefreshTokenIsAlreadyConsumed() async throws {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            dataType: .json,
+            contentType: .json,
             statusCode: 400,
             data: [
                 .post : try JSONEncoder().encode([
@@ -241,35 +247,29 @@ class AuthTests: XCTestCase {
             ]
         ).register()
         
-        let expectation = self.expectation(description: "Refreshing token")
-        
         let accessToken = generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970) // this will be expired
+        let store = Context.currentContext.store
+        
+        let authSubscriber = TestFilteredSubscriber<AuthState?>()
+        store.subscribe(authSubscriber) {
+            $0.select { $0.auth }
+        }
         
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: accessToken,
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
         )))
         
-        // Dispatch a Thunk to test after the previous state change
-        store.dispatch(Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
-            
-            XCTAssertTrue(state.auth.isAuthenticated, "User should be authenticated initially")
-            Task {
-                let accessToken = try! await Rownd.getAccessToken()
-                XCTAssertNil(accessToken, "Returned token should be nil")
-
-                guard let state = getState() else { return }
-                XCTAssertFalse(state.auth.isAuthenticated, "User should no longer be authenticated")
-                
-                expectation.fulfill()
-            }
-        })
+        XCTAssertTrue((authSubscriber.receivedValue as? AuthState)?.isAuthenticated == true, "User should be authenticated initially")
         
-        waitForExpectations(timeout: 10, handler: nil)
+            let accessToken2 = try! await Rownd.getAccessToken()
+            XCTAssertNil(accessToken2, "Returned token should be nil")
+
+            XCTAssertTrue((authSubscriber.receivedValue as? AuthState)?.isAuthenticated == false, "User should no longer be authenticated")
     }
     
     func testRefreshTokenThrowsWhenHttpServerErrorsOccur() throws {
+        let store = Context.currentContext.store
         store.dispatch(SetAuthState(payload: AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
             refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
@@ -283,7 +283,7 @@ class AuthTests: XCTestCase {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            dataType: .json,
+            contentType: .json,
             statusCode: 504,
             data: [
                 .post : try JSONEncoder().encode(responseData)
@@ -346,7 +346,7 @@ struct Payload: Encodable {
     var exp = Int(Date.init().timeIntervalSince1970)
 }
 
-fileprivate func generateJwt(expires: TimeInterval) -> String {
+internal func generateJwt(expires: TimeInterval) -> String {
     let secret = "your-256-bit-secret"
     let privateKey = SymmetricKey(data: Data(secret.utf8))
     

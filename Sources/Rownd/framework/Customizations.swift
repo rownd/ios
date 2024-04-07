@@ -13,7 +13,7 @@ open class RowndCustomizations: Encodable {
     public init(){}
 
     open var sheetBackgroundColor: UIColor {
-        let darkMode = store.state.appConfig.config?.hub?.customizations?.darkMode
+        let darkMode = Context.currentContext.store.state.appConfig.config?.hub?.customizations?.darkMode
         if (darkMode == "enabled") {
             return Constants.BACKGROUND_DARK
         }
@@ -37,7 +37,7 @@ open class RowndCustomizations: Encodable {
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
     internal var loadingAnimationView: LottieAnimationView {
-        let aniView = LottieAnimationView(animation: loadingAnimation!)
+        let aniView = LottieAnimationView(animation: loadingAnimation)
         aniView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         aniView.contentMode = .scaleAspectFit
         aniView.frame = CGRect.init(
@@ -65,8 +65,8 @@ open class RowndCustomizations: Encodable {
         try container.encode(sheetCornerBorderRadius, forKey: .sheetCornerBorderRadius)
         try container.encode(defaultFontSize, forKey: .defaultFontSize)
         try container.encode(uiColorToRgbaString(color: sheetBackgroundColor), forKey: .sheetBackgroundColor)
-        try container.encode(store.state.appConfig.config?.hub?.customizations?.fontFamily, forKey: .fontFamily)
-        try container.encode(store.state.appConfig.config?.hub?.customStyles?[safe: 0]?.content.count ?? 0 > 0, forKey: .customStylesFlag)
+        try container.encode(Context.currentContext.store.state.appConfig.config?.hub?.customizations?.fontFamily, forKey: .fontFamily)
+        try container.encode(Context.currentContext.store.state.appConfig.config?.hub?.customStyles?[safe: 0]?.content.count ?? 0 > 0, forKey: .customStylesFlag)
     }
 }
 

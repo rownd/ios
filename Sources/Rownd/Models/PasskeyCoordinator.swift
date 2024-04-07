@@ -87,7 +87,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         let hubViewController = getHubViewController()
         
-        guard let subdomain = store.state.appConfig.config?.subdomain else {
+        guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
@@ -111,6 +111,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     )
                 )
                 
+                let store = Context.currentContext.store
                 let _ = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
                 // Username priority in order Email, phone, or UID
                 var userName = "unknown user"
@@ -146,7 +147,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         method = PasskeyCoordinatorMethods.Authenticate
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         
-        guard let subdomain = store.state.appConfig.config?.subdomain else {
+        guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
@@ -170,7 +171,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     }
 
     func authenticate(anchor: ASPresentationAnchor, preferImmediatelyAvailableCredentials: Bool, challengeResponse: PasskeyAuthenticationResponse) {
-        guard let subdomain = store.state.appConfig.config?.subdomain else {
+        guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
@@ -193,7 +194,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     }
     
     func registerPasskey(userName: String, anchor: ASPresentationAnchor, challengeResponse: PasskeyRegisterResponse) {
-        guard let subdomain = store.state.appConfig.config?.subdomain else {
+        guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
@@ -297,13 +298,13 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     ).value
                     
                     DispatchQueue.main.async {
-                        store.dispatch(SetAuthState(
+                        Context.currentContext.store.dispatch(SetAuthState(
                             payload: AuthState(
                                 accessToken: challengeAuthenticationCompleteResponse.access_token,
                                 refreshToken: challengeAuthenticationCompleteResponse.refresh_token
                             )
                         ))
-                        store.dispatch(UserData.fetch())
+                        Context.currentContext.store.dispatch(UserData.fetch())
                     }
                     
                     await hubViewController?.loadNewPage(

@@ -41,18 +41,19 @@ public class Rownd: NSObject {
         super.init()
 
         // Start NTP sync
-        Clock.sync(from: "time.cloudflare.com", completion:  { date, offset in
-            logger.debug("NTP sync complete. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
+        let ntpStart = Date()
+        Clock.sync(from: "time.cloudflare.cox", first:  { date, offset in
+            logger.debug("NTP sync complete after \(ntpStart.distance(to: Date())) seconds. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
             
-            if store.state.clockSyncState != .synced {
-                store.dispatch(SetClockSync(clockSyncState: .synced))
+            if Context.currentContext.store.state.clockSyncState != .synced {
+                Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .synced))
             }
         })
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            if store.state.clockSyncState == .waiting {
-                logger.warning("NTP clock not synced after initial delay")
-                store.dispatch(SetClockSync(clockSyncState: .unknown))
+            if Context.currentContext.store.state.clockSyncState == .waiting {
+                logger.warning("NTP clock not synced after \(ntpStart.distance(to: Date())) seconds.")
+                Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .unknown))
             }
         }
     }
@@ -66,6 +67,7 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
+        let store = Context.currentContext.store
         if store.state.isInitialized && !store.state.auth.isAuthenticated {
             var launchUrl: URL?
             if let _launchUrl = launchOptions?[.url] as? URL {
@@ -110,6 +112,7 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func handleSignInLink(url: URL?) -> Bool {
+        let store = Context.currentContext.store
         if store.state.auth.isAuthenticated {
             return true
         }
@@ -182,6 +185,7 @@ public class Rownd: NSObject {
         inst.displayHub(.signIn, jsFnOptions: jsFnOptions)
     }
 
+    @MainActor
     public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
         connectAuthenticator(with: with, completion: completion, args: nil)
     }
@@ -189,6 +193,7 @@ public class Rownd: NSObject {
     internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: Dictionary<String, AnyCodable>?) {
         switch with {
             case .passkey:
+                let store = Context.currentContext.store
                 if (store.state.auth.accessToken != nil) {
                     var passkeySignInOptions = RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary()
                     args?.forEach{ (k,v) in passkeySignInOptions[k] = v }
@@ -202,6 +207,7 @@ public class Rownd: NSObject {
 
     public static func signOut() {
         DispatchQueue.main.async {
+            let store = Context.currentContext.store
             store.dispatch(SetAuthState(payload: AuthState()))
             store.dispatch(SetUserData(data: [:], meta: [:]))
             store.dispatch(SetPasskeyState())
@@ -223,6 +229,7 @@ public class Rownd: NSObject {
     }
 
     @discardableResult public static func getAccessToken() async throws -> String? {
+        let store = Context.currentContext.store
         return try await store.state.auth.getAccessToken()
     }
 
@@ -230,6 +237,7 @@ public class Rownd: NSObject {
         guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
 
         DispatchQueue.main.async {
+            let store = Context.currentContext.store
             store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
             store.dispatch(UserData.fetch())
         }
@@ -239,7 +247,7 @@ public class Rownd: NSObject {
     }
 
     public func state() -> Store<RowndState> {
-        return store
+        return Context.currentContext.store
     }
 
     // This is an internal test function used only to manually test
@@ -276,6 +284,7 @@ public class Rownd: NSObject {
     }
 
     internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
+        let store = Context.currentContext.store
         var signInOptions = signInOptions
         if signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn {
             if store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true {
@@ -292,6 +301,7 @@ public class Rownd: NSObject {
     }
 
     private func loadAppConfig() async {
+        let store = Context.currentContext.store
         if store.state.appConfig.id == nil {
             // Await the config if it wasn't already cached
             let appConfig = await AppConfig.fetch()
@@ -308,7 +318,10 @@ public class Rownd: NSObject {
     }
 
     private func inflateStoreCache() {
-        RowndState.load()
+        let store = Context.currentContext.store
+        Task {
+            await store.state.load()
+        }
     }
 
     private func displayHub(_ page: HubPageSelector) -> HubViewController {
@@ -318,10 +331,12 @@ public class Rownd: NSObject {
     @discardableResult
     private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
         let hubController = getHubViewController()
-
-        displayViewControllerOnTop(hubController)
-        hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
-
+            
+        Task { @MainActor in
+            displayViewControllerOnTop(hubController)
+            hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
+        }
+            
         return hubController
     }
 
@@ -377,6 +392,11 @@ public class Rownd: NSObject {
 }
 
 public class UserPropAccess {
+    private var store: Store<RowndState> {
+        get {
+            return Context.currentContext.store
+        }
+    }
     public func get() -> UserState {
         return store.state.user.get()
     }

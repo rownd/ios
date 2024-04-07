@@ -42,7 +42,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     
     override init() {
         super.init()
-        store.subscribe(self) {
+        Context.currentContext.store.subscribe(self) {
             $0.select{
                 AutomationStoreState(user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth, passkeys: $0.passkeys)
             }
@@ -55,7 +55,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     deinit {
-       store.unsubscribe(self)
+        Context.currentContext.store.unsubscribe(self)
     }
 
     private func processAutomations(_ state: AutomationStoreState) {
@@ -119,7 +119,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             let dateFormatter = ISO8601DateFormatter()
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             let dateString = AnyCodable(dateFormatter.string(from: date))
-            store.state.user.setMetaData(field: lastRunId, value: dateString)
+            Context.currentContext.store.state.user.setMetaData(field: lastRunId, value: dateString)
         }
     }
     

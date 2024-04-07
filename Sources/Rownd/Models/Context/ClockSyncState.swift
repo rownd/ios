@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ClockSyncState.swift
 //  
 //
 //  Created by Matt Hamann on 3/28/24.

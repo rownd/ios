@@ -115,16 +115,16 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         try await Task.sleep(nanoseconds: UInt64(2 * Double(NSEC_PER_SEC)))
                         
                         DispatchQueue.main.async {
-                            store.dispatch(store.state.auth.onReceiveAuthTokens(
+                            Context.currentContext.store.dispatch(Context.currentContext.store.state.auth.onReceiveAuthTokens(
                                 AuthState(
                                     accessToken: tokenResponse?.accessToken,
                                     refreshToken: tokenResponse?.refreshToken
                                 )
                             ))
                             
-                            store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
+                            Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
                             
-                            store.dispatch(Thunk<RowndState> { dispatch, getState in
+                            Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
                                 guard let state = getState() else { return }
                                 
                                 var userData = state.user.data
@@ -157,11 +157,13 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         }
                     } catch ApiError.generic(let errorInfo) {
                         if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
-                            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                                token: idToken,
-                                loginStep: .noAccount,
-                                intent: .signIn
-                            ))
+                            Task { @MainActor in
+                                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                                    token: idToken,
+                                    loginStep: .noAccount,
+                                    intent: .signIn
+                                ))
+                            }
                         } else {
                             DispatchQueue.main.async {
                                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(

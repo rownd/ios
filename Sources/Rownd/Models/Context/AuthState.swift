@@ -29,7 +29,7 @@ extension AuthState: Codable {
     }
 
     public var isAccessTokenValid: Bool {
-        guard let accessToken = accessToken, !isLoading, store.state.clockSyncState != .waiting else {
+        guard let accessToken = accessToken, !isLoading, Context.currentContext.store.state.clockSyncState != .waiting else {
             return false
         }
 
@@ -55,11 +55,11 @@ extension AuthState: Codable {
     }
 
     func toRphInitHash() -> String? {
-        let userId: String? = store.state.user.get(field: "user_id") as? String ?? nil
+        let userId: String? = Context.currentContext.store.state.user.get(field: "user_id") as? String ?? nil
         let rphInit = [
             "access_token": self.accessToken,
             "refresh_token": self.refreshToken,
-            "app_id": store.state.appConfig.id,
+            "app_id": Context.currentContext.store.state.appConfig.id,
             "app_user_id": userId
         ]
 
@@ -191,7 +191,7 @@ class Auth {
     }
     
     static func fetchToken(idToken: String, intent: RowndSignInIntent?) async throws -> TokenResponse? {
-        guard let appId = store.state.appConfig.id else { return nil }
+        guard let appId = Context.currentContext.store.state.appConfig.id else { return nil }
         let tokenRequest = TokenRequest(
             idToken: idToken,
             appId: appId,

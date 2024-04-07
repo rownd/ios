@@ -44,7 +44,7 @@ extension UserState: Codable {
 
     public func set(data: Dictionary<String, AnyCodable>) -> Void {
         DispatchQueue.main.async {
-            store.dispatch(UserData.save(data))
+            Context.currentContext.store.dispatch(UserData.save(data))
         }
     }
 
@@ -52,13 +52,13 @@ extension UserState: Codable {
         var userData = self.data
         userData[field] = value
         DispatchQueue.main.async {
-            store.dispatch(UserData.save(userData))
+            Context.currentContext.store.dispatch(UserData.save(userData))
         }
     }
     
     internal func setMetaData(_ meta: Dictionary<String, AnyCodable>) -> Void {
         DispatchQueue.main.async {
-            store.dispatch(UserData.saveMetaData(meta))
+            Context.currentContext.store.dispatch(UserData.saveMetaData(meta))
         }
     }
     
@@ -66,7 +66,7 @@ extension UserState: Codable {
         var meta = self.meta ?? [:]
         meta[field] = value
         DispatchQueue.main.async {
-            store.dispatch(UserData.saveMetaData(meta))
+            Context.currentContext.store.dispatch(UserData.saveMetaData(meta))
         }
     }
 }
@@ -182,7 +182,7 @@ class UserData {
     }
     
     static func save() -> Thunk<RowndState> {
-        return save(store.state.user.data)
+        return save(Context.currentContext.store.state.user.data)
     }
     
     static func save(_ data: Dictionary<String, AnyCodable>) -> Thunk<RowndState> {

@@ -23,7 +23,7 @@ class GoogleSignInCoordinator: NSObject {
     }
 
     func signIn(_ intent: RowndSignInIntent?, hint: String?) async {
-        let googleConfig = store.state.appConfig.config?.hub?.auth?.signInMethods?.google
+        let googleConfig = Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.google
         guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                 loginStep: .error,
@@ -88,14 +88,14 @@ class GoogleSignInCoordinator: NSObject {
                 do {
                     let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, intent: intent)
                     DispatchQueue.main.async {
-                        store.dispatch(SetAuthState(
+                        Context.currentContext.store.dispatch(SetAuthState(
                             payload: AuthState(
                                 accessToken: tokenResponse?.accessToken,
                                 refreshToken: tokenResponse?.refreshToken
                             )
                         ))
-                        store.dispatch(UserData.fetch())
-                        store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
+                        Context.currentContext.store.dispatch(UserData.fetch())
+                        Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
 
                         Rownd.requestSignIn(
                             jsFnOptions: RowndSignInJsOptions(

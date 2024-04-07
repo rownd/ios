@@ -62,7 +62,7 @@ class RowndApiClientDelegate : APIClientDelegate {
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
 
         do {
-            if store.state.auth.isAuthenticated, let accessToken = try await Rownd.getAccessToken() {
+            if Context.currentContext.store.state.auth.isAuthenticated, let accessToken = try await Rownd.getAccessToken() {
                 request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
         } catch {
