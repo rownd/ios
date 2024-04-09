@@ -1,0 +1,18 @@
+{
+  "configurations" : [
+    {
+      "id" : "D2146259-A8E2-4ADD-ABB4-963763934188",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+
+  ],
+  "version" : 1
+}
