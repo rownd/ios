@@ -20,7 +20,7 @@ public enum HubPageSelector {
     case unknown
 }
 
-fileprivate final class InputAccessoryHackHelper: NSObject {
+private final class InputAccessoryHackHelper: NSObject {
     @objc var inputAccessoryView: AnyObject? { return nil }
 }
 
@@ -57,7 +57,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
     let userController = WKUserContentController()
     lazy var webView: WKWebView = WKWebView(frame: .zero, configuration: webConfiguration)
 
-    var url: URL? = nil
+    var url: URL?
     var hubViewController: HubViewProtocol?
     var jsFunctionArgsAsJson: String = "{}"
 
@@ -79,7 +79,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
         let pref = WKWebpagePreferences.init()
         pref.preferredContentMode = .mobile
         webConfiguration.defaultWebpagePreferences = pref
-        
+
         webView.customUserAgent = Constants.DEFAULT_WEB_USER_AGENT
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -141,7 +141,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
         logger.trace("Evaluating script: \(code)")
 
-        let result = webView.evaluateJavaScript(wrappedJs) { (result, error) in
+        webView.evaluateJavaScript(wrappedJs) { (result, error) in
             if error == nil {
                 logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
             } else {
@@ -167,7 +167,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         if navigationAction.targetFrame == nil {
             let url = navigationAction.request.url
             if UIApplication.shared.canOpenURL(url!) {
-                if (url?.absoluteString != "mailto:") {
+                if url?.absoluteString != "mailto:" {
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                     return nil
                 }
@@ -197,8 +197,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation) {
-        //This function is called when the webview finishes navigating to the webpage.
-        //We use this to send data to the webview when it's loaded.
+        // This function is called when the webview finishes navigating to the webpage.
+        // We use this to send data to the webview when it's loaded.
 
         webViewOnLoad(webView: webView, targetPage: nil, jsFnOptions: nil)
     }
@@ -210,7 +210,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             webView.scrollView.backgroundColor = UIColor.clear
 
             let webViewOrigin = (webView.url?.absoluteURL.scheme ?? "") + "://" + (webView.url?.absoluteURL.host ?? "")
-            if (webViewOrigin != Rownd.config.baseUrl) {
+            if webViewOrigin != Rownd.config.baseUrl {
                 // Only disable loading if webView is not from hub
                 self.animateInContent()
             } else {
@@ -228,7 +228,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
             }
 
-            switch (targetPage ?? self.hubViewController?.targetPage) {
+            switch targetPage ?? self.hubViewController?.targetPage {
             case .signOut:
                 self.evaluateJavaScript(code: "rownd.signOut({\"show_success\":true})", webView: webView)
             case .connectPasskey:
@@ -261,12 +261,12 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
     }
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        //This function handles the events coming from javascript. We'll configure the javascript side of this later.
-        //We can access properties through the message body, like this:
+        // This function handles the events coming from javascript. We'll configure the javascript side of this later.
+        // We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
 
         logger.trace("Received message from hub: \(response)")
-        
+
         let store = Context.currentContext.store
 
         do {
@@ -287,7 +287,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
                     // Close the hub as long as no other rownd api was called
-                    if (initialJsFunctionArgsAsJson == self?.jsFunctionArgsAsJson) {
+                    if initialJsFunctionArgsAsJson == self?.jsFunctionArgsAsJson {
                         self?.hubViewController?.hide()
                     }
                 }
@@ -303,7 +303,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
 
             case .triggerSignInWithApple:
-                var signInWithAppleMessage: MessagePayload.TriggerSignInWithAppleMessage? = nil
+                var signInWithAppleMessage: MessagePayload.TriggerSignInWithAppleMessage?
                 if case .triggerSignInWithApple(let message) = hubMessage.payload {
                     signInWithAppleMessage = message
                 }
@@ -316,7 +316,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 )
 
             case .triggerSignInWithGoogle:
-                var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage? = nil
+                var signInWithGoogleMessage: MessagePayload.TriggerSignInWithGoogleMessage?
                 if case .triggerSignInWithGoogle(let message) = hubMessage.payload {
                     signInWithGoogleMessage = message
                 }
@@ -351,7 +351,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
             case .canTouchBackgroundToDismiss:
                 guard case .canTouchBackgroundToDismiss(let canDismissMessage) = hubMessage.payload else { return }
-                if (canDismissMessage.enable == "false") {
+                if canDismissMessage.enable == "false" {
                     self.hubViewController?.canTouchDimmingBackgroundToDismiss(false)
                     return
                 }
