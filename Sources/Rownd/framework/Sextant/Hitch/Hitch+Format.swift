@@ -1,13 +1,13 @@
 import Foundation
 
 @usableFromInline
-let trueHitch: Hitch = "true"
+let trueHitch_rename: Hitch = "true"
 @usableFromInline
-let falseHitch: Hitch = "false"
+let falseHitch_rename: Hitch = "false"
 @usableFromInline
 let errorHitch: Hitch = "error"
 @usableFromInline
-let nullHitch: Hitch = "null"
+let nullHitch_rename: Hitch = "null"
 
 @usableFromInline
 let defaultPrecision = 15
@@ -77,7 +77,7 @@ extension Hitch {
         case let value as Int: return(TypedValue(int: value))
         case let value as Double: return(TypedValue(double: value))
         case let value as Float: return(TypedValue(double: Double(value)))
-        case let value as Bool: return value ? TypedValue(hitch: trueHitch) : TypedValue(hitch: falseHitch)
+        case let value as Bool: return value ? TypedValue(hitch: trueHitch_rename) : TypedValue(hitch: falseHitch_rename)
         case let value as Hitch: return(TypedValue(hitch: value))
         case let value as HalfHitch: return(TypedValue(hitch: value.hitch()))
         case let value as String: return(TypedValue(hitch: Hitch(string: value)))
@@ -127,7 +127,7 @@ extension Hitch {
         let appendUnboundedValue: (Int, Int) -> Void = { valueIdx, fieldPrecision in
             let value = self.getTypedValue(values[valueIdx])
             switch value.type {
-            case .null: scratch.append(nullHitch)
+            case .null: scratch.append(nullHitch_rename)
             case .int: scratch.append(number: value.int ?? 0)
             case .double: scratch.append(double: value.double ?? 0.0, precision: fieldPrecision)
             case .hitch: scratch.append(value.hitch ?? Hitch.empty, precision: fieldPrecision)
@@ -143,7 +143,7 @@ extension Hitch {
             let value = self.getTypedValue(values[valueIdx])
             switch value.type {
             case .null:
-                valueAsHitch = nullHitch
+                valueAsHitch = nullHitch_rename
             case .int:
                 valueScratch.clear()
                 valueScratch.append(number: value.int ?? 0)

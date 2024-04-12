@@ -184,7 +184,7 @@ public extension Data {
     }
 }
 
-internal final class Sextant {
+public final class Sextant {
     public static let shared = Sextant()
     private init() { }
 

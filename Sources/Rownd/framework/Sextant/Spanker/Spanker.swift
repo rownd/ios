@@ -1,8 +1,8 @@
 import Foundation
 
-fileprivate typealias JsonAny = Any?
-fileprivate typealias JsonArray = [JsonAny]
-fileprivate typealias JsonDictionary = [String: JsonAny]
+//fileprivate typealias JsonAny = Any?
+//fileprivate typealias JsonArray = [JsonAny]
+//fileprivate typealias JsonDictionary = [String: JsonAny]
 
 
 prefix operator ^
