@@ -41,7 +41,7 @@ struct AccountManager: View {
             }
             Button (action: {
                 let mergedData = editingUser.merging(userData.current) { (current, _) in current }
-                store.dispatch(UserData.save(mergedData))
+                Context.currentContext.store.dispatch(UserData.save(mergedData))
             }) {
                 Text(userIsLoading.current ? "Saving..." : "Save")
             }

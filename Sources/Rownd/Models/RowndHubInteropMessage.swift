@@ -92,11 +92,11 @@ enum MessagePayload: Decodable {
     
     init(from decoder: Decoder) throws {
         // We're accessing a value from the parent that must exist, else we can't continue
-        guard let messageType = decoder.userInfo[.messageType] as? MessageTypeHolder else {
+        guard let messageType = decoder.userInfo[.messageType] as? MessageTypeHolder, let messageTypeStr = messageType.type else {
             self = .unknown
             return;
         }
-        let type = messageType.type!
+        let type = messageTypeStr
         
         let objectContainer = try decoder.singleValueContainer()
         

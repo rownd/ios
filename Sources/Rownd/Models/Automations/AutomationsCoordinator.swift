@@ -23,9 +23,9 @@ func computeLastRunId(_ automation: RowndAutomation) -> String {
     return lastRunId
 }
 
-func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>) -> Date? {
+func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>?) -> Date? {
     let lastRunId = computeLastRunId(automation)
-    if let lastRunDate = meta[lastRunId] {
+    if let lastRunDate = meta?[lastRunId] {
         logger.log("Last run date: \(lastRunDate)")
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -42,7 +42,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     
     override init() {
         super.init()
-        store.subscribe(self) {
+        Context.currentContext.store.subscribe(self) {
             $0.select{
                 AutomationStoreState(user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth, passkeys: $0.passkeys)
             }
@@ -55,7 +55,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     deinit {
-       store.unsubscribe(self)
+        Context.currentContext.store.unsubscribe(self)
     }
 
     private func processAutomations(_ state: AutomationStoreState) {
@@ -119,12 +119,12 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             let dateFormatter = ISO8601DateFormatter()
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             let dateString = AnyCodable(dateFormatter.string(from: date))
-            store.state.user.setMetaData(field: lastRunId, value: dateString)
+            Context.currentContext.store.state.user.setMetaData(field: lastRunId, value: dateString)
         }
     }
     
     public func determineAutomationMetaData(_ state: AutomationStoreState) -> Dictionary<String, AnyCodable> {
-        var automationMeta = state.user.meta
+        var automationMeta = state.user.meta ?? [:]
 
         var hasPasskeys = false
         if let passkeyCount = state.passkeys.registration?.count {
@@ -135,7 +135,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             "is_authenticated": AnyCodable(state.auth.isAccessTokenValid),
             "is_verified": AnyCodable(state.auth.isVerifiedUser ?? false),
             "are_passkeys_initialized": AnyCodable(state.passkeys.isInitialized),
-            "has_prompted_for_passkey": AnyCodable(state.user.meta["last_passkey_registration_prompt"] != nil),
+            "has_prompted_for_passkey": AnyCodable(state.user.meta?["last_passkey_registration_prompt"] != nil),
             "has_passkeys": AnyCodable(hasPasskeys)
         ]
         

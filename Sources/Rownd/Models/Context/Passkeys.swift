@@ -98,7 +98,7 @@ class PasskeyData {
             guard let state = getState() else { return }
             guard !state.passkeys.isLoading else { return }
             
-            if (store.state.appConfig.config?.hub?.auth?.signInMethods?.passkeys?.enabled != true)  {
+            if (Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.passkeys?.enabled != true)  {
                 logger.debug("Passkeys are not enabled")
                 return
             }

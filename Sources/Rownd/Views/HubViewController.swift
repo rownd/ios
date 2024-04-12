@@ -77,7 +77,10 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
 
-        let hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)&sign_in=\(store.state.signIn.toSignInHash() ?? "")")
+        let store = Context.currentContext.store
+        guard let hubLoaderUrl = URLComponents(string: "\(Rownd.config.baseUrl)/mobile_app?config=\(base64EncodedConfig)&sign_in=\(store.state.signIn.toSignInHash() ?? "")") else {
+            return
+        }
 
         view = UIView()
         view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
@@ -90,16 +93,22 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
                 let _ = try? await Rownd.getAccessToken()
                 let rphInit = store.state.auth.toRphInitHash()
                 if let rphInit = rphInit {
-                    hubLoaderUrl?.fragment = "rph_init=\(rphInit)"
+                    hubLoaderUrl.fragment = "rph_init=\(rphInit)"
+                }
+                
+                guard let hubLoaderUrl = hubLoaderUrl.url else {
+                    return
                 }
 
-                DispatchQueue.main.async { [weak self, hubLoaderUrl] in
-                    guard let self = self else { return }
-                    self.hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
+                Task { @MainActor [self, hubLoaderUrl] in
+                    self.hubWebController.setUrl(url: hubLoaderUrl)
                 }
             }
         } else {
-            hubWebController.setUrl(url: (hubLoaderUrl?.url)!)
+            guard let hubLoaderUrl = hubLoaderUrl.url else {
+                return
+            }
+            hubWebController.setUrl(url: hubLoaderUrl)
         }
 
         addChild(hubWebController)
@@ -111,9 +120,12 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
             self.overrideUserInterfaceStyle = .dark
         }
 
-        if let _ = Rownd.config.customizations.loadingAnimation {
+        if Rownd.config.customizations.loadingAnimation != nil  {
             customLoadingAnimationView = Rownd.config.customizations.loadingAnimationView
-            view.addSubview(customLoadingAnimationView!)
+        }
+        
+        if let customLoadingAnimationView = customLoadingAnimationView {
+            view.addSubview(customLoadingAnimationView)
         } else {
             activityIndicator.hidesWhenStopped = true
             activityIndicator.translatesAutoresizingMaskIntoConstraints = false

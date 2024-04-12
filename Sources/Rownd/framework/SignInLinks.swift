@@ -40,14 +40,14 @@ class SignInLinks {
             let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
 
             Task { @MainActor in
-                store.dispatch(SetAuthState(payload: AuthState(
+                Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
                     accessToken: authResp.accessToken,
                     refreshToken: authResp.refreshToken
                 )))
 
-                store.dispatch(UserData.fetch())
+                Context.currentContext.store.dispatch(UserData.fetch())
 
-                store.dispatch(PasskeyData.fetchPasskeyRegistration())
+                Context.currentContext.store.dispatch(PasskeyData.fetchPasskeyRegistration())
 
                 if Rownd.isDisplayingHub() {
                     Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(

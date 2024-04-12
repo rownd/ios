@@ -1,0 +1,6 @@
+platform :ios, '14.0'
+
+target 'ios native' do
+  use_frameworks!
+  pod 'LBBottomSheet', :git => 'https://github.com/rownd/lbbottomsheet.git'
+end

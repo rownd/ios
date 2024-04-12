@@ -27,7 +27,8 @@ internal func tokenApiFactory() -> APIClient {
 
 fileprivate class TokenApiClientDelegate : APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
-        request.setValue(DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
+        request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
+        request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
     }
 
     // Handle refresh token non-400 response codes
@@ -61,7 +62,7 @@ fileprivate class TokenApiClientDelegate : APIClientDelegate {
 // which leads to memmory corruption and weird app crashes.
 class AuthenticatorSubscription: NSObject {
     private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
-    internal static var currentAuthState: AuthState? = store.state.auth
+    internal static var currentAuthState: AuthState? = Context.currentContext.store.state.auth
 
     private override init() {}
 
@@ -137,11 +138,11 @@ actor Authenticator {
 
                 // Update the auth state - this really should be abstracted out elsewhere
                 DispatchQueue.main.async {
-                    store.dispatch(SetAuthState(payload: AuthState(
+                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
                         accessToken: newAuthState.accessToken,
                         refreshToken: newAuthState.refreshToken,
-                        isVerifiedUser: store.state.auth.isVerifiedUser,
-                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn
+                        isVerifiedUser: Context.currentContext.store.state.auth.isVerifiedUser,
+                        hasPreviouslySignedIn: Context.currentContext.store.state.auth.hasPreviouslySignedIn
                     )))
                 }
 

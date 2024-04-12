@@ -22,7 +22,7 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
     // MARK: Lifecycle
     
     public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil) {
-        self.current = selector(store.state)
+        self.current = selector(Context.currentContext.store.state)
         self.selector = selector
         self.animation = animation
         self.subscribe()
@@ -30,13 +30,13 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
     
     public func subscribe() {
         guard !isSubscribed else { return }
-        store.subscribe(self, transform: { [self] in $0.select(selector) })
+        Context.currentContext.store.subscribe(self, transform: { [self] in $0.select(selector) })
         isSubscribed = true
     }
     
     func unsubscribe() {
         guard isSubscribed else { return }
-        store.unsubscribe(self)
+        Context.currentContext.store.unsubscribe(self)
         isSubscribed = false
     }
     
@@ -111,7 +111,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     // MARK: Lifecycle
     
     public init(select selector: @escaping (RowndState) -> Original, transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil) {
-        self.current = transform(selector(store.state))
+        self.current = transform(selector(Context.currentContext.store.state))
         self.selector = selector
         self.transform = transform
         self.animation = animation
@@ -120,13 +120,13 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     
     func subscribe() {
         guard !isSubscribed else { return }
-        store.subscribe(self, transform: { [self] in $0.select(selector) })
+        Context.currentContext.store.subscribe(self, transform: { [self] in $0.select(selector) })
         isSubscribed = true
     }
     
     func unsubscribe() {
         guard isSubscribed else { return }
-        store.unsubscribe(self)
+        Context.currentContext.store.unsubscribe(self)
         isSubscribed = false
     }
     

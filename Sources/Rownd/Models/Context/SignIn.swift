@@ -32,8 +32,8 @@ public struct SignInState: Hashable, Codable {
     
     func toSignInHash() -> String? {
         let signInInit = [
-            "last_sign_in": store.state.signIn.lastSignIn?.rawValue,
-            "last_sign_in_date": store.state.signIn.lastSignInDate
+            "last_sign_in": Context.currentContext.store.state.signIn.lastSignIn?.rawValue,
+            "last_sign_in_date": Context.currentContext.store.state.signIn.lastSignInDate
         ]
 
         do {

@@ -1,0 +1,151 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "862808b2070cd908cb04f9aafe7de83d35f81b05",
+          "version": "0.6.7"
+        }
+      },
+      {
+        "package": "AppAuth",
+        "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
+        "state": {
+          "branch": null,
+          "revision": "7e2c09cbeb3bb799f26c268dbedb26325ea722a9",
+          "version": "1.7.3"
+        }
+      },
+      {
+        "package": "CodeScanner_Rownd",
+        "repositoryURL": "https://github.com/rownd/CodeScanner_Rownd",
+        "state": {
+          "branch": null,
+          "revision": "22be2da64ca86d6a92578d95a35ae9792b2c1848",
+          "version": "2.2.1"
+        }
+      },
+      {
+        "package": "Factory",
+        "repositoryURL": "https://github.com/hmlongco/Factory",
+        "state": {
+          "branch": null,
+          "revision": "39ff6a675cd0272d833d184d35add0f8fddd63de",
+          "version": "1.3.7"
+        }
+      },
+      {
+        "package": "Get",
+        "repositoryURL": "https://github.com/rownd/Get",
+        "state": {
+          "branch": null,
+          "revision": "16486f86671fc67ffbb3f2c012c7550e0f8c717a",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "GoogleSignIn",
+        "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
+        "state": {
+          "branch": null,
+          "revision": "a7965d134c5d3567026c523e0a8a583f73b62b0d",
+          "version": "7.1.0"
+        }
+      },
+      {
+        "package": "GTMSessionFetcher",
+        "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
+        "state": {
+          "branch": null,
+          "revision": "9534039303015a84837090d20fa21cae6e5eadb6",
+          "version": "3.3.2"
+        }
+      },
+      {
+        "package": "GTMAppAuth",
+        "repositoryURL": "https://github.com/google/GTMAppAuth.git",
+        "state": {
+          "branch": null,
+          "revision": "5d7d66f647400952b1758b230e019b07c0b4b22a",
+          "version": "4.1.1"
+        }
+      },
+      {
+        "package": "JWTDecode",
+        "repositoryURL": "https://github.com/auth0/JWTDecode.swift",
+        "state": {
+          "branch": null,
+          "revision": "3cd207fb9e943b6168a117baa3936c823204c2dc",
+          "version": "2.6.3"
+        }
+      },
+      {
+        "package": "Kronos",
+        "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
+        "state": {
+          "branch": null,
+          "revision": "a46542ce639581af2a85ab9ec1616a507a5d4ae2",
+          "version": "4.2.2"
+        }
+      },
+      {
+        "package": "LBBottomSheet",
+        "repositoryURL": "https://github.com/rownd/LBBottomSheet.git",
+        "state": {
+          "branch": null,
+          "revision": "047863471a722edab0eb4ce1a88d521142bc6425",
+          "version": "1.1.7"
+        }
+      },
+      {
+        "package": "Lottie",
+        "repositoryURL": "https://github.com/airbnb/lottie-ios",
+        "state": {
+          "branch": null,
+          "revision": "b4bd0604ded9574807f41b4004b57dd1226a30a4",
+          "version": "3.5.0"
+        }
+      },
+      {
+        "package": "Mocker",
+        "repositoryURL": "https://github.com/WeTransfer/Mocker",
+        "state": {
+          "branch": null,
+          "revision": "95fa785c751f6bc40c49e112d433c3acf8417a97",
+          "version": "3.0.2"
+        }
+      },
+      {
+        "package": "ReSwift",
+        "repositoryURL": "https://github.com/ReSwift/ReSwift",
+        "state": {
+          "branch": null,
+          "revision": "cb5c3c02f652420ef413dea41e13ac5a76b6c0fd",
+          "version": "6.1.1"
+        }
+      },
+      {
+        "package": "ReSwiftThunk",
+        "repositoryURL": "https://github.com/ReSwift/ReSwift-Thunk",
+        "state": {
+          "branch": null,
+          "revision": "5ee9816158a2115863b1458c66cf1be9e9143b39",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "SwiftKeychainWrapper",
+        "repositoryURL": "https://github.com/jrendel/SwiftKeychainWrapper",
+        "state": {
+          "branch": null,
+          "revision": "185a3165346a03767101c4f62e9a545a0fe0530f",
+          "version": "4.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
