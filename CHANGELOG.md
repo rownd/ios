@@ -1,5 +1,13 @@
 
 
+## [3.0.3](https://github.com/rownd/ios/compare/3.0.2...3.0.3) (2024-04-12)
+
+
+### Bug Fixes
+
+* **auth:** handle longer ntp clock sync window ([#69](https://github.com/rownd/ios/issues/69)) ([a520815](https://github.com/rownd/ios/commit/a5208159c1d66f670bd10d247a9ae876f6f5e64b))
+* decoding app config automations ([#67](https://github.com/rownd/ios/issues/67)) ([ca4f3e0](https://github.com/rownd/ios/commit/ca4f3e050940fa69633f1189bd1c940a70bb6932))
+
 ## [3.0.2](https://github.com/rownd/ios/compare/3.0.1...3.0.2) (2024-02-27)
 
 
