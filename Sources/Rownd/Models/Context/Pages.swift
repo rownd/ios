@@ -121,12 +121,34 @@ public struct MobileAppPageAndRule: MobileAppPageRuleProto, Hashable, Codable {
 
 public struct MobileAppPageRule: MobileAppPageRuleProto, Hashable, Codable {
     public var value: AnyCodable?
-    public var _operator: String?
+    public var _operator: MobileAppPageRuleOperator?
     public var operand: String?
 
     enum CodingKeys: String, CodingKey {
         case value, operand
         case _operator = "operator"
+    }
+}
+
+public enum MobileAppPageRuleOperator: String {
+    case equals = "EQUALS"
+    case notEquals = "NOT_EQUALS"
+    case contains = "CONTAINS"
+    case notContains = "NOT_CONTAINS"
+    case isIn = "IN"
+    case isNotIn = "NOT_IN"
+    case exists = "EXISTS"
+    case notExists = "NOT_EXISTS"
+    case greaterThan = "GREATER_THAN"
+    case greaterThanEqual = "GREATER_THAN_EQUAL"
+    case lessThan = "LESS_THAN"
+    case lessThanEqual = "LESS_THAN_EQUAL"
+    case unknown
+}
+
+extension MobileAppPageRuleOperator: Codable {
+    public init(from decoder: Decoder) throws {
+        self = try MobileAppPageRuleOperator(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
     }
 }
 
