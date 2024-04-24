@@ -1,5 +1,13 @@
 
 
+# [3.1.0](https://github.com/rownd/ios/compare/3.0.3...3.1.0) (2024-04-24)
+
+
+### Features
+
+* update lottie version ([#70](https://github.com/rownd/ios/issues/70)) ([77def64](https://github.com/rownd/ios/commit/77def642d2a3e09dd94f75d9e4849077aa60bc9a))
+* update package.resolved ([b96063c](https://github.com/rownd/ios/commit/b96063c8a84e184ae1dc22c488f7cccf539c38e1))
+
 ## [3.0.3](https://github.com/rownd/ios/compare/3.0.2...3.0.3) (2024-04-12)
 
 
