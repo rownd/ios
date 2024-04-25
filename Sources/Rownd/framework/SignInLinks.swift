@@ -30,8 +30,14 @@ class SignInLinks {
             if let fragment = signInUrl.fragment {
                 signInUrl = URL(string: signInUrl.absoluteString.replacingOccurrences(of: "#\(fragment)", with: "")) ?? signInUrl
             }
-
-            let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
+            
+            let actualBaseUrlString = Rownd.config.apiUrl
+            guard let actualURL = URL(string: "/hub/auth/magic\(url.path)", relativeTo: URL(string: actualBaseUrlString)!) else {
+                logger.error("Failed to construct magic link URL from path \(url.path) and base url \(actualBaseUrlString)")
+                return
+            }
+            
+            let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: actualURL.absoluteURL)).value
 
             
             /// If the sign-in link completed with a Platform JWT, save it and enable mobile app tagging if requested

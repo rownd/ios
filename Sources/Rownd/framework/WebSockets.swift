@@ -57,6 +57,12 @@ class RowndWebSocketMessageHandler: RowndWebSocketMessageHandlerDelegate {
                 Rownd.actionOverlay.disconnect()
                 shouldReceiveNext = false
                 break
+            case .captureScreen:
+                Rownd.actionOverlay.setState(state: .captureScreen)
+            case .captureScreenForPage:
+                let payload = try PayloadCaptureScreenForPage.fromJson(message: message.payload)
+                Rownd.actionOverlay.setCaptureForPageId(payload.pageId)
+                Rownd.actionOverlay.setState(state: .captureScreen)
             default:
                 logger.error("Unsupported web socket message \(string)")
                 break
@@ -112,6 +118,8 @@ class RowndWebSocket : NSObject, URLSessionWebSocketDelegate {
     }
     
     func sendMessage(_ msgType: WebSocketMessageMessage, payload: Encodable) async -> Void {
+        logger.debug("Sending websocket message: \(String(describing: msgType)), payload: \(String(describing: payload))")
+
         do {
             let payloadString = try payload.asJsonString()
             let msg = WebSocketMessage(messageType: msgType, payload: payloadString)
@@ -185,9 +193,11 @@ class RowndWebSocket : NSObject, URLSessionWebSocketDelegate {
 internal enum WebSocketMessageMessage: String, Codable {
     case getConnectionId = "get_connection_id"
     case connected = "connected"
-    case capturePageSucceeded = "capture_page_succeeded"
-    case capturePageFailed = "capture_page_failed"
+    case captureScreenSucceeded = "capture_screen_succeeded"
+    case captureScreenFailed = "capture_screen_failed"
     case setActionOverlayState = "set_action_overlay_state"
+    case captureScreen = "capture_screen"
+    case captureScreenForPage = "capture_screen_for_page"
     case close = "close"
 }
 
@@ -217,9 +227,20 @@ internal struct PayloadConnected: Codable {
     }
 }
 
-internal struct PayloadCapturePage: Codable {
+internal struct PayloadCaptureScreenSucceeded: Codable {
     var page: CreatePageResponse
+    var pageCapture: CreatePageCaptureResponse
     enum CodingKeys: String, CodingKey {
         case page = "page"
+        case pageCapture = "page_capture"
+    }
+}
+
+internal struct PayloadCaptureScreen: Codable {}
+
+internal struct PayloadCaptureScreenForPage: Codable {
+    var pageId: String
+    enum CodingKeys: String, CodingKey {
+        case pageId = "page_id"
     }
 }

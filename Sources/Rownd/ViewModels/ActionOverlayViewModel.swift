@@ -10,6 +10,8 @@ import SwiftUI
 
 protocol ActionOverlayViewModelProto {
     var state: ActionOverlayState { get set }
+    // TODO: get rid of all the fabXXX props and use this nested view model
+//    var fab: FloatingActionButtonViewModel { get }
     var fabImage: UIImage? { get }
     var fabImageInsets: UIEdgeInsets { get }
     var fabTarget: Any { get }
@@ -18,19 +20,20 @@ protocol ActionOverlayViewModelProto {
     var fabPosition: CGPoint { get set }
     var fabBackgroundColor: UIColor { get }
     var fabAlpha: CGFloat { get }
+    var pageId: String? { get set }
 }
 
 enum ActionOverlayState: String, Codable {
     case initializing, ready, success, failure
-    case capturePage = "capture_page"
-    case capturingPage = "capturing_page"
+    case captureScreen = "capture_screen"
+    case capturingScreen = "capturing_screen"
 }
 
 class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     var state: ActionOverlayState
-    lazy var fab: FloatingActionButtonViewModel = {
-        return FloatingActionButtonViewModel(parent: self)
-    }()
+//    lazy var fab: FloatingActionButtonViewModel = {
+//        return FloatingActionButtonViewModel(parent: self)
+//    }()
     var fabImage: UIImage? {
         get { return self.determineFabImage() }
     }
@@ -43,8 +46,9 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     var fabPosition: CGPoint = CGPoint(x: -16, y: -16)
     var fabBackgroundColor: UIColor = .white
     var fabAlpha: CGFloat {
-        get { return self.state == .capturingPage ? 0.0 : 1.0 }
+        get { return self.state == .capturingScreen ? 0.0 : 1.0 }
     }
+    var pageId: String?
     
     override init() {
         self.state = .ready
@@ -53,7 +57,7 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     
     fileprivate func determineFabImage() -> UIImage? {
         switch self.state {
-        case .capturePage:
+        case .captureScreen:
             let image = UIImage(named: "camera", in: Bundle.module, compatibleWith: nil)
             return image?.withTintColor(UIColor.rowndPurple)
         case .success:
@@ -70,7 +74,7 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     
     fileprivate func determineFabImageInsets() -> UIEdgeInsets {
         switch self.state {
-        case .capturePage:
+        case .captureScreen:
             return UIEdgeInsets(top: 14, left: 12, bottom: 14, right: 12)
         default:
             return UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
@@ -79,8 +83,8 @@ class ActionOverlayViewModel: NSObject, ActionOverlayViewModelProto {
     
     @objc func handleClick(_ sender: UIButton) {
         switch self.state {
-        case .capturePage:
-            Rownd.capturePage()
+        case .captureScreen:
+            Rownd.actionOverlay.actions.captureScreen(forPageId: self.pageId)
         default:
             return
         }

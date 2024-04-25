@@ -70,6 +70,10 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
         self.mobileAppTagger.platformAccessToken = token
     }
     
+    func setCaptureForPageId(_ pageId: String?) -> Void {
+        actionOverlayController?.viewModel?.pageId = pageId
+    }
+    
     func setState(state: ActionOverlayState) -> Void {
         actionOverlayController?.viewModel?.state = state
     }
@@ -105,39 +109,70 @@ internal class ActionOverlayCoordinator : ActionOverlayControllerPresentationCon
             self.parent = parent
         }
         
-        func capturePage() -> Void {
-            self.parent.setState(state: .capturingPage)
+        func captureScreen() -> Void {
+            self.captureScreen(forPageId: nil)
+        }
+        
+        func captureScreen(forPageId pageId: String?) -> Void {
+            self.parent.setState(state: .capturingScreen)
             Task {
                 guard let rowndTree = await RowndTreeSerialization.serializeTree() else {
                     logger.error("Failed to capture page. Tree serialiation failed")
                     return
                 }
                 
-                let viewHierarchyString = try rowndTree.asJsonString()
-                guard let viewHierarchyStringBase64 = viewHierarchyString.data(using: .utf8)?.base64EncodedString() else {
-                    logger.error("Failed to capture page. Failed to encode view hierarchy string")
-                    return
-                }
-                                
-                
                 /// Take a screenshot
                 let screenshot = try await captureScreenshot()
-                let screenshotDataBase64 = screenshot?.pngData()?.base64EncodedString()
-                
-                guard let _ = viewHierarchyStringBase64 as String? else {
-                    logger.error("Failed to capture page. root view recursiveDescription could not be encoded")
+                guard let screenshot = screenshot else {
+                    logger.error("Failed to take screenshot")
                     return
                 }
+                let screenshotDataBase64 = screenshot.pngData()?.base64EncodedString()
                 
                 guard let screenshotDataBase64 = screenshotDataBase64 else {
                     logger.error("Failed to capture page. Unable to take screenshot")
+                    self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
+                    return
+                }
+                
+                var createdPage: MobileAppPage? = nil
+                if pageId == nil {
+                    do {
+                        createdPage = try await self.parent.mobileAppTagger.createPage(name: nil)
+                    } catch {
+                        logger.error("Failed to create page \(error)")
+                        self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
+                        return
+                    }
+                }
+                
+                guard let captureForPageId = pageId ?? createdPage?.id else {
+                    logger.error("Failed to assign page after creation")
+                    self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
                     return
                 }
                 
                 do {
-                    var _ = try await self.parent.mobileAppTagger.capturePage(viewHierarchyStringBase64: viewHierarchyStringBase64, screenshotDataBase64: screenshotDataBase64)
+                    guard let pageCapture = try await self.parent.mobileAppTagger.createPageCapture(pageId: captureForPageId, screenStructure: rowndTree, screenshotDataBase64: screenshotDataBase64, screenshotHeight: Int(screenshot.size.height), screenshotWidth: Int(screenshot.size.width)) else {
+                        logger.error("Failed to create page capture")
+                        self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
+                        return
+                    }
+                    
+                    // Fetch the page to include in the success message sent to the Platform
+                    // via the websocket connection
+                    guard let page = await PagesData.fetch(appId: pageCapture.appId, pageId: pageCapture.pageId) else {
+                        logger.error("Failed to fetch page after page capture")
+                        self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
+                        return
+                    }
+                    
+                    // Send a success message
+                    await Rownd.actionOverlay.sendMessage(.captureScreenSucceeded, payload: PayloadCaptureScreenSucceeded(
+                            page: page, pageCapture: pageCapture
+                        ))
                 } catch {
-                    logger.error("Failed to capture page \(error)")
+                    logger.error("Failed to create page capture \(error)")
                     self.parent.setState(state: .failure, withDelayNS: 2_000_000_000)
                     return
                 }

@@ -38,7 +38,7 @@ class FloatingActionButtonViewModel: NSObject, FloatingActionButtonViewModelProt
     var position: CGPoint = CGPoint(x: -16, y: -16)
     var backgroundColor: UIColor = .white
     var alpha: CGFloat {
-        get { return self.parent.state == .capturingPage ? 0.0 : 1.0 }
+        get { return self.parent.state == .capturingScreen ? 0.0 : 1.0 }
     }
     
     init(parent: ActionOverlayViewModel) {
@@ -47,7 +47,7 @@ class FloatingActionButtonViewModel: NSObject, FloatingActionButtonViewModelProt
     
     fileprivate func determineFabImage() -> UIImage? {
         switch self.parent.state {
-        case .capturePage:
+        case .captureScreen:
             let image = UIImage(named: "camera", in: Bundle.module, compatibleWith: nil)
             return image?.withTintColor(UIColor.rowndPurple)
         case .success:
@@ -64,7 +64,7 @@ class FloatingActionButtonViewModel: NSObject, FloatingActionButtonViewModelProt
     
     fileprivate func determineFabImageInsets() -> UIEdgeInsets {
         switch self.parent.state {
-        case .capturePage:
+        case .captureScreen:
             return UIEdgeInsets(top: 14, left: 12, bottom: 14, right: 12)
         default:
             return UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
@@ -73,8 +73,8 @@ class FloatingActionButtonViewModel: NSObject, FloatingActionButtonViewModelProt
     
     @objc func handleClick(_ sender: UIButton) {
         switch self.parent.state {
-        case .capturePage:
-            Rownd.capturePage()
+        case .captureScreen:
+            Rownd.actionOverlay.actions.captureScreen()
         default:
             return
         }

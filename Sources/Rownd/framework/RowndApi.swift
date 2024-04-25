@@ -66,7 +66,9 @@ class RowndApiClientDelegate : APIClientDelegate {
         }
 
         let localRequest = request
-        logger.debug("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
+        if let methodStr = localRequest.httpMethod?.uppercased(), let urlStr = localRequest.url?.absoluteString {
+            logger.debug("Making request to: \(methodStr) \(urlStr))")
+        }
     }
 }
 

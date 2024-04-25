@@ -324,17 +324,6 @@ public class Rownd: NSObject {
                 store.dispatch(PagesData.requestPagesData())
             }
         }
-        
-        if !store.state.versions.loaded {
-            let versions = await VersionsData.fetch(appId: appid)
-            Task { @MainActor in
-                store.dispatch(SetVersions(payload: versions ?? store.state.versions.versions))
-            }
-        } else {
-            Task { @MainActor in
-                store.dispatch(VersionsData.requestVersionsData())
-            }
-        }
     }
 
     private func inflateStoreCache() {
@@ -384,14 +373,6 @@ public class Rownd: NSObject {
             return try await task.result.get()
         } catch {
             return nil
-        }
-    }
-
-    public static func capturePage() -> Void {
-        do {
-            try Rownd.actionOverlay.actions.capturePage()
-        } catch {
-            logger.error("Failed to capture page: \(String(describing: error))")
         }
     }
     

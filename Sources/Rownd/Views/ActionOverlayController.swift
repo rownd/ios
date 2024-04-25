@@ -11,10 +11,6 @@ import SwiftUI
 
 // MARK: Coordinator
 
-protocol MobileTagger {
-    func capturePage(viewHierarchyStringBase64: String, screenshotDataBase64: String) async throws -> CreatePageResponse?
-}
-
 protocol ActionOverlayControllerPresentationContextProviding {
     func presentationAnchor(for controller: ActionOverlayController) async throws -> ActionOverlayAnchor
 }
