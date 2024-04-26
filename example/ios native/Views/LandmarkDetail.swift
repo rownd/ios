@@ -27,15 +27,15 @@ struct LandmarkDetail: View {
                     Text(landmark.state)
                         .font(.subheadline)
                 }
-                
+
                 Divider()
-                
+
                 Text("About \(landmark.name)")
                     .font(.title2)
                 Text(landmark.description)
             }
             .padding()
-            
+
             Spacer()
         }
         .navigationTitle(landmark.name)

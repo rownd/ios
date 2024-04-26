@@ -9,6 +9,7 @@ import SwiftUI
 import Rownd
 import Combine
 import AnyCodable
+import WidgetKit
 
 struct ContentView: View {
     @StateObject var authState = Rownd.getInstance().state().subscribe { $0.auth }
@@ -22,18 +23,22 @@ struct ContentView: View {
     @State var cipherCryptText = ""
     @State var displayTokenSheet = false
     @State var signInToken = ""
-    
+
     private var cancellables = Set<AnyCancellable>()
-    
+
     init() {
 //        self.user.$current.sink { u in
 //            self.firstName = u["first_name"]?.value as? String ?? ""
 //        }
 //        .store(in: &cancellables)
+        self.state.$current.sink { _ in
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        .store(in: &cancellables)
     }
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -42,9 +47,9 @@ struct ContentView: View {
                 }, label: {
                     Text("Transfer key")
                 })
-                
+
                 Spacer()
-                
+
                 Button("Edit name") {
                     firstName = user.current["first_name"]?.value as? String ?? ""
                     presentEditName = true
@@ -148,7 +153,7 @@ struct ContentView: View {
                         }, label: {
                             Text("Sign in")
                         })
-                        
+
                         Button(action: {
                             displayTokenSheet = true
                         }, label: {
@@ -169,7 +174,7 @@ struct ContentView: View {
                                             if token != nil {
                                                 displayTokenSheet = false
                                             }
-                                            
+
                                         }
                                     }, label: {
                                         Text("Sign in")
@@ -177,7 +182,7 @@ struct ContentView: View {
                                 }
                             }
                         })
-                        
+
                         Button(action: {
                             Rownd.requestSignIn(
                                 with: .googleId
@@ -185,7 +190,7 @@ struct ContentView: View {
                         }, label: {
                             Text("Sign in w/ Google")
                         })
-                        
+
                         Button(action: {
                             Rownd.requestSignIn(
                                 with: .appleId,

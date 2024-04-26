@@ -28,10 +28,9 @@ func apiExchangeRowndToken(body: TokenExchangeBody) async throws -> TokenResp {
         let formatter = ISO8601DateFormatter()
         let currentDate = Clock.now ?? Date()
         let dateSource = Clock.now != nil ? "ntp" : "local"
-        
-        
+
         let userAgentStr = "Rownd SDK for iOS/\(String(describing: Bundle.main.bundleIdentifier)) (Language: Swift; Platform=\(await UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString); Timestamp=\(currentDate.ISO8601Format()); Timezone=\(TimeZone.current); TimeSource=\(dateSource)"
-        
+
         let request = Request<TokenResp>(path: "/token", method: .post, body: body, headers: ["User-Agent": userAgentStr])
         let resp: TokenResp = try await client.send(request).value
         return resp
@@ -39,4 +38,3 @@ func apiExchangeRowndToken(body: TokenExchangeBody) async throws -> TokenResp {
         throw error
     }
 }
-
