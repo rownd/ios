@@ -11,32 +11,39 @@ import Rownd
 struct SplashView: View {
     @StateObject var rowndState = Rownd.getInstance().state().subscribe { $0 }
     @StateObject var authState = Rownd.getInstance().state().subscribe { $0.auth }
-    
+
     var body: some View {
-        Spacer()
-        
-        Text("Welcome to Lndmarks")
-            .font(.title)
-        
-        
-        if (rowndState.current.isInitialized && !authState.current.isAuthenticated) {
+        VStack {
             Spacer()
-            VStack(spacing: 20) {
-                Button("Sign up as a guest", action: {
-//                    Rownd.requestSignIn(with: .guest)
-                })
-                .foregroundColor(.white)
-                .padding()
-                .background(Color(red: 0, green: 0.2, blue: 0.7))
-                .clipShape(RoundedRectangle(cornerRadius: 20.0, style: .continuous))
-                
-                Button("Sign in with an existing account", action: {
-                    Rownd.requestSignIn()
-                })
+
+            Text("Welcome to Lndmarks")
+                .font(.title)
+
+            if !rowndState.current.isInitialized || authState.current.isLoading {
+                ProgressView()
+                Spacer()
             }
-            .padding(.bottom, 25)
-            
+
+            if rowndState.current.isInitialized && !authState.current.isAuthenticated {
+                Spacer()
+                VStack(spacing: 20) {
+                    Button("Sign up as a guest", action: {
+                        Rownd.requestSignIn(with: .guest)
+                    })
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color(red: 0, green: 0.2, blue: 0.7))
+                    .clipShape(RoundedRectangle(cornerRadius: 20.0, style: .continuous))
+
+                    Button("Sign in with an existing account", action: {
+                        Rownd.requestSignIn()
+                    })
+                }
+                .padding(.bottom, 25)
+            }
         }
+        .animation(.easeIn, value: rowndState.current.isInitialized)
+        .transition(.slide)
     }
 }
 

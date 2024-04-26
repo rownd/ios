@@ -12,6 +12,8 @@ import Kronos
 
 fileprivate let STORAGE_STATE_KEY = "RowndState"
 
+let debouncer = Debouncer(delay: 0.1) // 100ms
+
 public struct RowndState: Codable, Hashable {
     public var isStateLoaded = false
     internal var clockSyncState: ClockSyncState = Clock.now != nil ? .synced : .waiting
@@ -40,20 +42,20 @@ extension RowndState {
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
     }
 
-    func save() {
-        Task {
+    internal func save() {
+        debouncer.debounce(action: {
             if let encoded = try? self.toJson() {
-                Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
+                Storage.set(encoded, forKey: STORAGE_STATE_KEY)
             }
-        }
+        })
     }
     
-    func load() async {
+    public func load() async {
         await load(Context.currentContext.store)
     }
     
-    func load(_ store: Store<RowndState>) async {
-        let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String
+    internal func load(_ store: Store<RowndState>) async {
+        let existingStateStr = Storage.get(forKey: STORAGE_STATE_KEY)
 //        logger.trace("initial store state: \(existingStateStr)")
         
         guard let existingStateStr = existingStateStr else {

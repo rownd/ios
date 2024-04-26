@@ -31,7 +31,7 @@ public class Rownd: NSObject {
     internal static var authenticator = Authenticator()
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
-    
+
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
         Rownd.automationsCoordinator.processAutomations()
@@ -42,14 +42,14 @@ public class Rownd: NSObject {
 
         // Start NTP sync
         let ntpStart = Date()
-        Clock.sync(from: "time.cloudflare.cox", first:  { date, offset in
+        Clock.sync(from: "time.cloudflare.cox", first: { date, offset in
             logger.debug("NTP sync complete after \(ntpStart.distance(to: Date())) seconds. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
-            
+
             if Context.currentContext.store.state.clockSyncState != .synced {
                 Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .synced))
             }
         })
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             if Context.currentContext.store.state.clockSyncState == .waiting {
                 logger.warning("NTP clock not synced after \(ntpStart.distance(to: Date())) seconds.")
@@ -63,7 +63,7 @@ public class Rownd: NSObject {
             config.appKey = _appKey
         }
 
-        inst.inflateStoreCache()
+        await inst.inflateStoreCache()
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
@@ -94,7 +94,7 @@ public class Rownd: NSObject {
 
             if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
                 do {
-                    let _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+                    _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
                     logger.debug("Successfully restored previous Google Sign-in")
                 } catch {
                     logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
@@ -139,6 +139,11 @@ public class Rownd: NSObject {
         }
 
         return false
+    }
+
+    public static func getStateForExtension() async -> RowndState {
+        await inst.inflateStoreCache()
+        return Context.currentContext.store.state
     }
 
     public static func getInstance() -> Rownd {
@@ -190,18 +195,18 @@ public class Rownd: NSObject {
         connectAuthenticator(with: with, completion: completion, args: nil)
     }
 
-    internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: Dictionary<String, AnyCodable>?) {
+    internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: [String: AnyCodable]?) {
         switch with {
-            case .passkey:
-                let store = Context.currentContext.store
-                if (store.state.auth.accessToken != nil) {
-                    var passkeySignInOptions = RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary()
-                    args?.forEach{ (k,v) in passkeySignInOptions[k] = v }
-                    inst.displayHub(.connectPasskey, jsFnOptions: passkeySignInOptions)
-                } else {
-                    logger.log("Need to be authenticated to Connect another method")
-                    requestSignIn()
-                }
+        case .passkey:
+            let store = Context.currentContext.store
+            if store.state.auth.accessToken != nil {
+                var passkeySignInOptions = RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary()
+                args?.forEach { (k, v) in passkeySignInOptions[k] = v }
+                inst.displayHub(.connectPasskey, jsFnOptions: passkeySignInOptions)
+            } else {
+                logger.log("Need to be authenticated to Connect another method")
+                requestSignIn()
+            }
         }
     }
 
@@ -317,11 +322,9 @@ public class Rownd: NSObject {
 
     }
 
-    private func inflateStoreCache() {
+    private func inflateStoreCache() async {
         let store = Context.currentContext.store
-        Task {
-            await store.state.load()
-        }
+        await store.state.load()
     }
 
     private func displayHub(_ page: HubPageSelector) -> HubViewController {
@@ -331,12 +334,12 @@ public class Rownd: NSObject {
     @discardableResult
     private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
         let hubController = getHubViewController()
-            
+
         Task { @MainActor in
             displayViewControllerOnTop(hubController)
             hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
         }
-            
+
         return hubController
     }
 
@@ -508,7 +511,7 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
     public var biometricType: String? = ""
     public var type: String = "passkey"
     public var error: String?
-    internal func dictionary() -> Dictionary<String, AnyCodable> {
+    internal func dictionary() -> [String: AnyCodable] {
         return ["status": AnyCodable(status),
                 "biometric_type": AnyCodable(biometricType),
                 "type": AnyCodable(type),
