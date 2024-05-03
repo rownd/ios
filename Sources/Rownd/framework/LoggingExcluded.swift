@@ -9,21 +9,21 @@ import Foundation
 
 @propertyWrapper
 public struct LoggingExcluded<Value>: CustomStringConvertible, CustomDebugStringConvertible, CustomLeafReflectable {
-    
+
     public var wrappedValue: Value
-    
+
     public init(wrappedValue: Value) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public var description: String {
         return "<REDACTED>"
     }
-    
+
     public var debugDescription: String {
         return "<REDACTED>"
     }
-    
+
     public var customMirror: Mirror {
         return Mirror(reflecting: "<REDACTED>")
     }

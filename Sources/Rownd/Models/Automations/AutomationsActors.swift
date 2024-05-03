@@ -8,12 +8,12 @@
 import Foundation
 import AnyCodable
 
-func AutomationActorPasskey(_ args: Dictionary<String, AnyCodable>?) -> Void {
+func AutomationActorPasskey(_ args: [String: AnyCodable]?) {
     logger.log("Trigger Automation: Rownd.connectAuthenticator(with: RowndConnectSignInHint.passkey)")
     Rownd.connectAuthenticator(with: RowndConnectSignInHint.passkey, args: args)
 }
 
-func AutomationActorRequireAuthentication(_ args: Dictionary<String, AnyCodable>?) -> Void {
+func AutomationActorRequireAuthentication(_ args: [String: AnyCodable]?) {
     logger.log("Trigger Automation: rownd.requestSignIn()")
     guard let method = args?["method"] else {
         Rownd.requestSignIn(jsFnOptions: args)

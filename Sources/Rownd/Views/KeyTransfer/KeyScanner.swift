@@ -43,7 +43,7 @@ struct KeyScannerView: View {
                     Spacer()
 
                     Button(action: {
-                        
+
                     }, label: {
                         Text("Enter code manually")
                     })

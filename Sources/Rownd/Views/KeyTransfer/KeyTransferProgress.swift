@@ -120,4 +120,3 @@ struct KeyTransferProgress: View {
         }
     }
 }
-

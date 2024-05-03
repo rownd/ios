@@ -14,7 +14,7 @@
 		B32C8A4D2BD6AD3F0082668F /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32C8A4C2BD6AD3F0082668F /* widgetBundle.swift */; };
 		B32C8A4F2BD6AD3F0082668F /* widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32C8A4E2BD6AD3F0082668F /* widget.swift */; };
 		B32C8A512BD6AD420082668F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B32C8A502BD6AD420082668F /* Assets.xcassets */; };
-		B32C8A552BD6AD420082668F /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B32C8A462BD6AD3F0082668F /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B32C8A552BD6AD420082668F /* rownd_widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B32C8A462BD6AD3F0082668F /* rownd_widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B32C8A5C2BD6C86C0082668F /* Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B32C8A5B2BD6C86C0082668F /* Rownd */; };
 		B33B21902A042C97006B592E /* Rownd in Frameworks */ = {isa = PBXBuildFile; productRef = B33B218F2A042C97006B592E /* Rownd */; };
 		B3725D282A1D32B600A1E837 /* LandmarksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3725D272A1D32B600A1E837 /* LandmarksApp.swift */; };
@@ -71,7 +71,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				B32C8A552BD6AD420082668F /* widgetExtension.appex in Embed Foundation Extensions */,
+				B32C8A552BD6AD420082668F /* rownd_widget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +82,7 @@
 		B302E2792858EEA2005FD927 /* SheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetViewController.swift; sourceTree = "<group>"; };
 		B302E2982863AAD3005FD927 /* framework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = framework.xcodeproj; path = ../../../framework/framework.xcodeproj; sourceTree = "<group>"; };
 		B302E2C32864D3BB005FD927 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B32C8A462BD6AD3F0082668F /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B32C8A462BD6AD3F0082668F /* rownd_widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = rownd_widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B32C8A472BD6AD3F0082668F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B32C8A492BD6AD3F0082668F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		B32C8A4C2BD6AD3F0082668F /* widgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widgetBundle.swift; sourceTree = "<group>"; };
@@ -184,7 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				B374E52628542AEF00955719 /* Landmarks.app */,
-				B32C8A462BD6AD3F0082668F /* widgetExtension.appex */,
+				B32C8A462BD6AD3F0082668F /* rownd_widget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -275,9 +275,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B32C8A452BD6AD3F0082668F /* widgetExtension */ = {
+		B32C8A452BD6AD3F0082668F /* rownd_widget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B32C8A592BD6AD420082668F /* Build configuration list for PBXNativeTarget "widgetExtension" */;
+			buildConfigurationList = B32C8A592BD6AD420082668F /* Build configuration list for PBXNativeTarget "rownd_widget" */;
 			buildPhases = (
 				B32C8A422BD6AD3F0082668F /* Sources */,
 				B32C8A432BD6AD3F0082668F /* Frameworks */,
@@ -287,12 +287,12 @@
 			);
 			dependencies = (
 			);
-			name = widgetExtension;
+			name = rownd_widget;
 			packageProductDependencies = (
 				B32C8A5B2BD6C86C0082668F /* Rownd */,
 			);
 			productName = widgetExtension;
-			productReference = B32C8A462BD6AD3F0082668F /* widgetExtension.appex */;
+			productReference = B32C8A462BD6AD3F0082668F /* rownd_widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		B374E52528542AEF00955719 /* rownd_ios_example */ = {
@@ -359,7 +359,7 @@
 			projectRoot = "";
 			targets = (
 				B374E52528542AEF00955719 /* rownd_ios_example */,
-				B32C8A452BD6AD3F0082668F /* widgetExtension */,
+				B32C8A452BD6AD3F0082668F /* rownd_widget */,
 			);
 		};
 /* End PBXProject section */
@@ -433,7 +433,7 @@
 /* Begin PBXTargetDependency section */
 		B32C8A542BD6AD420082668F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B32C8A452BD6AD3F0082668F /* widgetExtension */;
+			target = B32C8A452BD6AD3F0082668F /* rownd_widget */;
 			targetProxy = B32C8A532BD6AD420082668F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -699,7 +699,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B32C8A592BD6AD420082668F /* Build configuration list for PBXNativeTarget "widgetExtension" */ = {
+		B32C8A592BD6AD420082668F /* Build configuration list for PBXNativeTarget "rownd_widget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B32C8A572BD6AD420082668F /* Debug */,

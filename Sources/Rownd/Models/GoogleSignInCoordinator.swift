@@ -17,7 +17,7 @@ class GoogleSignInCoordinator: NSObject {
         self.parent = parent
         super.init()
     }
-    
+
     func signIn(_ intent: RowndSignInIntent?) async {
         await signIn(intent, hint: nil)
     }

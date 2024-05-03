@@ -24,4 +24,3 @@ class Debouncer {
         queue.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
 }
-

@@ -10,17 +10,17 @@ import SwiftUI
 import Lottie
 
 open class RowndCustomizations: Encodable {
-    public init(){}
+    public init() {}
 
     open var sheetBackgroundColor: UIColor {
         let darkMode = Context.currentContext.store.state.appConfig.config?.hub?.customizations?.darkMode
-        if (darkMode == "enabled") {
+        if darkMode == "enabled" {
             return Constants.BACKGROUND_DARK
         }
-        if (darkMode == "disabled") {
+        if darkMode == "disabled" {
             return Constants.BACKGROUND_LIGHT
         }
-        switch(UIViewController().colorScheme) {
+        switch UIViewController().colorScheme {
         case .light, .unspecified:
             return Constants.BACKGROUND_LIGHT
         case .dark:
@@ -32,7 +32,7 @@ open class RowndCustomizations: Encodable {
 
     open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
 
-    open var loadingAnimation: LottieAnimation? = nil
+    open var loadingAnimation: LottieAnimation?
 
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
@@ -70,7 +70,7 @@ open class RowndCustomizations: Encodable {
     }
 }
 
-fileprivate func uiColorToRgbaString(color: UIColor) -> String {
+private func uiColorToRgbaString(color: UIColor) -> String {
     let ciColor = CIColor(color: color)
     return String(format: "rgba(%d, %d, %d, %.1f)", Int(round(ciColor.red * 255)), Int(round(ciColor.green * 255)), Int(round(ciColor.blue * 255)), round(ciColor.alpha))
 }
@@ -79,8 +79,7 @@ extension UIViewController {
     var colorScheme: UIUserInterfaceStyle {
         if #available(iOS 13.0, *) {
             return self.traitCollection.userInterfaceStyle
-        }
-        else {
+        } else {
             return UIUserInterfaceStyle.unspecified
         }
     }
@@ -90,7 +89,7 @@ extension UIViewController {
 extension LottieAnimationView {
 
     func startAnimating(_ hideWhenFinished: Bool = true) {
-        self.play { finished in
+        self.play { _ in
             if hideWhenFinished {
                 self.isHidden = true
             }

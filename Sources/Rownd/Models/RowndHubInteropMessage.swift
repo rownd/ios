@@ -32,7 +32,7 @@ import UIKit
 struct RowndHubInteropMessage: Decodable {
     var type: MessageType
     var payload: MessagePayload?
-    
+
     static func fromJson(message: String) throws -> RowndHubInteropMessage {
         let decoder = JSONDecoder()
         decoder.userInfo[.messageType] = MessageTypeHolder()
@@ -59,7 +59,7 @@ enum MessageType: String, Codable {
     enum CodingKeys: String, CodingKey {
         case type
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let type = try container.decode(String.self)
@@ -85,64 +85,64 @@ enum MessagePayload: Decodable {
     case tryAgain
     case hubResize(TriggerHubResize)
     case canTouchBackgroundToDismiss(CanTouchBackgroundToDismiss)
-    
+
     enum CodingKeys: String, CodingKey {
         case type
     }
-    
+
     init(from decoder: Decoder) throws {
         // We're accessing a value from the parent that must exist, else we can't continue
         guard let messageType = decoder.userInfo[.messageType] as? MessageTypeHolder, let messageTypeStr = messageType.type else {
             self = .unknown
-            return;
+            return
         }
         let type = messageTypeStr
-        
+
         let objectContainer = try decoder.singleValueContainer()
-        
+
         switch type {
         case .triggerSignInWithApple:
             let payload = try objectContainer.decode(TriggerSignInWithAppleMessage.self)
             self = .triggerSignInWithApple(payload)
-        
+
         case .triggerSignInWithGoogle:
             let payload = try objectContainer.decode(TriggerSignInWithGoogleMessage.self)
             self = .triggerSignInWithGoogle(payload)
-        
+
         case .triggerSignUpWithPasskey:
             self = .triggerSignUpWithPasskey
-            
+
         case .triggerSignInWithPasskey:
             self = .triggerSignInWithPasskey
-            
+
         case .authentication:
             let payload = try objectContainer.decode(AuthenticationMessage.self)
             self = .authentication(payload)
-        
+
         case .closeHubViewController:
             self = .closeHubViewController
-            
+
         case .userDataUpdate:
             let payload = try objectContainer.decode(UserDataUpdateMessage.self)
             self = .userDataUpdate(payload)
-        
+
         case .hubResize:
             let payload = try objectContainer.decode(TriggerHubResize.self)
             self = .hubResize(payload)
-        
+
         case .canTouchBackgroundToDismiss:
             let payload = try objectContainer.decode(CanTouchBackgroundToDismiss.self)
             self = .canTouchBackgroundToDismiss(payload)
-            
+
         case .signOut:
             self = .signOut
-        
+
         case .tryAgain:
             self = .tryAgain
-            
+
         case .hubLoaded:
             self = .hubLoaded
-            
+
         case .unknown:
             self = .unknown
         }
@@ -151,50 +151,50 @@ enum MessagePayload: Decodable {
     public struct AuthenticationMessage: Codable {
         var accessToken: String
         var refreshToken: String
-        
+
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
             case refreshToken = "refresh_token"
         }
     }
-    
+
     public struct TriggerSignInWithGoogleMessage: Codable {
-        var intent: RowndSignInIntent? = nil
-        var hint: String? = nil
-        
+        var intent: RowndSignInIntent?
+        var hint: String?
+
         enum CodingKeys: String, CodingKey {
             case intent, hint
         }
     }
-    
+
     public struct TriggerSignInWithAppleMessage: Codable {
-        var intent: RowndSignInIntent? = nil
-        
+        var intent: RowndSignInIntent?
+
         enum CodingKeys: String, CodingKey {
             case intent
         }
     }
-    
+
     public struct UserDataUpdateMessage: Codable {
-        var data: Dictionary<String, AnyCodable>
-        var meta: Dictionary<String, AnyCodable>?
-        
+        var data: [String: AnyCodable]
+        var meta: [String: AnyCodable]?
+
         enum CodingKeys: String, CodingKey {
             case data = "data"
             case meta = "meta"
         }
     }
-    
+
     public struct TriggerHubResize: Codable {
-        var height: String? = nil
+        var height: String?
 
         enum CodingKeys: String, CodingKey {
             case height
         }
     }
-    
+
     public struct CanTouchBackgroundToDismiss: Codable {
-        var enable: String? = nil
+        var enable: String?
 
         enum CodingKeys: String, CodingKey {
             case enable

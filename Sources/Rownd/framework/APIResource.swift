@@ -10,7 +10,7 @@ import Foundation
 protocol APIResource {
     associatedtype ModelType: Decodable
     var methodPath: String { get }
-    var headers: Dictionary<String, String>? { get set }
+    var headers: [String: String]? { get set }
 }
 
 extension APIResource {
@@ -27,9 +27,9 @@ extension APIResource {
         components.queryItems = []
         return components.url!
     }
-    
-    var combinedHeaders: Dictionary<String, String> {
-        var localHeaders = Dictionary<String, String>()
+
+    var combinedHeaders: [String: String] {
+        var localHeaders = [String: String]()
         if let _resourceHeaders = headers {
             localHeaders = _resourceHeaders
         }
