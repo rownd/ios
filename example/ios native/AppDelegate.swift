@@ -26,7 +26,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Rownd.config.baseUrl = "https://hub.dev.rownd.io"
         Rownd.config.apiUrl = "https://api.us-east-2.dev.rownd.io"
         Rownd.config.subdomainExtension = ".dev.rownd.link"
-//        Rownd.config.sharedStoragePrefix = "group.rowndexample"
+        Rownd.config.appGroupPrefix = "group.rowndexample"
 
         Rownd.config.customizations = AppCustomizations()
 
