@@ -90,10 +90,6 @@ class Storage: NSObject, NSFilePresenter {
     }
 
     func get(forKey key: String) -> String? {
-        //        guard let fileUrl = computeStoragePath(key) else {
-        //            return defaultStore?.object(forKey: key) as? String
-        //        }
-
         // Try to read from shared container (app group)
         var value: String?
         if let sharedFileUrl = computeSharedStoragePath(Rownd.config.appGroupPrefix) {
@@ -145,5 +141,9 @@ class Storage: NSObject, NSFilePresenter {
             writeToStorage(value, fileUrl: appFileUrl.appendingPathComponent(key))
             Self.log.debug("Successfully wrote to \(String(describing: appFileUrl.appendingPathComponent(key)))")
         }
+
+        // We no longer want to use UserDefaults for state, so we'll remove this later.
+        // Mainly keeping it around for backward compat purposes. Remove in v5.0 or later.
+        userDefaultsStore?.set(value, forKey: key)
     }
 }
