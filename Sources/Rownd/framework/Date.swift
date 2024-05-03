@@ -7,15 +7,14 @@
 
 import Foundation
 
-
 internal func stringToSeconds(_ str: String) -> Int? {
     let numberString = str.dropLast()
     let timeUnit = str.suffix(1)
-    
+
     guard let number = Int(numberString) else {
         return nil
     }
-    
+
     switch timeUnit {
     case "s": // seconds
         return number

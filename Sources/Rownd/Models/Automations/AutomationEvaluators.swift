@@ -8,7 +8,7 @@
 import Foundation
 import AnyCodable
 
-internal func evaluateRule(userData: Dictionary<String, AnyCodable>?, rule: RowndAutomationRule) -> Bool {
+internal func evaluateRule(userData: [String: AnyCodable]?, rule: RowndAutomationRule) -> Bool {
     guard let userData = userData else {
         logger.error("User data not available during automation rule evaluation")
         return false
@@ -20,22 +20,22 @@ internal func evaluateRule(userData: Dictionary<String, AnyCodable>?, rule: Rown
 
     let conditionEvalFun = conditionEvaluators[rule.condition]
     let result = conditionEvalFun?(userData, rule.attribute, rule.value) ?? false
-    
+
     logger.log("Rule (Attribute, attribute value, rule value, and result): \(rule.attribute), \(userDataValue), \(rule.value ?? "N/A"), \(result)")
 
     return result
 }
 
-func conditionEvaluatorsEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsEquals(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: EQUALS")
     guard let dataValue = data[attribute], let attributeValue = value else {
         return false
     }
-    
+
     return "\(dataValue)" == "\(attributeValue)"
 }
 
-func conditionEvaluatorsNotEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsNotEquals(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: NOT_EQUALS")
     guard let dataValue = data[attribute], let attributeValue = value else {
         return false
@@ -43,7 +43,7 @@ func conditionEvaluatorsNotEquals(data: Dictionary<String, AnyCodable>, attribut
     return "\(dataValue)" != "\(attributeValue)"
 }
 
-func conditionEvaluatorsContains(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsContains(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: CONTAINS")
     guard let dataValue = data[attribute] else {
         return false
@@ -51,7 +51,7 @@ func conditionEvaluatorsContains(data: Dictionary<String, AnyCodable>, attribute
     return "\(dataValue)".contains(String(describing: value))
 }
 
-func conditionEvaluatorsNotContains(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsNotContains(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: NOT_CONTAINS")
     guard let dataValue = data[attribute] else {
         return false
@@ -59,7 +59,7 @@ func conditionEvaluatorsNotContains(data: Dictionary<String, AnyCodable>, attrib
     return !"\(dataValue)".contains(String(describing: value))
 }
 
-func conditionEvaluatorsIn(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsIn(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: IN")
     guard let dataValue = data[attribute] else {
         return false
@@ -67,7 +67,7 @@ func conditionEvaluatorsIn(data: Dictionary<String, AnyCodable>, attribute: Stri
     return String(describing: value).contains("\(dataValue)")
 }
 
-func conditionEvaluatorsNotIn(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsNotIn(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: NOT_IN")
     guard let dataValue = data[attribute] else {
         return false
@@ -75,12 +75,12 @@ func conditionEvaluatorsNotIn(data: Dictionary<String, AnyCodable>, attribute: S
     return !String(describing: value).contains("\(dataValue)")
 }
 
-func conditionEvaluatorsExists(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsExists(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: EXISTS")
     return data[attribute] != nil
 }
 
-func conditionEvaluatorsNotExists(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+func conditionEvaluatorsNotExists(data: [String: AnyCodable], attribute: String, value: AnyCodable?) -> Bool {
     logger.log("Condition: NOT_EXISTS")
     return data[attribute] == nil
 }

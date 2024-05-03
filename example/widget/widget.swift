@@ -11,8 +11,11 @@ import Rownd
 import Combine
 
 struct Provider: TimelineProvider {
-    init() {
-        Rownd.config.sharedStoragePrefix = "group.rowndexample"
+    func initRownd () async -> RowndState {
+        Rownd.config.apiUrl = "https://api.us-east-2.dev.rownd.io"
+        Rownd.config.baseUrl = "https://hub.us-east-2.dev.rownd.io"
+        Rownd.config.appGroupPrefix = "group.rowndexample"
+        return await Rownd.configure(appKey: "key_pko8eul59xz33hr21jgxvx6s")
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
@@ -21,7 +24,8 @@ struct Provider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         Task {
-            let rowndState = await Rownd.getStateForExtension()
+            let rowndState = await initRownd()
+            print(try? await Rownd.getAccessToken())
             var currentEmoji: String = "❓"
             if rowndState.auth.isAuthenticated == true {
                 currentEmoji = "😁"
@@ -35,7 +39,8 @@ struct Provider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         Task {
-            let rowndState = await Rownd.getStateForExtension()
+            let rowndState = await initRownd()
+            print(try? await Rownd.getAccessToken())
 
             var entries: [SimpleEntry] = []
 

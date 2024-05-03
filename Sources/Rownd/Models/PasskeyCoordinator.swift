@@ -65,14 +65,14 @@ enum PasskeyCoordinatorMethods {
 }
 
 class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
-    
-    var method: PasskeyCoordinatorMethods? = nil
-    
+
+    var method: PasskeyCoordinatorMethods?
+
     private func getWindowScene() -> UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         return scenes.first as? UIWindowScene
     }
-    
+
     private func getHubViewController() -> HubViewController? {
         let bottomSheetController = Rownd.getInstance().bottomSheetController
         if let hubViewController = bottomSheetController.controller as? HubViewController {
@@ -80,18 +80,18 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         }
         return nil
     }
-    
+
     func registerPasskey() {
-        //Add passkey to the Rownd user
+        // Add passkey to the Rownd user
         method = PasskeyCoordinatorMethods.Register
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
         let hubViewController = getHubViewController()
-        
+
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
-        
+
         Task {
             do {
                 let challengeResponse: PasskeyRegisterResponse = try await Rownd.apiClient.send(
@@ -102,7 +102,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         ]
                     )
                 ).value
-                
+
                 await hubViewController?.loadNewPage(
                     targetPage: .connectPasskey,
                     jsFnOptions: RowndConnectPasskeySignInOptions(
@@ -110,9 +110,9 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         biometricType: LAContext().biometricType.rawValue
                     )
                 )
-                
+
                 let store = Context.currentContext.store
-                let _ = store.state.appConfig.name != nil ? String(describing:store.state.appConfig.name!) : ""
+                _ = store.state.appConfig.name != nil ? String(describing: store.state.appConfig.name!) : ""
                 // Username priority in order Email, phone, or UID
                 var userName = "unknown user"
                 let email = store.state.user.data["email"] != nil ? String(describing: store.state.user.data["email"]!) : ""
@@ -141,17 +141,17 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             }
         }
     }
-    
+
     func authenticate() {
-        //Use passkey to sign in as a Rownd user
+        // Use passkey to sign in as a Rownd user
         method = PasskeyCoordinatorMethods.Authenticate
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
-        
+
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
-        
+
         Task {
             do {
                 let challengeResponse: PasskeyAuthenticationResponse = try await Rownd.apiClient.send(
@@ -163,8 +163,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                     )
                 ).value
                 authenticate(anchor: anchor, preferImmediatelyAvailableCredentials: false, challengeResponse: challengeResponse)
-            }
-            catch {
+            } catch {
                 logger.error("Failed to fetch passkey challenge: \(String(describing: error))")
             }
         }
@@ -192,7 +191,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         authController.performRequests()
 
     }
-    
+
     func registerPasskey(userName: String, anchor: ASPresentationAnchor, challengeResponse: PasskeyRegisterResponse) {
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
@@ -205,7 +204,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
             relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension
         )
-        
+
         let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
         let userID = Data(challengeResponse.user.id.utf8)
 
@@ -220,7 +219,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         authController.presentationContextProvider = self
         authController.performRequests()
     }
-    
+
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard #available(iOS 15.0, *) else {
             logger.trace("iOS 15.0 is required to sign in with Passkey")
@@ -232,7 +231,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             let attestationObject = credentialRegistration.rawAttestationObject
             let clientDataJSON = credentialRegistration.rawClientDataJSON
             let credentialID = credentialRegistration.credentialID.base64URLEncodedString()
-            
+
             let hubViewController = getHubViewController()
 
             Task {
@@ -245,12 +244,12 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                 )
 
                 do {
-                    let _ = try await Rownd.apiClient.send(Get.Request(
+                    _ = try await Rownd.apiClient.send(Get.Request(
                         url: URL(string: "/hub/auth/passkeys/registration")!,
                         method: "post",
                         body: body,
                         headers: [
-                            "content-type":"application/json"
+                            "content-type": "application/json"
                         ]
                     )).value
                     await hubViewController?.loadNewPage(targetPage: .connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(status: Status.success, biometricType: LAContext().biometricType.rawValue))
@@ -272,9 +271,9 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             let userId = credentialAssertion.userID
             let credentialID = credentialAssertion.credentialID.base64URLEncodedString()
             let authenticatorData = credentialAssertion.rawAuthenticatorData
-            
+
             let hubViewController = getHubViewController()
-            
+
             Task {
                 let body: PasskeyAuthenticationPayload = PasskeyAuthenticationPayload(
                     response: PasskeyAuthenticationPayloadResponse(
@@ -293,10 +292,10 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                             url: URL(string: "/hub/auth/passkeys/authentication")!,
                             method: "post",
                             body: body,
-                            headers: ["content-type":"application/json"]
+                            headers: ["content-type": "application/json"]
                         )
                     ).value
-                    
+
                     DispatchQueue.main.async {
                         Context.currentContext.store.dispatch(SetAuthState(
                             payload: AuthState(
@@ -306,7 +305,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                         ))
                         Context.currentContext.store.dispatch(UserData.fetch())
                     }
-                    
+
                     await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
@@ -337,10 +336,10 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         }
 
     }
-    
+
     private func handleRegistrationError(_ controller: ASAuthorizationController, _ error: Error) {
         let hubViewController = getHubViewController()
-        
+
         logger.error("Passkey registration error: \(String(describing: error))")
 
         hubViewController?.loadNewPage(
@@ -352,8 +351,8 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
             )
         )
     }
-    
-    private func handleAuthenticationError(_ controller: ASAuthorizationController, _ error: Error) {        
+
+    private func handleAuthenticationError(_ controller: ASAuthorizationController, _ error: Error) {
         logger.error("Passkey authentication error: \(String(describing: error))")
 
         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
@@ -364,7 +363,7 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        
+
         if let authorizationError = error as? ASAuthorizationError {
             switch authorizationError.code {
             case .canceled:
@@ -376,13 +375,13 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                 break
             }
         }
-        
+
         if method == .Register {
             handleRegistrationError(controller, error)
         } else {
             handleAuthenticationError(controller, error)
         }
-        
+
 //        let hubViewController = getHubViewController()
 //
 //        guard let authorizationError = error as? ASAuthorizationError else {
@@ -437,7 +436,6 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
         return (vc?.view.window!)!
     }
 
-
 }
 
 struct PasskeyRegisterResponse: Hashable, Codable {
@@ -481,7 +479,6 @@ extension PasskeyRegisterPayloadResponse: Codable {
     }
 }
 
-
 struct PasskeyAuthenticationResponse: Hashable, Codable {
     public var challenge: String
 
@@ -513,7 +510,6 @@ extension PasskeyAuthenticationPayloadResponse: Codable {
         case clientDataJSON, signature, userHandle, authenticatorData
     }
 }
-
 
 struct PasskeyAuthenticationCompleteResponse: Hashable, Codable {
     public var verified: Bool

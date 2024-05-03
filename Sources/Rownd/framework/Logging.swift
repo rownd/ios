@@ -8,4 +8,4 @@
 import Foundation
 import OSLog
 
-internal let logger = Logger(subsystem: "io.rownd.sdk", category: "Rownd")
+internal let logger = Logger(subsystem: "io.rownd.sdk", category: "general")

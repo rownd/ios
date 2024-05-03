@@ -24,10 +24,10 @@ struct FrameworkFeature: Codable {
 
 func getFrameworkFeatures() -> String {
     let frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
-    
+
     let encoder = JSONEncoder()
     encoder.dataEncodingStrategy = .base64
-    
+
     do {
         let encodedData = try encoder.encode(frameworkFeatures)
         return String(data: encodedData, encoding: .utf8) ?? "{}"
@@ -39,16 +39,16 @@ func getFrameworkFeatures() -> String {
 
 struct Constants {
     static private let formatter = ISO8601DateFormatter()
-    
+
     static let BACKGROUND_LIGHT = UIColor.white
     static let BACKGROUND_DARK = UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0)
-    
+
     static var DEFAULT_API_USER_AGENT: String {
         get {
             return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language: Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString))"
         }
     }
-    
+
     static var DEFAULT_WEB_USER_AGENT: String {
         get {
             return "Rownd SDK for iOS/\(getFrameworkVersion()) (Language=Swift; Platform: \(UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString))"

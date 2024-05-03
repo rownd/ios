@@ -9,6 +9,9 @@ import Foundation
 import Get
 import Factory
 import ReSwift
+import OSLog
+
+private let log = Logger(subsystem: "io.rownd.sdk", category: "authenticator")
 
 enum AuthenticationError: Error {
     case noAccessTokenPresent
@@ -25,7 +28,7 @@ internal func tokenApiFactory() -> APIClient {
     return Get.APIClient(configuration: tokenApiConfig)
 }
 
-fileprivate class TokenApiClientDelegate : APIClientDelegate {
+private class TokenApiClientDelegate: APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
@@ -70,12 +73,12 @@ class AuthenticatorSubscription: NSObject {
     /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
     /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
     internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
-        return { dispatch, getState in
+        return { _, _ in
             return { next in
                 return { action in
                     var authState: AuthState?
 
-                    switch(action) {
+                    switch action {
                     case let action as SetAuthState:
                         authState = action.payload
                     case let action as InitializeRowndState:
@@ -99,7 +102,6 @@ actor Authenticator {
     private let tokenApi = Container.tokenApi()
     private var refreshTask: Task<AuthState, Error>?
 
-
     func getValidToken() async throws -> AuthState {
         if let handle = refreshTask {
             return try await handle.value
@@ -118,6 +120,7 @@ actor Authenticator {
 
     func refreshToken() async throws -> AuthState {
         if let refreshTask = refreshTask {
+            log.debug("Waiting for token refresh already in progress")
             return try await refreshTask.value
         }
 
@@ -125,6 +128,7 @@ actor Authenticator {
             defer { refreshTask = nil }
 
             do {
+                log.debug("Refreshing auth tokens...")
                 let newAuthState: AuthState = try await tokenApi.send(
                     Request(
                         path: "/hub/auth/token",
@@ -132,6 +136,8 @@ actor Authenticator {
                         body: TokenRequest(refreshToken: AuthenticatorSubscription.currentAuthState?.refreshToken)
                     )
                 ).value
+
+                log.debug("Successfully refreshed auth tokens.")
 
                 // Store the new token response here for immediate use outside of the state lifecycle
                 AuthenticatorSubscription.currentAuthState = newAuthState
@@ -148,7 +154,7 @@ actor Authenticator {
 
                 return newAuthState
             } catch {
-                logger.error("Token refresh failed: \(String(describing: error))")
+                log.error("Token refresh failed: \(String(describing: error))")
 
                 if
                     case .unacceptableStatusCode(let statusCode) = error as? APIError,

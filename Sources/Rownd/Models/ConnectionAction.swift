@@ -26,7 +26,7 @@ internal struct ConnectionActionPayload: Encodable {
 
 class ConnectionAction {
     internal func getFirebaseIdToken() async throws -> String {
-        if (!Context.currentContext.store.state.auth.isAuthenticated) {
+        if !Context.currentContext.store.state.auth.isAuthenticated {
             throw ConnectionActionError.customMessage("User needs to be authenticated to generate a firebase *ID token*")
         }
         do {
@@ -37,11 +37,11 @@ class ConnectionAction {
                     method: "post",
                     body: body,
                     headers: [
-                        "content-type":"application/json"
+                        "content-type": "application/json"
                     ]
                 )
             ).value
-            
+
             return actionResponse.data.token
         } catch {
            throw error
@@ -65,5 +65,3 @@ internal struct FirebaseGetIdTokenResponseData: Hashable, Codable {
         case token
     }
 }
-
-

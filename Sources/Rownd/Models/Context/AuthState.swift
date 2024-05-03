@@ -13,7 +13,7 @@ import JWTDecode
 import Kronos
 import Get
 
-fileprivate let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
+private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
 
 public struct AuthState: Hashable {
     public var isLoading: Bool = false
@@ -35,7 +35,7 @@ extension AuthState: Codable {
 
         do {
             let jwt = try decode(jwt: accessToken)
-            
+
             let currentDate = Clock.now ?? Date()
             guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
                 return false
@@ -46,7 +46,7 @@ extension AuthState: Codable {
             return false
         }
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
@@ -73,7 +73,7 @@ extension AuthState: Codable {
             return nil
         }
     }
-    
+
     func getAccessToken() async throws -> String? {
         do {
             let authState = try await Rownd.authenticator.getValidToken()
@@ -81,7 +81,7 @@ extension AuthState: Codable {
         } catch {
             logger.warning("Failed to retrieve access token: \(String(describing: error))")
 
-            switch (error as? AuthenticationError) {
+            switch error as? AuthenticationError {
             case .networkConnectionFailure:
                 throw error
             default: break
@@ -119,9 +119,9 @@ struct SetAuthState: Action {
 
 func authReducer(action: Action, state: AuthState?) -> AuthState {
     var state = state ?? AuthState()
-    
+
     let hasPreviouslySignedIn = state.hasPreviouslySignedIn
-    
+
     switch action {
     case let action as SetAuthState:
         state = action.payload
@@ -129,10 +129,10 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
         break
     }
 
-    if (hasPreviouslySignedIn ?? false || state.isAuthenticated) {
+    if hasPreviouslySignedIn ?? false || state.isAuthenticated {
         state.hasPreviouslySignedIn = true
     }
-    
+
     return state
 }
 
@@ -149,7 +149,7 @@ struct TokenRequest: Codable {
     var appId: String?
     var intent: RowndSignInIntent?
     var intentMismatchBehavior: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
         case idToken = "id_token"
@@ -163,7 +163,7 @@ struct TokenResponse: Codable {
     var refreshToken: String?
     var accessToken: String?
     var userType: UserType?
-    
+
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
         case accessToken = "access_token"
@@ -171,25 +171,22 @@ struct TokenResponse: Codable {
     }
 }
 
-
 struct TokenResource: APIResource {
-    
-    var headers: Dictionary<String, String>?
-    
+
+    var headers: [String: String]?
+
     typealias ModelType = TokenResponse
-    
+
     var methodPath: String {
         return "/hub/auth/token"
     }
 }
 
-
-
 class Auth {
     static func fetchToken(_ token: String) async throws -> TokenResponse? {
         return try await fetchToken(idToken: token, intent: nil)
     }
-    
+
     static func fetchToken(idToken: String, intent: RowndSignInIntent?) async throws -> TokenResponse? {
         guard let appId = Context.currentContext.store.state.appConfig.id else { return nil }
         let tokenRequest = TokenRequest(
@@ -200,14 +197,14 @@ class Auth {
         )
         return try await fetchToken(tokenRequest: tokenRequest)
     }
-    
+
     static func fetchToken(tokenRequest: TokenRequest) async throws -> TokenResponse {
         let tokenResp: Response<TokenResponse> = try await rowndApi.send(Request(
             path: "/hub/auth/token",
             method: .post,
             body: tokenRequest
         ))
-        
+
         return tokenResp.value
     }
 }
@@ -223,9 +220,9 @@ extension JWT {
         guard let ntpDate = ntpDate else {
             return self.expired
         }
-        
+
         // Token is expired if the token expiration timestamp is less than the current timestamp (minus a 60 second buffer)
-        
+
         return date.compare(ntpDate) != ComparisonResult.orderedDescending
     }
 }

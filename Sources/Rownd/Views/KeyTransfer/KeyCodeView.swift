@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import WebKit
 
-struct KeyCodeView : View {
+struct KeyCodeView: View {
 
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var keyState: KeyTransferViewState
@@ -79,4 +79,3 @@ struct KeyCodeView : View {
         }
     }
 }
-
