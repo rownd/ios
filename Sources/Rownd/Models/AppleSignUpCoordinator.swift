@@ -11,14 +11,14 @@ import UIKit
 import AnyCodable
 import ReSwiftThunk
 
-fileprivate let appleSignInDataKey = "userAppleSignInData"
+private let appleSignInDataKey = "userAppleSignInData"
 
 struct AppleSignInData: Codable {
     var email: String
     var firstName: String?
     var lastName: String?
     var fullName: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
         case lastName = "last_name"
@@ -30,58 +30,58 @@ struct AppleSignInData: Codable {
 class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     var parent: Rownd?
     var intent: RowndSignInIntent?
-    
+
     init(_ parent: Rownd) {
         self.parent = parent
         super.init()
     }
-    
+
     func signIn(_ intent: RowndSignInIntent?) {
         self.intent = intent
-        //Create an object of the ASAuthorizationAppleIDProvider
+        // Create an object of the ASAuthorizationAppleIDProvider
         let appleIDProvider = ASAuthorizationAppleIDProvider()
-        //Create a request
+        // Create a request
         let request = appleIDProvider.createRequest()
-        //Define the scope of the request
+        // Define the scope of the request
         request.requestedScopes = [.fullName, .email]
-        //Make the request
+        // Make the request
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        
-        //Assigning the delegates
+
+        // Assigning the delegates
         authorizationController.presentationContextProvider = self
         authorizationController.delegate = self
         authorizationController.performRequests()
     }
-    
+
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         let vc = UIApplication.shared.windows.last?.rootViewController
         return (vc?.view.window!)!
     }
-    
+
     private func getFullName(firstName: String?, lastName: String?) -> String {
         return String("\(firstName ?? "") \(lastName ?? "")")
     }
-    
+
     // If authorization is successful then this method will get triggered
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        
+
         DispatchQueue.main.async {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                 loginStep: .completing
             ))
         }
-        
+
         switch authorization.credential {
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
-            
+
             // Create an account in your system.
             // let userIdentifier = appleIDCredential.user
             let fullName = appleIDCredential.fullName
             let email = appleIDCredential.email
             let identityToken = appleIDCredential.identityToken
-            
+
             if let email = email {
-                //Store email and fullName in AppleSignInData struct if available
+                // Store email and fullName in AppleSignInData struct if available
                 let userAppleSignInData = AppleSignInData(
                     email: email,
                     firstName: fullName?.givenName,
@@ -94,15 +94,15 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                     defaults.set(encoded, forKey: appleSignInDataKey)
                 }
             }
-            
+
             if let identityToken = identityToken,
                let urlContent = NSString(data: identityToken, encoding: String.Encoding.ascii.rawValue) {
                 let idToken = urlContent as String
-                
+
                 Task {
                     do {
                         let tokenResponse = try await Auth.fetchToken(idToken: idToken, intent: intent)
-                        
+
                         Task { @MainActor in
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                                 loginStep: RowndSignInLoginStep.success,
@@ -110,10 +110,10 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                 userType: tokenResponse?.userType
                             ))
                         }
-                        
+
                         // Prevent fast auth handshakes from feeling jarring to the user
                         try await Task.sleep(nanoseconds: UInt64(2 * Double(NSEC_PER_SEC)))
-                        
+
                         DispatchQueue.main.async {
                             Context.currentContext.store.dispatch(Context.currentContext.store.state.auth.onReceiveAuthTokens(
                                 AuthState(
@@ -121,16 +121,16 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                     refreshToken: tokenResponse?.refreshToken
                                 )
                             ))
-                            
+
                             Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
-                            
+
                             Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
                                 guard let state = getState() else { return }
-                                
+
                                 var userData = state.user.data
-                                
+
                                 let defaults = UserDefaults.standard
-                                //use UserDefault values for Email and fullName if available
+                                // use UserDefault values for Email and fullName if available
                                 if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
                                     let decoder = JSONDecoder()
                                     if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
@@ -147,8 +147,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                         userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
                                     }
                                 }
-                                
-                                if (!userData.isEmpty) {
+
+                                if !userData.isEmpty {
                                     DispatchQueue.main.async {
                                         dispatch(UserData.save(userData))
                                     }
@@ -188,7 +188,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                     signInType: .apple
                 ))
             }
-            
+
         default:
             logger.error("Unknown credential type returned from Apple ID sign-in: \(String(describing: authorization.credential))")
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
@@ -198,13 +198,13 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             break
         }
     }
-    
-    //If authorization faced any issue then this method will get triggered
+
+    // If authorization faced any issue then this method will get triggered
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        
-        //If there is any error will get it here
+
+        // If there is any error will get it here
         logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
-        
+
         guard let authorizationError = error as? ASAuthorizationError else {
             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                 loginStep: .error,
@@ -212,7 +212,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             ))
             return
         }
-        
+
         switch authorizationError.code {
         case .canceled:
             return
@@ -224,5 +224,3 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         }
     }
 }
-
-

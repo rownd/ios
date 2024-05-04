@@ -14,7 +14,7 @@ let baseConfig = APIClient.Configuration(
 )
 let rowndApi = Get.APIClient(configuration: baseConfig)
 
-class RowndUnauthenticatedApiClientDelegate : APIClientDelegate {
+class RowndUnauthenticatedApiClientDelegate: APIClientDelegate {
     // Pre-request hook
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
@@ -22,11 +22,11 @@ class RowndUnauthenticatedApiClientDelegate : APIClientDelegate {
         if request.httpMethod?.lowercased() != "get", request.value(forHTTPHeaderField: "Content-Type") == nil {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        
+
         let localRequest = request
         logger.debug("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
     }
-    
+
     // Post-response validation
     func client(
         _ client: APIClient,
@@ -55,7 +55,7 @@ class RowndApi {
     }
 }
 
-class RowndApiClientDelegate : APIClientDelegate {
+class RowndApiClientDelegate: APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(Rownd.config.appKey, forHTTPHeaderField: "X-Rownd-App-Key")
         request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
@@ -74,7 +74,7 @@ class RowndApiClientDelegate : APIClientDelegate {
     }
 }
 
-struct RowndApiError : Codable, Hashable {
+struct RowndApiError: Codable, Hashable {
     var statusCode: Int
     var error: String
     var code: String?
@@ -87,7 +87,7 @@ extension RowndApiError {
     }
 }
 
-enum ApiError : Error {
+enum ApiError: Error {
     case generic(RowndApiError)
     case unexpected
 }

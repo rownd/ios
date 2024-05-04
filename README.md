@@ -112,7 +112,7 @@ The `RowndCustomizations` class exists to facilitate these customizations. It pr
 
 - `sheetBackgroundColor: UIColor` (default: `light: .white`, `dark: .systemGray6`; requires subclassing) - Allows changing the background color underlaying the bottom sheet that appears when signing in, managing the user account, transferring encryption keys, etc.
 - `sheetCornerBorderRadius: CGFloat` (default: `25.0`) - Modifies the curvature radius of the bottom sheet corners.
-- `loadingAnimation: Lottie.Animation` (default: nil) - Replace Rownd's use of the system default loading spinner (i.e., `UIActivityIndicatorView` or `ProgressView`) with a custom animation. Any animation compatible with [Lottie](https://airbnb.design/lottie/) should work, but will be scaled to fit a 1:1 aspect ratio (usually with a `CGRect` frame width/height of `100`)
+- `loadingAnimation: Lottie.Animation` (default: nil) - Replace Rownd's use of the system default loading spinner (i.e., `UIActivityIndicatorView` or `ProgressView`) with a custom animation. Any animation compatible with [Lottie](https://airbnb.design/lottie/) should work but will be scaled to fit a 1:1 aspect ratio (usually with a `CGRect` frame width/height of `100`)
 
 To apply customizations, we recommend subclassing the `RowndCustomizations` class. Here's an example:
 
@@ -139,6 +139,28 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 ```
+
+### Usage within app extensions
+It's possible to access the Rownd state from within an app extension, like a widget. You'll need to include the Rownd package in the extension's dependencies and set up an app group for data sharing between the app and the extension. Without the app group, extensions will not be able to sync with your app's authentication state.
+
+Follow these steps to configure your app and extension to work with Rownd:
+1. Add an [app group](https://developer.apple.com/documentation/xcode/configuring-app-groups) entitlement to both your app and any extensions that will use Rownd.
+   This app group **must** be named like this: `<prefix>.io.rownd.sdk`. For example, if you work at a company with the acme.com domain, your app group might look like this: `com.acme.app.io.rownd.sdk`. Rownd will store its data in this app group. Your app should store data in a separate app group to prevent any collisions.
+
+2. In your app's `AppDelegate` file as well as your extension's entry point, set the app group prefix you defined above via `Rownd.config.appGroupPrefix = "<prefix>"` (e.g., `Rownd.config.appGroupPrefix = "com.acme.app"`)
+
+3. In your extension, call `Rownd.configure()` prior to accessing authentication state. Here's an example:
+   ```swift
+    Task {
+        Rownd.config.appGroupPrefix = "group.rowndexample"
+        let rowndState = await Rownd.configure(appKey: "key_pko8eul59xz33hr21jgxvx6s")
+        
+        var authStatus: String = "You are not authenticated. ☹️"
+        if rowndState.auth.isAuthenticated == true {
+            authStatus = "You are authenticated! 😁"
+        }
+    }
+   ```
 
 ## API reference
 

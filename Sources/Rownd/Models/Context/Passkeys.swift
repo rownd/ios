@@ -63,7 +63,7 @@ struct SetPasskeyError: Action {
 
 func passkeyReducer(action: Action, state: PasskeyState?) -> PasskeyState {
     var state = state ?? PasskeyState()
-    
+
     switch action {
     case let action as SetPasskeyState:
         state = action.payload
@@ -77,7 +77,7 @@ func passkeyReducer(action: Action, state: PasskeyState?) -> PasskeyState {
     default:
         break
     }
-    
+
     return state
 }
 
@@ -91,18 +91,17 @@ extension PasskeysRegistrationResponse: Codable {
     }
 }
 
-
 class PasskeyData {
     static func fetchPasskeyRegistration() -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
             guard !state.passkeys.isLoading else { return }
-            
-            if (Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.passkeys?.enabled != true)  {
+
+            if Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.passkeys?.enabled != true {
                 logger.debug("Passkeys are not enabled")
                 return
             }
-            
+
             Task {
                 guard state.auth.isAuthenticated else {
                     return
@@ -111,18 +110,18 @@ class PasskeyData {
                 DispatchQueue.main.async {
                     dispatch(SetPasskeyLoading(isLoading: true))
                 }
-                
+
                 defer {
                     DispatchQueue.main.async {
                         dispatch(SetPasskeyLoading(isLoading: false))
                     }
                 }
-                
+
                 do {
                     let response = try await Rownd.apiClient.send(Request<PasskeysRegistrationResponse>(path: "/me/auth/passkeys", method: .get)).value
-                
+
                     logger.debug("Passkey response: \(String(describing: response))")
-                    
+
                     DispatchQueue.main.async {
                         dispatch(SetPasskeyRegistration(payload: response.passkeys))
                     }
@@ -134,4 +133,3 @@ class PasskeyData {
         }
     }
 }
-

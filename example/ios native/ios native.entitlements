@@ -13,5 +13,9 @@
 		<string>webcredentials:mthshiny.dev.rownd.link</string>
 		<string>webcredentials:mthlandmarks.dev.rownd.link</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.rowndexample.io.rownd.sdk</string>
+	</array>
 </dict>
 </plist>

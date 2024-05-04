@@ -6,11 +6,16 @@
 //
 
 import Foundation
+import OSLog
 import ReSwift
 import ReSwiftThunk
 import Kronos
 
-fileprivate let STORAGE_STATE_KEY = "RowndState"
+private let log = Logger(subsystem: "io.rownd.sdk", category: "state")
+
+private let STORAGE_STATE_KEY = "RowndState"
+
+private let debouncer = Debouncer(delay: 0.1) // 100ms
 
 public struct RowndState: Codable, Hashable {
     public var isStateLoaded = false
@@ -26,7 +31,7 @@ extension RowndState {
     enum CodingKeys: String, CodingKey {
         case appConfig, auth, user, signIn, passkeys
     }
-    
+
     public var isInitialized: Bool {
         return isStateLoaded && clockSyncState != .waiting
     }
@@ -40,29 +45,32 @@ extension RowndState {
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
     }
 
-    func save() {
-        Task {
+    internal func save() {
+        debouncer.debounce(action: {
             if let encoded = try? self.toJson() {
-                Storage.store?.set(encoded, forKey: STORAGE_STATE_KEY)
+                Storage.shared.set(encoded, forKey: STORAGE_STATE_KEY)
+                log.debug("Wrote state to storage \(String(describing: self), privacy: .public)")
             }
-        }
+        })
     }
-    
-    func load() async {
-        await load(Context.currentContext.store)
+
+    @discardableResult
+    public func load() async -> RowndState {
+        return await load(Context.currentContext.store)
     }
-    
-    func load(_ store: Store<RowndState>) async {
-        let existingStateStr = Storage.store?.object(forKey: STORAGE_STATE_KEY) as? String
-//        logger.trace("initial store state: \(existingStateStr)")
-        
+
+    @discardableResult
+    internal func load(_ store: Store<RowndState>) async -> RowndState {
+        let existingStateStr = Storage.shared.get(forKey: STORAGE_STATE_KEY)
+//        log.debug("initial store state: \(String(describing: existingStateStr))")
+
         guard let existingStateStr = existingStateStr else {
             await MainActor.run {
                 store.dispatch(SetStateLoaded())
             }
-            return
+            return store.state
         }
-        
+
         do {
             let decoder = JSONDecoder()
             var decoded = try decoder.decode(
@@ -74,8 +82,41 @@ extension RowndState {
             await MainActor.run { [decoded] in
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
+
+            return decoded
         } catch {
-            logger.debug("Failed decoding state from storage (if this is the first time launching the app, this is expected): \(String(describing: error))")
+            log.debug("Failed decoding state from storage (if this is the first time launching the app, this is expected): \(String(describing: error))")
+        }
+
+        return store.state
+    }
+
+    internal func reload() async {
+        await reload(Context.currentContext.store)
+    }
+
+    internal func reload(_ store: Store<RowndState>) async {
+        let existingStateStr = Storage.shared.get(forKey: STORAGE_STATE_KEY)
+        log.debug("Retrieved store state: \(String(describing: existingStateStr), privacy: .public)")
+
+        guard let existingStateStr = existingStateStr else {
+            return
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            let decoded = try decoder.decode(
+                RowndState.self,
+                from: (existingStateStr.data(using: .utf8) ?? Data())
+            )
+
+            log.debug("Retreived auth state: \(String(describing: decoded.auth), privacy: .public)")
+
+            await MainActor.run { [decoded] in
+                store.dispatch(ReloadRowndState(payload: decoded))
+            }
+        } catch {
+            log.debug("Failed decoding state from storage (if this is the first time launching the app, this is expected): \(String(describing: error))")
         }
     }
 
@@ -88,7 +129,7 @@ extension RowndState {
         throw StateError("Failed to encode state")
     }
 
-    public func toDictionary() throws -> [String:Any?] {
+    public func toDictionary() throws -> [String: Any?] {
         let encoder = JSONEncoder()
         let data = try encoder.encode(self)
         return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
@@ -105,9 +146,13 @@ struct SetClockSync: Action {
     var clockSyncState: ClockSyncState
 }
 
+struct ReloadRowndState: Action {
+    var payload: RowndState
+}
+
 func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     var newState: RowndState
-    switch (action) {
+    switch action {
     case _ as SetStateLoaded:
         newState = state ?? Context.currentContext.store.state
         newState.isStateLoaded = true
@@ -117,6 +162,10 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     case let clockSyncAction as SetClockSync:
         newState = state ?? Context.currentContext.store.state
         newState.clockSyncState = clockSyncAction.clockSyncState
+    case let reloadAction as ReloadRowndState:
+        newState = reloadAction.payload
+        newState.clockSyncState = state?.clockSyncState ?? .unknown
+        newState.isStateLoaded = state?.isStateLoaded ?? true
     default:
         newState = RowndState(
             isStateLoaded: true,
@@ -130,6 +179,8 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
 
         newState.save()
     }
+
+    log.debug("Internal state update \(String(describing: action), privacy: .public)")
 
     return newState
 }

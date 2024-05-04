@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import AVFoundation
 
-struct KeyTransferView : View {
+struct KeyTransferView: View {
 
     @Environment(\.presentationMode) var presentationMode
 
@@ -17,7 +17,7 @@ struct KeyTransferView : View {
     var receiveKeyTransfer: (_ url: String) -> Void
 
     @State var appName = "app_name"
-    @State private var activeNavSelection: String? = nil
+    @State private var activeNavSelection: String?
     @State private var isShowingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
@@ -144,7 +144,7 @@ struct RowndButton: ViewModifier {
 
 struct KeyTransferView_Previews: PreviewProvider {
     static var previews: some View {
-        KeyTransferView(parentViewController: KeyTransferViewController(), receiveKeyTransfer: { url in
+        KeyTransferView(parentViewController: KeyTransferViewController(), receiveKeyTransfer: { _ in
             return
         }, keyState: KeyTransferViewState())
     }

@@ -17,7 +17,7 @@ extension Date {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-        
+
         return dateFormatter.string(from: date).appending("Z")
     }
 }
@@ -29,7 +29,7 @@ public enum SignInMethodTypes: String, Codable {
 public struct SignInState: Hashable, Codable {
     public var lastSignIn: SignInMethodTypes?
     public var lastSignInDate: String?
-    
+
     func toSignInHash() -> String? {
         let signInInit = [
             "last_sign_in": Context.currentContext.store.state.signIn.lastSignIn?.rawValue,
@@ -45,13 +45,12 @@ public struct SignInState: Hashable, Codable {
             return nil
         }
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case lastSignIn = "last_sign_in"
         case lastSignInDate = "last_sign_in_date"
     }
 }
-
 
 // MARK: Reducers
 struct SetLastSignInMethod: Action {
@@ -62,7 +61,7 @@ struct ResetSignInState: Action {}
 
 func signInReducer(action: Action, state: SignInState?) -> SignInState {
     var state = state ?? SignInState()
-    
+
     switch action {
     case _ as ResetSignInState:
         state = SignInState()
@@ -72,8 +71,6 @@ func signInReducer(action: Action, state: SignInState?) -> SignInState {
     default:
         break
     }
-    
+
     return state
 }
-
-

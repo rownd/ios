@@ -11,11 +11,11 @@ import Rownd
 @main
 struct LandmarksApp: App {
     @UIApplicationDelegateAdaptor var delegate: AppDelegate
-    
+
     @StateObject var authState = Rownd.getInstance().state().subscribe { $0.auth }
 
     var body: some Scene {
-        WindowGroup {            
+        WindowGroup {
             if authState.current.isAuthenticated {
                 ContentView()
             } else {

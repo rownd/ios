@@ -10,7 +10,7 @@ import SwiftUI
 import Get
 import LBBottomSheet
 
-class KeyTransferViewState : ObservableObject {
+class KeyTransferViewState: ObservableObject {
     @Published var key = "Loading..."
     @Published var signInLink: String = ""
     @Published var isReceivingKey = false
@@ -26,7 +26,7 @@ class KeyTransferViewState : ObservableObject {
 
 }
 
-class KeyTransferViewController : UIViewController, BottomSheetControllerProtocol, BottomSheetHostProtocol {
+class KeyTransferViewController: UIViewController, BottomSheetControllerProtocol, BottomSheetHostProtocol {
 
     var hostController: BottomSheetController?
 
@@ -50,7 +50,7 @@ class KeyTransferViewController : UIViewController, BottomSheetControllerProtoco
         UINavigationBar.appearance().standardAppearance = coloredAppearance
         UINavigationBar.appearance().compactAppearance = coloredAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
-        
+
         addChild(contentView)
         view.addSubview(contentView.view)
 

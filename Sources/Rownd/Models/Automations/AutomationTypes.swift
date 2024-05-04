@@ -47,7 +47,7 @@ extension RowndAutomationPlatform: Codable {
 
 public struct RowndAutomationAction: Hashable {
     public var type: RowndAutomationActionType
-    public var args: Dictionary<String, AnyCodable>?
+    public var args: [String: AnyCodable]?
 }
 
 extension RowndAutomationAction: Codable {
@@ -143,7 +143,6 @@ extension RowndAutomationRuleCondition: Codable {
         self = try RowndAutomationRuleCondition(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
     }
 }
-
 
 public struct RowndAutomationTrigger: Hashable {
     public var type: RowndAutomationTriggerType

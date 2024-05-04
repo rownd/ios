@@ -18,7 +18,7 @@ public struct AppConfigState: Hashable {
     public var icon: String?
     public var name: String?
     public var userVerificationFields: [String]?
-    public var schema: Dictionary<String, AppSchemaField>?
+    public var schema: [String: AppSchemaField]?
     public var config: AppConfigConfig?
 }
 
@@ -173,16 +173,17 @@ struct SetAppLoading: Action {
 
 func appConfigReducer(action: Action, state: AppConfigState?) -> AppConfigState {
     var state = state ?? AppConfigState()
-    
+
     switch action {
     case let action as SetAppConfig:
         state = action.payload
+        state.isLoading = false
     case let action as SetAppLoading:
         state.isLoading = action.isLoading
     default:
         break
     }
-    
+
     return state
 }
 
@@ -204,7 +205,9 @@ class AppConfig {
                 let appConfig = await AppConfig.fetch()
 
                 DispatchQueue.main.async {
-                    dispatch(SetAppConfig(payload: appConfig?.app ?? state.appConfig))
+                    if let appConfig = appConfig {
+                        dispatch(SetAppConfig(payload: appConfig.app))
+                    }
                     dispatch(SetAppLoading(isLoading: false))
                 }
             }
@@ -217,7 +220,7 @@ class AppConfig {
 
             return appConfig
         } catch {
-            logger.error("Failed to fetch app config: \(String(describing: error))")
+            logger.error("Failed to fetch app config: \(String(describing: error), privacy: .public)")
             return nil
         }
     }

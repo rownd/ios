@@ -9,6 +9,7 @@ import Combine
 import Foundation
 import AnyCodable
 import Rownd
+import WidgetKit
 
 protocol AuthRepositoryProtocol {
     var internalAuthState: InternalAuthState { get }
@@ -60,7 +61,7 @@ enum AuthError: Error {
     case invalidToken
 }
 
-final class AuthRepository: AuthRepositoryProtocol {    
+final class AuthRepository: AuthRepositoryProtocol {
 
 //    @Published var user: User? {
 //        didSet {
@@ -89,7 +90,7 @@ final class AuthRepository: AuthRepositoryProtocol {
             .$current
             .sink { state in
                 guard state.isInitialized else { return }
-                
+
                 self.isRowndStateInitialized = true
 
                 guard state.auth.isAuthenticated else {
@@ -102,6 +103,8 @@ final class AuthRepository: AuthRepositoryProtocol {
         self.authState
             .$current
             .sink { state in
+                WidgetCenter.shared.reloadAllTimelines()
+
                 guard self.isRowndStateInitialized, state.isAuthenticated else { return }
                 self.internalAuthState = .loading
                 if let accessToken = state.accessToken,
@@ -181,7 +184,7 @@ final class AuthRepository: AuthRepositoryProtocol {
         do {
             let resp = try await apiExchangeRowndToken(body: TokenExchangeBody( idToken: idToken ))
             print(String(describing: resp))
-            
+
         } catch {
             print("Error exchanging token: \(String(describing: error))")
             if shouldRetry {

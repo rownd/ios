@@ -27,10 +27,10 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: BottomSheetController?
-    
+
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
 //        if let presentation = sheetPresentationController {
 //            presentation.detents = [.medium(), .large()]
 //            presentation.prefersGrabberVisible = true
@@ -39,20 +39,20 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         if let customLoadingAnimationView = customLoadingAnimationView {
             NSLayoutConstraint.activate([
                 customLoadingAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                customLoadingAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                customLoadingAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
         } else {
             NSLayoutConstraint.activate([
                 activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
         }
-        
+
         hubWebController.didMove(toParent: self)
         hubWebController.view.frame = view.bounds
         hubWebController.view.autoresizingMask = .flexibleHeight
     }
-    
+
     public func loadNewPage(targetPage: HubPageSelector, jsFnOptions: Encodable?) {
         DispatchQueue.main.async {
             self.targetPage = targetPage
@@ -63,16 +63,16 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
                     logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
                 }
             }
-            
+
             if self.hubWebController.webView.url != nil {
                 self.hubWebController.webViewOnLoad(webView: self.hubWebController.webView, targetPage: targetPage, jsFnOptions: jsFnOptions)
             }
         }
     }
-    
+
     public override func loadView() {
         hubWebController.hubViewController = self
-        
+
         let base64EncodedConfig = Rownd.config.toJson()
             .data(using: .utf8)?
             .base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? ""
@@ -90,12 +90,12 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         if store.state.auth.isAuthenticated {
             Task { [hubLoaderUrl] in
                 var hubLoaderUrl = hubLoaderUrl // Capture local copy of var to prevent compiler mutation issues
-                let _ = try? await Rownd.getAccessToken()
+                _ = try? await Rownd.getAccessToken()
                 let rphInit = store.state.auth.toRphInitHash()
                 if let rphInit = rphInit {
                     hubLoaderUrl.fragment = "rph_init=\(rphInit)"
                 }
-                
+
                 guard let hubLoaderUrl = hubLoaderUrl.url else {
                     return
                 }
@@ -115,15 +115,14 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         view.addSubview(hubWebController.view)
         setupConstraints()
 
-        
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark
         }
 
-        if Rownd.config.customizations.loadingAnimation != nil  {
+        if Rownd.config.customizations.loadingAnimation != nil {
             customLoadingAnimationView = Rownd.config.customizations.loadingAnimationView
         }
-        
+
         if let customLoadingAnimationView = customLoadingAnimationView {
             view.addSubview(customLoadingAnimationView)
         } else {
@@ -141,16 +140,16 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
 
         hostController.dismiss(animated: true)
     }
-    
+
     func setLoading(_ isLoading: Bool) {
         if customLoadingAnimationView != nil {
-            if (isLoading) {
+            if isLoading {
                 customLoadingAnimationView?.startAnimating()
             } else {
                 customLoadingAnimationView?.stopAnimating()
             }
         } else {
-            if (isLoading) {
+            if isLoading {
                 activityIndicator.startAnimating()
             } else {
                 activityIndicator.stopAnimating()
@@ -158,23 +157,23 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         }
 
     }
-    
+
     func hide() {
         self.dismiss(animated: true)
     }
-    
+
     func show() {
         view.isHidden = false
     }
-    
+
     func updateBottomSheetHeight(_ number: CGFloat) {
         hostController?.updateBottomSheetHeight(number)
     }
-    
+
     func canTouchDimmingBackgroundToDismiss(_ enable: Bool) {
         hostController?.canTouchDimmingBackgroundToDismiss(enable)
     }
-    
+
     fileprivate func setupConstraints() {
         hubWebController.view.translatesAutoresizingMaskIntoConstraints = false
         hubWebController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -182,5 +181,5 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         hubWebController.view.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         hubWebController.view.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
-    
+
 }

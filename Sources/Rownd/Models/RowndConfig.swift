@@ -8,7 +8,7 @@
 import Foundation
 
 public struct RowndConfig: Encodable {
-    internal init(){}
+    internal init() {}
 
     public var apiUrl = "https://api.rownd.io"
     public var baseUrl = "https://hub.rownd.io"
@@ -18,11 +18,12 @@ public struct RowndConfig: Encodable {
     public var postSignInRedirect: String? = "NATIVE_APP"
     public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
-    
+    public var appGroupPrefix: String?
+
     func toJson() -> String {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
-        
+
         do {
             let encodedData = try encoder.encode(self)
             return String(data: encodedData, encoding: .utf8) ?? "{}"
