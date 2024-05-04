@@ -1,5 +1,12 @@
 
 
+# [3.2.0](https://github.com/rownd/ios/compare/3.1.0...3.2.0) (2024-05-04)
+
+
+### Features
+
+* support for app groups ([#73](https://github.com/rownd/ios/issues/73)) ([4dbee05](https://github.com/rownd/ios/commit/4dbee05d1a4d87c7f9eb836782145271089e97b9))
+
 # [3.1.0](https://github.com/rownd/ios/compare/3.0.3...3.1.0) (2024-04-24)
 
 
