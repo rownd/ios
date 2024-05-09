@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import UIKit
 import Lottie
+import OSLog
 
 protocol HubViewProtocol {
     var targetPage: HubPageSelector { get set }
@@ -21,6 +22,7 @@ protocol HubViewProtocol {
 }
 
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
+    private let log = Logger(subsystem: "io.rownd.sdk", category: "hub_view_controller")
     @objc var preferredHeightInBottomSheet: CGFloat = UIScreen.main.bounds.height * 0.3
     var activityIndicator = UIActivityIndicatorView(style: .large)
     var customLoadingAnimationView: LottieAnimationView?
@@ -60,7 +62,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
                 do {
                     self.hubWebController.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
                 } catch {
-                    logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+                    self.log.error("Failed to encode JS options to pass to function: \(String(describing: error))")
                 }
             }
 

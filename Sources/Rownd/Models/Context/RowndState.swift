@@ -62,7 +62,7 @@ extension RowndState {
     @discardableResult
     internal func load(_ store: Store<RowndState>) async -> RowndState {
         let existingStateStr = Storage.shared.get(forKey: STORAGE_STATE_KEY)
-//        log.debug("initial store state: \(String(describing: existingStateStr))")
+        log.debug("initial store state: \(String(describing: existingStateStr), privacy: .public)")
 
         guard let existingStateStr = existingStateStr else {
             await MainActor.run {
@@ -116,7 +116,7 @@ extension RowndState {
                 store.dispatch(ReloadRowndState(payload: decoded))
             }
         } catch {
-            log.debug("Failed decoding state from storage (if this is the first time launching the app, this is expected): \(String(describing: error))")
+            log.debug("Failed decoding state from storage: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -180,7 +180,7 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
         newState.save()
     }
 
-    log.debug("Internal state update \(String(describing: action), privacy: .public)")
+    log.debug("Internal state update: \(String(describing: action), privacy: .public)")
 
     return newState
 }

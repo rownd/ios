@@ -131,7 +131,7 @@ public class Rownd: NSObject {
     }
 
     if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
-        logger.trace("handling url: \(String(describing: url.absoluteString))")
+        logger.debug("handling url: \(String(describing: url.absoluteString), privacy: .public)")
 
         var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
         urlComponents?.scheme = "https"
@@ -217,7 +217,7 @@ internal static func connectAuthenticator(with: RowndConnectSignInHint, completi
             args?.forEach { (k, v) in passkeySignInOptions[k] = v }
             inst.displayHub(.connectPasskey, jsFnOptions: passkeySignInOptions)
         } else {
-            logger.log("Need to be authenticated to Connect another method")
+            logger.log("Authentication is required in order to connect an additional authenticator")
             requestSignIn()
         }
     }

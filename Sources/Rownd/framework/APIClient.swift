@@ -22,7 +22,7 @@ extension NetworkRequest {
         request.timeoutInterval = 10 // seconds
 
         if let body = body {
-            logger.trace("API request body: \(String(decoding: body, as: UTF8.self))")
+            logger.debug("API request body: \(String(decoding: body, as: UTF8.self), privacy: .public)")
         }
 
         let task = URLSession.shared.dataTask(with: request) { [weak self] (data, resp, error) -> Void in

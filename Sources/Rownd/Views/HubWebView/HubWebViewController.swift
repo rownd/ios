@@ -10,6 +10,7 @@ import UIKit
 import WebKit
 import SwiftUI
 import LocalAuthentication
+import OSLog
 
 public enum HubPageSelector {
     case signIn
@@ -52,6 +53,7 @@ extension WKWebView {
 }
 
 public class HubWebViewController: UIViewController, WKUIDelegate {
+    private let log = Logger(subsystem: "io.rownd.sdk", category: "hub_web_view_controller")
 
     let webConfiguration = WKWebViewConfiguration()
     let userController = WKUserContentController()
@@ -139,13 +141,13 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         """
 
-        logger.trace("Evaluating script: \(code)")
+        log.debug("Evaluating script: \(code, privacy: .public)")
 
         webView.evaluateJavaScript(wrappedJs) { (result, error) in
             if error == nil {
-                logger.trace("JavaScript evaluation finished with result: \(String(describing: result))")
+                self.log.debug("JavaScript evaluation finished with result: \(String(describing: result), privacy: .public)")
             } else {
-                logger.error("Evaluation of '\(code)' failed: \(String(describing: error))")
+                self.log.error("Evaluation of '\(code)' failed: \(String(describing: error))")
             }
         }
     }
@@ -224,9 +226,11 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 do {
                     self.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
                 } catch {
-                    logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
+                    log.error("Failed to encode JS options to pass to function: \(String(describing: error))")
                 }
             }
+
+            log.debug("Loading page '\(String(describing: targetPage), privacy: .public)' with options: \(String(describing: jsFnOptions), privacy: .public)")
 
             switch targetPage ?? self.hubViewController?.targetPage {
             case .signOut:
@@ -265,14 +269,14 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         // We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
 
-        logger.trace("Received message from hub: \(response)")
+        log.debug("Received message from hub: \(response, privacy: .public)")
 
         let store = Context.currentContext.store
 
         do {
             let hubMessage = try RowndHubInteropMessage.fromJson(message: response)
 
-            logger.debug("Received message from hub with type: \(String(describing: hubMessage.type))")
+            log.debug("Received message from hub with type: \(String(describing: hubMessage.type), privacy: .public)")
 
             switch hubMessage.type {
             case .authentication:
@@ -346,7 +350,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     let cgFloatValue = CGFloat(doubleValue)
                     self.hubViewController?.updateBottomSheetHeight(cgFloatValue)
                 } else {
-                    logger.error("Invalid string format for Hub Resize.")
+                    log.error("Invalid string format for Hub Resize.")
                 }
 
             case .canTouchBackgroundToDismiss:
@@ -361,7 +365,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 break
             }
         } catch {
-            logger.error("Failed to decode incoming interop message: \(String(describing: error))")
+            log.error("Failed to decode incoming interop message: \(String(describing: error))")
         }
     }
 

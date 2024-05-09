@@ -12,8 +12,10 @@ import ReSwiftThunk
 import JWTDecode
 import Kronos
 import Get
+import OSLog
 
 private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
+private let log = Logger(subsystem: "io.rownd.sdk", category: "auth")
 
 public struct AuthState: Hashable {
     public var isLoading: Bool = false
@@ -41,7 +43,11 @@ extension AuthState: Codable {
                 return false
             }
 
-            return !jwt.ntpExpired && (currentDateWithMargin < expiresAt)
+            let result = !jwt.ntpExpired && (currentDateWithMargin < expiresAt)
+
+            log.debug("isAccessTokenValid: \(result)")
+
+            return result
         } catch {
             return false
         }
@@ -69,7 +75,7 @@ extension AuthState: Codable {
 
             return encoded.base64EncodedString()
         } catch {
-            logger.error("Failed to build rph_init hash string: \(String(describing: error))")
+            log.error("Failed to build rph_init hash string: \(String(describing: error), privacy: .public)")
             return nil
         }
     }
@@ -79,7 +85,7 @@ extension AuthState: Codable {
             let authState = try await Rownd.authenticator.getValidToken()
             return authState.accessToken
         } catch {
-            logger.warning("Failed to retrieve access token: \(String(describing: error))")
+            log.warning("Failed to retrieve access token: \(String(describing: error), privacy: .public)")
 
             switch error as? AuthenticationError {
             case .networkConnectionFailure:
