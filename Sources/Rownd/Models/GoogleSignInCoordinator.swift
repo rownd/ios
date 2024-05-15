@@ -8,6 +8,7 @@
 import Foundation
 import GoogleSignIn
 import UIKit
+import AnyCodable
 
 class GoogleSignInCoordinator: NSObject {
     var parent: Rownd
@@ -104,6 +105,14 @@ class GoogleSignInCoordinator: NSObject {
                                 userType: tokenResponse?.userType
                             )
                         )
+
+                        RowndEventEmitter.emit(RowndEvent(
+                            event: .signInCompleted,
+                            data: [
+                                "method": AnyCodable(SignInType.google.rawValue),
+                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue)
+                            ]
+                        ))
                     }
                     return
                 } catch ApiError.generic(let errorInfo) {

@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
         "state": {
           "branch": null,
-          "revision": "71cde449f13d453227e687458144bde372d30fc7",
-          "version": "1.6.2"
+          "revision": "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
+          "version": "1.7.5"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
         "state": {
           "branch": null,
-          "revision": "7932d33686c1dc4d7df7a919aae47361d1cdfda4",
-          "version": "7.0.0"
+          "revision": "a7965d134c5d3567026c523e0a8a583f73b62b0d",
+          "version": "7.1.0"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
         "state": {
           "branch": null,
-          "revision": "76135c9f4e1ac85459d5fec61b6f76ac47ab3a4c",
-          "version": "3.3.1"
+          "revision": "0382ca27f22fb3494cf657d8dc356dc282cd1193",
+          "version": "3.4.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/google/GTMAppAuth.git",
         "state": {
           "branch": null,
-          "revision": "cee3c709307912d040bd1e06ca919875a92339c6",
-          "version": "2.0.0"
+          "revision": "5d7d66f647400952b1758b230e019b07c0b4b22a",
+          "version": "4.1.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
         "state": {
           "branch": null,
-          "revision": "a46542ce639581af2a85ab9ec1616a507a5d4ae2",
-          "version": "4.2.2"
+          "revision": "1b2d25bb6aad7052559035906f9fd01bb71fe6ba",
+          "version": "4.3.0"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
           "branch": null,
-          "revision": "b4bd0604ded9574807f41b4004b57dd1226a30a4",
-          "version": "3.5.0"
+          "revision": "769b88d83a42ca8d5572b020c96f47e3690b3796",
+          "version": "4.4.3"
         }
       },
       {

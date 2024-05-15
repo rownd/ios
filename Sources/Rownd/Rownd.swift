@@ -229,6 +229,10 @@ public static func signOut() {
         store.dispatch(SetAuthState(payload: AuthState()))
         store.dispatch(SetUserData(data: [:], meta: [:]))
         store.dispatch(SetPasskeyState())
+
+        RowndEventEmitter.emit(RowndEvent(
+            event: .signOut
+        ))
     }
 }
 

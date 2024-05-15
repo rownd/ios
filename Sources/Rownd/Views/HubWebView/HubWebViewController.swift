@@ -357,6 +357,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 }
                 self.hubViewController?.canTouchDimmingBackgroundToDismiss(true)
                 break
+            case .event:
+                guard case .event(let eventMessage) = hubMessage.payload else { return }
+                RowndEventEmitter.emit(eventMessage)
+                break
             case .unknown:
                 break
             }

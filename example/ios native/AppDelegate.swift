@@ -27,6 +27,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Rownd.config.apiUrl = "https://api.us-east-2.dev.rownd.io"
         Rownd.config.subdomainExtension = ".dev.rownd.link"
         Rownd.config.appGroupPrefix = "group.rowndexample"
+        Rownd.config.eventDelegate = RowndEventHandler()
 
         Rownd.config.customizations = AppCustomizations()
 
