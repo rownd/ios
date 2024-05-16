@@ -13,6 +13,8 @@ class Context {
 
     let store: Store<RowndState>
 
+    var eventListeners: [RowndEventHandlerDelegate] = []
+
     init() {
         store = createStore()
     }

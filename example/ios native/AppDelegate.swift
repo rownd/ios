@@ -27,9 +27,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Rownd.config.apiUrl = "https://api.us-east-2.dev.rownd.io"
         Rownd.config.subdomainExtension = ".dev.rownd.link"
         Rownd.config.appGroupPrefix = "group.rowndexample"
-        Rownd.config.eventDelegate = RowndEventHandler()
 
         Rownd.config.customizations = AppCustomizations()
+        
+        Rownd.addEventHandler(RowndEventHandler())
 
         Task {
             await Rownd.configure(launchOptions: launchOptions, appKey: "key_pko8eul59xz33hr21jgxvx6s")

@@ -22,7 +22,6 @@ public struct RowndConfig: Encodable {
 
     // These should never be encoded
     public var appGroupPrefix: String?
-    public var eventDelegate: RowndEventHandlerDelegate?
 
     private enum CodingKeys: String, CodingKey {
         case apiUrl, baseUrl, subdomainExtension, appKey, forceDarkMode, postSignInRedirect, googleClientId, customizations
