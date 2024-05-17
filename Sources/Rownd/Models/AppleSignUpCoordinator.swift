@@ -134,17 +134,17 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                 if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
                                     let decoder = JSONDecoder()
                                     if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
-                                        userData["email"] = AnyCodable.init(loadedAppleSignInData.email)
-                                        userData["first_name"] = AnyCodable.init(loadedAppleSignInData.firstName)
-                                        userData["last_name"] = AnyCodable.init(loadedAppleSignInData.lastName)
-                                        userData["full_name"] = AnyCodable.init(loadedAppleSignInData.fullName)
+                                        userData["email"] = AnyCodable(loadedAppleSignInData.email)
+                                        userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
+                                        userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
+                                        userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
                                     }
                                 } else {
                                     if let email = email {
-                                        userData["email"] = AnyCodable.init(email)
-                                        userData["first_name"] = AnyCodable.init(fullName?.givenName)
-                                        userData["last_name"] = AnyCodable.init(fullName?.familyName)
-                                        userData["full_name"] = AnyCodable.init(String("\(fullName?.givenName) \(fullName?.familyName)"))
+                                        userData["email"] = AnyCodable(email)
+                                        userData["first_name"] = AnyCodable(fullName?.givenName)
+                                        userData["last_name"] = AnyCodable(fullName?.familyName)
+                                        userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
                                     }
                                 }
 
@@ -154,6 +154,14 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                     }
                                 }
                             })
+
+                            RowndEventEmitter.emit(RowndEvent(
+                                event: .signInCompleted,
+                                data: [
+                                    "method": AnyCodable(SignInType.apple.rawValue),
+                                    "user_type": AnyCodable(tokenResponse?.userType?.rawValue)
+                                ]
+                            ))
                         }
                     } catch ApiError.generic(let errorInfo) {
                         if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {

@@ -54,6 +54,7 @@ enum MessageType: String, Codable {
     case hubLoaded = "hub_loaded"
     case hubResize = "hub_resize"
     case canTouchBackgroundToDismiss = "can_touch_background_to_dismiss"
+    case event = "event"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -85,6 +86,7 @@ enum MessagePayload: Decodable {
     case tryAgain
     case hubResize(TriggerHubResize)
     case canTouchBackgroundToDismiss(CanTouchBackgroundToDismiss)
+    case event(RowndEvent)
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -142,6 +144,10 @@ enum MessagePayload: Decodable {
 
         case .hubLoaded:
             self = .hubLoaded
+
+        case .event:
+            let payload = try objectContainer.decode(RowndEvent.self)
+            self = .event(payload)
 
         case .unknown:
             self = .unknown

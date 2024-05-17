@@ -29,6 +29,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Rownd.config.appGroupPrefix = "group.rowndexample"
 
         Rownd.config.customizations = AppCustomizations()
+        
+        Rownd.addEventHandler(RowndEventHandler())
 
         Task {
             await Rownd.configure(launchOptions: launchOptions, appKey: "key_pko8eul59xz33hr21jgxvx6s")

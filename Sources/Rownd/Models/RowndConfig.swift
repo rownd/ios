@@ -10,6 +10,7 @@ import Foundation
 public struct RowndConfig: Encodable {
     internal init() {}
 
+    // These are encoded for the hub to read
     public var apiUrl = "https://api.rownd.io"
     public var baseUrl = "https://hub.rownd.io"
     public var subdomainExtension = ".rownd.link"
@@ -18,7 +19,13 @@ public struct RowndConfig: Encodable {
     public var postSignInRedirect: String? = "NATIVE_APP"
     public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
+
+    // These should never be encoded
     public var appGroupPrefix: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case apiUrl, baseUrl, subdomainExtension, appKey, forceDarkMode, postSignInRedirect, googleClientId, customizations
+    }
 
     func toJson() -> String {
         let encoder = JSONEncoder()

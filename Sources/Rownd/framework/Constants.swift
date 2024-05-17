@@ -23,7 +23,10 @@ struct FrameworkFeature: Codable {
 }
 
 func getFrameworkFeatures() -> String {
-    let frameworkFeatures: [FrameworkFeature] = [FrameworkFeature(name: "openEmailInbox", enabled: "true")]
+    let frameworkFeatures: [FrameworkFeature] = [
+        FrameworkFeature(name: "openEmailInbox", enabled: "true"),
+        FrameworkFeature(name: "can_receive_event_messages", enabled: "true")
+    ]
 
     let encoder = JSONEncoder()
     encoder.dataEncodingStrategy = .base64

@@ -1,4 +1,5 @@
 import AuthenticationServices
+import AnyCodable
 import Foundation
 import os
 import Get
@@ -314,6 +315,14 @@ class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContext
                             userType: .ExistingUser
                         )
                     )
+
+                    RowndEventEmitter.emit(RowndEvent(
+                        event: .signInCompleted,
+                        data: [
+                            "method": AnyCodable(SignInType.passkey.rawValue),
+                            "user_type": AnyCodable(UserType.ExistingUser.rawValue)
+                        ]
+                    ))
                 } catch {
                     logger.error("Failed passkey POST authentication: \(String(describing: error))")
                     await hubViewController?.loadNewPage(
