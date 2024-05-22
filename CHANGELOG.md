@@ -1,5 +1,12 @@
 
 
+# [3.3.0](https://github.com/rownd/ios/compare/3.2.0...3.3.0) (2024-05-22)
+
+
+### Features
+
+* **events:** emit events that occur during the auth lifecycle ([#74](https://github.com/rownd/ios/issues/74)) ([69cd18c](https://github.com/rownd/ios/commit/69cd18c8bde93717838ddf1546ec8857711cdb69))
+
 # [3.2.0](https://github.com/rownd/ios/compare/3.1.0...3.2.0) (2024-05-04)
 
 
