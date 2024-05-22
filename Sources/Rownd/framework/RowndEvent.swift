@@ -21,8 +21,8 @@ public enum RowndEventType: String, Codable {
 }
 
 public struct RowndEvent: Codable {
-    var event: RowndEventType
-    var data: [String: AnyCodable?]?
+    public var event: RowndEventType
+    public var data: [String: AnyCodable?]?
 }
 
 public protocol RowndEventHandlerDelegate: AnyObject {

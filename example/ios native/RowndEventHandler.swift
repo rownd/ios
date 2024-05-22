@@ -10,6 +10,13 @@ import Rownd
 
 class RowndEventHandler: RowndEventHandlerDelegate {
     func handleRowndEvent(_ event: RowndEvent) {
-        print(String(describing: event))
+        switch event.event {
+        case .signInCompleted:
+            let userType = event.data?["user_type"]
+            break
+
+        default:
+            break
+        }
     }
 }
