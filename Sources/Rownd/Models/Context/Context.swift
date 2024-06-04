@@ -20,12 +20,11 @@ public struct RowndState: Codable, Hashable {
     public var signIn = SignInState()
     public var showActionOverlay = false
     public var pages = PagesState()
-    public var versions = VersionsState()
 }
 
 extension RowndState {
     enum CodingKeys: String, CodingKey {
-        case appConfig, auth, user, signIn, passkeys, pages, versions
+        case appConfig, auth, user, signIn, passkeys, pages
     }
 
     public init(from decoder: Decoder) throws {
@@ -36,7 +35,6 @@ extension RowndState {
         passkeys = try container.decode(PasskeyState.self, forKey: .passkeys)
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
         pages = try container.decodeIfPresent(PagesState.self, forKey: .pages) ?? PagesState()
-        versions = try container.decodeIfPresent(VersionsState.self, forKey: .versions) ?? VersionsState()
     }
 
     static func save(state: RowndState) {
@@ -110,8 +108,7 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
             passkeys: passkeyReducer(action: action, state: state.passkeys),
             signIn: signInReducer(action: action, state: state.signIn),
             showActionOverlay: false,
-            pages: pagesReducer(action: action, state: state.pages),
-            versions: versionsReducer(action: action, state: state.versions)
+            pages: pagesReducer(action: action, state: state.pages)
         )
 
         RowndState.save(state: newState)

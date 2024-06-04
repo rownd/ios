@@ -58,21 +58,62 @@ struct MobileAppPagesResponse: Decodable {
 struct MobileAppPage: Hashable {
     public var id: String
     public var name: String
-    public var platform: String
-    public var viewHierarchy: RowndScreen
     public var appId: String
     public var createdAt: String
     public var createdBy: String
-    public var rules: [MobileAppPageRuleUnknown]?
+    public var captures: [MobileAppPageCapture]
 }
 
 extension MobileAppPage: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, name, platform
-        case viewHierarchy = "view_hierarchy"
+        case id, name, captures
         case appId = "app_id"
         case createdAt = "created_at"
         case createdBy = "created_by"
+    }
+}
+
+struct MobileAppPageCapture: Hashable {
+    public var id: String
+    public var appId: String
+    public var pageId: String
+    public var platform: String
+    public var capturedOnAppVersion: String
+    public var capturedOnSdkVersion: String
+//    public var screenStructure: any Hashable
+    public var screenshotUrl: String
+    public var screenshotHeight: Int
+    public var screenshotWidth: Int
+    public var ruleSet: MobileAppPageCaptureRuleSet
+//    public var metadata: any Hashable
+    public var createdAt: String
+    public var createdBy: String
+}
+
+extension MobileAppPageCapture: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id, platform
+        case appId = "app_id"
+        case pageId = "page_id"
+        case capturedOnAppVersion = "captured_on_app_version"
+        case capturedOnSdkVersion = "captured_on_sdk_version"
+//        case screenStructure = "screen_structure"
+        case screenshotUrl = "screenshot_url"
+        case screenshotHeight = "screenshot_height"
+        case screenshotWidth = "screenshot_width"
+        case ruleSet = "rule_set"
+        case createdAt = "created_at"
+        case createdBy = "created_by"
+    }
+}
+
+struct MobileAppPageCaptureRuleSet: Hashable {
+    var jsonPath: MobileAppPageRuleUnknown
+}
+
+extension MobileAppPageCaptureRuleSet: Codable {
+    enum CodingKeys: String, CodingKey {
+        case jsonPath = "json_path"
     }
 }
 
@@ -121,16 +162,16 @@ public struct MobileAppPageAndRule: MobileAppPageRuleProto, Hashable, Codable {
 
 public struct MobileAppPageRule: MobileAppPageRuleProto, Hashable, Codable {
     public var value: AnyCodable?
-    public var _operator: MobileAppPageRuleOperator?
+    public var operation: MobileAppPageRuleOperation?
     public var operand: String?
 
     enum CodingKeys: String, CodingKey {
         case value, operand
-        case _operator = "operator"
+        case operation = "operation"
     }
 }
 
-public enum MobileAppPageRuleOperator: String {
+public enum MobileAppPageRuleOperation: String {
     case equals = "EQUALS"
     case notEquals = "NOT_EQUALS"
     case contains = "CONTAINS"
@@ -146,9 +187,9 @@ public enum MobileAppPageRuleOperator: String {
     case unknown
 }
 
-extension MobileAppPageRuleOperator: Codable {
+extension MobileAppPageRuleOperation: Codable {
     public init(from decoder: Decoder) throws {
-        self = try MobileAppPageRuleOperator(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+        self = try MobileAppPageRuleOperation(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
     }
 }
 
@@ -192,6 +233,15 @@ class PagesData {
             return dictionary
         } catch {
             logger.error("Failed to fetch mobile app pages: \(String(describing: error))")
+            return nil
+        }
+    }
+    
+    static func fetch(appId: String, pageId: String) async -> MobileAppPage? {
+        do {
+            return try await Rownd.apiClient.send(Get.Request(url: URL(string: "/applications/\(appId)/automations/mobile/pages/\(pageId)")!, method: "get")).value
+        } catch {
+            logger.error("Failed to fetch mobile app page: \(String(describing: error))")
             return nil
         }
     }

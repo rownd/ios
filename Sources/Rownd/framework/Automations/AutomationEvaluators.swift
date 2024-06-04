@@ -27,17 +27,18 @@ internal func evaluateRule(userData: Dictionary<String, AnyCodable>, rule: Rownd
 /// contain a rule set property that declares how they should be identified. For instance, a page could
 /// have a ruleset that says, "one specific text must be found" or "my `swiftUIIdentiifier` value
 /// AND some specific text must both be foundn on the current page".
-internal func evaluateScopeRule(rule: RowndAutomationRule, page: MobileAppPage?, version: MobileAppVersion?) async -> Bool {
-    let currentPage = await RowndTreeSerialization.serializeTree()
-    guard let currentPage = currentPage else {
-        return false
-    }
-    
-    guard let expectedTexts = page?.viewHierarchy.retroactiveScreenData.texts else {
-        return false
-    }
-    
-    return currentPage.retroactiveScreenData.texts.elementsEqual(expectedTexts)
+internal func evaluateScopeRule(rule: RowndAutomationRule, page: MobileAppPage?) async -> Bool {
+    return false
+//    let currentPage = await RowndTreeSerialization.serializeTree()
+//    guard let currentPage = currentPage else {
+//        return false
+//    }
+//    
+//    guard let expectedTexts = page?.viewHierarchy.retroactiveScreenData.texts else {
+//        return false
+//    }
+//    
+//    return currentPage.retroactiveScreenData.texts.elementsEqual(expectedTexts)
 }
 
 func conditionEvaluatorsEquals(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {

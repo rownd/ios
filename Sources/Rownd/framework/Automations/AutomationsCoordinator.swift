@@ -14,7 +14,6 @@ public struct AutomationStoreState {
     var user: UserState
     var automations: [RowndAutomation]?
     var pages: Dictionary<String, MobileAppPage>
-    var versions: Dictionary<String, MobileAppVersion>
     var auth: AuthState
     var passkeys: PasskeyState
 }
@@ -50,7 +49,6 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                     user: $0.user,
                     automations: $0.appConfig.config?.automations,
                     pages: $0.pages.pages,
-                    versions: $0.versions.versions,
                     auth: $0.auth,
                     passkeys: $0.passkeys
                 )
@@ -170,7 +168,6 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                 return evaluateRule(userData: userData, rule: _rule)
             case .scope:
                 var page: MobileAppPage?
-                var version: MobileAppVersion?
                 if _rule.attribute == "mobile_page" {
                     guard let pageId = _rule.value else {
                         autoLogger.warning("Automation rule for mobile_page scope missing page ID value")
@@ -182,7 +179,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                     }
                     page = p
                 }
-                return await evaluateScopeRule(rule: _rule, page: page, version: version)
+                return await evaluateScopeRule(rule: _rule, page: page)
             }
         case .or(let _rule):
             return await processRuleSet(rules: _rule.or, op: .or, metaData: metaData)
