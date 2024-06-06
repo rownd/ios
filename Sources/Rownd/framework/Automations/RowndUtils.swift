@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import AnyCodable
 
 internal class RowndUtils {
     static func rownd_debug(obj: AnyObject) -> Void {
@@ -57,5 +58,49 @@ internal class RowndUtils {
         for subview in view.subviews {
             textContainers(in: subview)
         }
+    }
+    
+    static func stringifyJsonAny(_ any: Any?) -> String {
+        var string = ""
+        
+        guard let any = any else {
+            return ""
+        }
+        
+        if let dataString = any as? String {
+            string = dataString
+        }
+        else if JSONSerialization.isValidJSONObject(any) {
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: any)
+                string = String(decoding: jsonData, as: UTF8.self)
+            } catch {
+                print("Error converting array to JSON: \(error)")
+            }
+        }
+        
+        return string
+    }
+
+    static func stringifyAnyCodable(_ any: AnyCodable?) -> String {
+        var string = ""
+        
+        guard let any = any else {
+            return ""
+        }
+        
+        if let any = any.isString() {
+            string = any
+        }
+        else {
+            do {
+                string = try any.asJsonString()
+            } catch {
+                autoLogger.warning("Unable to convert AnyCodable to json string")
+            }
+        }
+
+        
+        return string
     }
 }

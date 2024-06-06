@@ -10,6 +10,10 @@ import Get
 import SwiftUI
 import AnyCodable
 
+func getReleaseVersionNumber() -> String? {
+    return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String?
+}
+
 class MobileAppTagger {
     var platformAccessToken: String?
     
@@ -46,7 +50,7 @@ class MobileAppTagger {
             throw ConnectionActionError.customMessage("User needs to be authenticated with a Platform JWT for mobile app tagging")
         }
 
-        guard let releaseVersionNumber = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+        guard let releaseVersionNumber = getReleaseVersionNumber() else {
             logger.error("Failed to capture page. Unable to determine release version number")
             return nil
         }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AnyCodable
 
 extension Encodable {
     func asJsonString() throws -> String {
@@ -13,5 +14,12 @@ extension Encodable {
         encoder.dateEncodingStrategy = .iso8601
         let data = try encoder.encode(self)
         return String(decoding: data, as: UTF8.self)
+    }
+    
+    func isString() -> String? {
+        if let string = self as? String {
+            return string
+        }
+        return nil
     }
 }
