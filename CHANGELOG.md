@@ -1,5 +1,12 @@
 
 
+# [3.4.0](https://github.com/rownd/ios/compare/3.3.0...3.4.0) (2024-06-07)
+
+
+### Features
+
+* remove unused "redacted" user field ([3d9275f](https://github.com/rownd/ios/commit/3d9275f74ace30c8f89458782dc8babb75bc5a0b))
+
 # [3.3.0](https://github.com/rownd/ios/compare/3.2.0...3.3.0) (2024-05-22)
 
 
