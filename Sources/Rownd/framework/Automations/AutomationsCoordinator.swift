@@ -244,30 +244,24 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         let automationMetaData = determineAutomationMetaData(state)
         let ruleResult = await processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
         
-        var triggerResult = true
-        if let timeTrigger = automation.triggers.first(where: { $0.type == .time }) {
-            let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
-            triggerResult = shouldTrigger(trigger: timeTrigger, lastRunTimestamp: lastRunTimestamp)
-            
-            let finalResult = ruleResult && triggerResult
-            
-            return finalResult
+        if (!ruleResult) {
+            return false
         }
         
-        /// For now, always accept  `MOBILE_EVENT` `"page_visit"` triggers
-        if let pageVisitTrigger = automation.triggers.first(where: { $0.type == .mobileEvent }) {
-            let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
-            triggerResult = shouldTrigger(trigger: pageVisitTrigger, lastRunTimestamp: lastRunTimestamp)
-            
-            let finalResult = ruleResult && triggerResult
-            
-            return finalResult
-        }
+        var triggerResult = processTriggers(automation, state: state)
         
-        return false // Currently only working with time triggers
+        return triggerResult
     }
     
-    public func shouldTrigger(trigger: RowndAutomationTrigger, lastRunTimestamp: Date?) -> Bool {
+    public func processTriggers(_ automation: RowndAutomation, state: AutomationStoreState) -> Bool {
+        return automation.triggers.contains {
+            let trigger = $0
+            return processTrigger(automation, trigger: trigger, state: state)
+        }
+    }
+    
+    public func processTrigger(_ automation: RowndAutomation, trigger: RowndAutomationTrigger, state: AutomationStoreState) -> Bool {
+        let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
         switch trigger.type {
         case .time:
             guard let lastRunTimestamp = lastRunTimestamp else {
@@ -281,6 +275,8 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
             let currentDate = Clock.now ?? Date()
             return currentDate > dateOfNextPrompt
+        case .timeOnce:
+            return lastRunTimestamp == nil
         case .mobileEvent:
             /// For now, always accept  `MOBILE_EVENT` `"page_visit"` triggers
             return trigger.value == "page_visit"
