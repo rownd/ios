@@ -18,12 +18,11 @@ public struct UserState: Hashable {
     public var errorMessage: String?
     public var data: [String: AnyCodable] = [:]
     public var meta: [String: AnyCodable]? = [:]
-    public var redacted: [String]?
 }
 
 extension UserState: Codable {
     public enum CodingKeys: String, CodingKey {
-        case data, redacted, meta
+        case data, meta
     }
 
     public func get() -> UserState {
@@ -112,7 +111,6 @@ func userReducer(action: Action, state: UserState?) -> UserState {
 // Easily unwrap the main payload from the `app` key
 struct UserDataPayload: Codable {
     var data: [String: AnyCodable]
-    var redacted: [String]?
 }
 
 struct UserMetaDataPayload: Codable {

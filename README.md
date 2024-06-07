@@ -100,7 +100,6 @@ public struct AuthState {
 public struct UserState {
     public var id: String?                           // The user's ID as known to Rownd
     public var data: Dictionary<String, AnyCodable>  // Contains key/value pairs for the current user based on your Rownd's app config
-    public var redacted: [String]                    // An array of field keys that the current user has disabled your app from accessing
 }
 ```
 
