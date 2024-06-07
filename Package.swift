@@ -62,7 +62,7 @@ let package = Package(
         .package(
             name: "Get",
             url: "https://github.com/rownd/Get",
-            .upToNextMajor(from: "2.0.1")
+            .upToNextMajor(from: "2.2.0")
         ),
         .package(
             name: "GoogleSignIn",

@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.dependency 'ReSwiftThunk', '~> 2.0.1'
   s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
   s.dependency 'CodeScanner_Rownd', '~> 2.2.1'
-  s.dependency 'Get', '~> 2.0.1'
+  s.dependency 'Get', '~> 2.2.0'
   s.dependency 'GoogleSignIn', '~> 7.0.0'
   s.dependency 'lottie-ios', '~> 4.3.3'
   s.dependency 'Factory', '~> 1.2.8'
