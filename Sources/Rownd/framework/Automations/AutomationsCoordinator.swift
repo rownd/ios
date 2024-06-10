@@ -285,7 +285,6 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                 if (lastRunTimestamp == CompletedAutomationMetaData) {
                     return false
                 }
-                return false
             }
             
             guard let triggerFrequency = stringToSeconds(trigger.value) else {

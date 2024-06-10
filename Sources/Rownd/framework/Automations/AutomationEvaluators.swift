@@ -118,7 +118,7 @@ func conditionEvaluatorsGreaterThanEqual(data: Dictionary<String, AnyCodable>, a
 }
 
 func conditionEvaluatorsLessThan(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    autoLogger.log("Condition: NOT_EXISTS")
+    autoLogger.log("Condition: LESS_THAN")
     
     guard let dataValue = data[attribute], let value = value else {
         return false
@@ -136,7 +136,7 @@ func conditionEvaluatorsLessThan(data: Dictionary<String, AnyCodable>, attribute
 }
 
 func conditionEvaluatorsLessThanEqual(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
-    autoLogger.log("Condition: NOT_EXISTS")
+    autoLogger.log("Condition: LESS_THAN_EQUAL")
     
     guard let dataValue = data[attribute], let value = value else {
         return false
