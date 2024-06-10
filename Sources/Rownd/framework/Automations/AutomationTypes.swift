@@ -161,6 +161,7 @@ extension RowndAutomationTrigger: Codable {
 
 public enum RowndAutomationTriggerType: String {
     case time = "TIME"
+    case timeOnce = "TIME_ONCE"
     case url = "URL"
     case event = "EVENT"
     case htmlSelector = "HTML_SELECTOR"
