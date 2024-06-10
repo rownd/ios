@@ -10,6 +10,8 @@ import ReSwift
 import Kronos
 import AnyCodable
 
+internal let CompletedAutomationMetaData = "complete"
+
 public struct AutomationStoreState {
     var user: UserState
     var automations: [RowndAutomation]?
@@ -18,28 +20,11 @@ public struct AutomationStoreState {
     var passkeys: PasskeyState
 }
 
-func computeLastRunId(_ automation: RowndAutomation) -> String {
-    let lastRunId = "automation_\(automation.id)_last_run"
-    autoLogger.log("Last run id: \(lastRunId)")
-    return lastRunId
-}
-
-func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>) -> Date? {
-    let lastRunId = computeLastRunId(automation)
-    if let lastRunDate = meta[lastRunId] {
-        autoLogger.log("Last run date: \(lastRunDate)")
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let date = dateFormatter.date(from: "\(lastRunDate)")
-        return date
-    }
-    return nil
-}
-
 public class AutomationsCoordinator: NSObject, StoreSubscriber {
     private var state: AutomationStoreState?
     public typealias StoreSubscriberStateType = AutomationStoreState
     let debouncer = Debouncer(delay: 0.5) // 500ms
+    let counter = Counter()
     
     override init() {
         super.init()
@@ -120,15 +105,18 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         }
         
         actionFn(args)
-        
-        // Save automatino action in meta data
-        let lastRunId = computeLastRunId(automation)
+
+        // Save automation action in meta data
+        let lastRunId = computeLastRunId(automation, trigger: nil)
+        let onceTimeTrigger = automation.triggers.first(where: { $0.type == .timeOnce })
         Task { @MainActor in
-            let date = Clock.now ?? Date()
-            let dateFormatter = ISO8601DateFormatter()
-            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let dateString = AnyCodable(dateFormatter.string(from: date))
-            store.state.user.setMetaData(field: lastRunId, value: dateString)
+            let dateString = currentDateString()
+            var meta = state?.user.meta ?? [:]
+            meta[lastRunId] = dateString
+            if (onceTimeTrigger != nil) {
+                meta[computeLastRunId(automation, trigger: onceTimeTrigger)] = AnyCodable(CompletedAutomationMetaData)
+            }
+            store.state.user.setMetaData(meta)
         }
     }
     
@@ -145,7 +133,8 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             "is_verified": AnyCodable(state.auth.isVerifiedUser ?? false),
             "are_passkeys_initialized": AnyCodable(state.passkeys.isInitialized),
             "has_prompted_for_passkey": AnyCodable(state.user.meta["last_passkey_registration_prompt"] != nil),
-            "has_passkeys": AnyCodable(hasPasskeys)
+            "has_passkeys": AnyCodable(hasPasskeys),
+            "app_duration": AnyCodable(counter.getCount())
         ]
         
         additionalAutomationMeta.forEach{ (k,v) in automationMeta[k] = v }
@@ -261,27 +250,64 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     }
     
     public func processTrigger(_ automation: RowndAutomation, trigger: RowndAutomationTrigger, state: AutomationStoreState) -> Bool {
-        let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
+        let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta, trigger: trigger)
         switch trigger.type {
         case .time:
-            guard let lastRunTimestamp = lastRunTimestamp else {
-                return true
+            
+            let onceTimeTrigger = automation.triggers.first(where: { $0.type == .timeOnce })
+            let lastRunTimestampOnceTrigger = computeLastRunTimestamp(automation: automation, meta: state.user.meta, trigger: onceTimeTrigger)
+            if let lastRunTimestampOnceTrigger = lastRunTimestampOnceTrigger as? String {
+                // Prevent time trigger if TIME_ONCE hasn't completed yet
+                if (lastRunTimestampOnceTrigger != CompletedAutomationMetaData) {
+                    return false
+                }
             }
-        
+            
             guard let triggerFrequency = stringToSeconds(trigger.value) else {
+                return false
+            }
+            
+            guard let lastRunTimestamp = lastRunTimestamp as? Date else {
                 return false
             }
         
             let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
-            let currentDate = Clock.now ?? Date()
+            let currentDate = currentDate()
             return currentDate > dateOfNextPrompt
         case .timeOnce:
-            return lastRunTimestamp == nil
+            guard let lastRunTimestamp = lastRunTimestamp else {
+                // Set the intial time if timestamp has not been set
+                setAutomationTime(automation, trigger: trigger)
+                return false
+            }
+            
+            if let lastRunTimestamp = lastRunTimestamp as? String {
+                if (lastRunTimestamp == CompletedAutomationMetaData) {
+                    return false
+                }
+            }
+            
+            guard let triggerFrequency = stringToSeconds(trigger.value) else {
+                return false
+            }
+            
+            guard let lastRunTimestamp = lastRunTimestamp as? Date else {
+                return false
+            }
+            
+            let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
+            let currentDate = currentDate()
+            return currentDate > dateOfNextPrompt
         case .mobileEvent:
             /// For now, always accept  `MOBILE_EVENT` `"page_visit"` triggers
             return trigger.value == "page_visit"
         default:
             return false
         }
+    }
+    
+    internal func setAutomationTime(_ automation: RowndAutomation, trigger: RowndAutomationTrigger?) {
+        let lastRunId = computeLastRunId(automation, trigger: trigger)
+        store.state.user.setMetaData(field: lastRunId, value: currentDateString())
     }
 }
