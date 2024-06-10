@@ -75,7 +75,7 @@ internal class RowndUtils {
                 let jsonData = try JSONSerialization.data(withJSONObject: any)
                 string = String(decoding: jsonData, as: UTF8.self)
             } catch {
-                print("Error converting array to JSON: \(error)")
+                autoLogger.warning("Unable to convert AnyCodable to json string")
             }
         }
         
@@ -103,4 +103,31 @@ internal class RowndUtils {
         
         return string
     }
+}
+
+
+func computeLastRunId(_ automation: RowndAutomation, trigger: RowndAutomationTrigger?) -> String {
+    var lastRunId = "automation_\(automation.id)_last_run"
+    
+    if (trigger != nil && trigger?.type == RowndAutomationTriggerType.timeOnce) {
+        lastRunId = lastRunId + "_\(RowndAutomationTriggerType.timeOnce.rawValue.lowercased())"
+    }
+    
+    autoLogger.log("Last run id: \(lastRunId)")
+    return lastRunId
+}
+
+func computeLastRunTimestamp(automation: RowndAutomation, meta: Dictionary<String, AnyCodable>, trigger: RowndAutomationTrigger?) -> DateOrString? {
+    
+    let lastRunId = computeLastRunId(automation, trigger: trigger)
+    if let lastRunDate = meta[lastRunId] {
+        autoLogger.log("Last run date: \(lastRunDate)")
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = dateFormatter.date(from: "\(lastRunDate)") {
+            return date
+        }
+        return String(describing: lastRunDate) // Return string if date wasn't found
+    }
+    return nil
 }

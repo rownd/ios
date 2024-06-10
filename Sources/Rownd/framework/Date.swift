@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Kronos
+import AnyCodable
 
 
 internal func stringToSeconds(_ str: String) -> Int? {
@@ -33,3 +35,21 @@ internal func stringToSeconds(_ str: String) -> Int? {
         return nil
     }
 }
+
+internal protocol DateOrString {}
+
+extension String: DateOrString {}
+extension Date: DateOrString {}
+
+
+func currentDate() -> Date {
+    return Clock.now ?? Date()
+}
+
+func currentDateString() -> AnyCodable {
+    let date = currentDate()
+    let dateFormatter = ISO8601DateFormatter()
+    dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return AnyCodable(dateFormatter.string(from: date))
+}
+

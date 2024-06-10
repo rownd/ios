@@ -81,6 +81,78 @@ func conditionEvaluatorsNotExists(data: Dictionary<String, AnyCodable>, attribut
     return data[attribute] == nil
 }
 
+func conditionEvaluatorsGreaterThan(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+    autoLogger.log("Condition: GREATER_THAN")
+    
+    guard let dataValue = data[attribute], let value = value else {
+        return false
+    }
+    
+    guard let dataValue = Int("\(dataValue)") else {
+        return false
+    }
+    
+    guard let value = Int(String(describing: value)) else {
+        return false
+    }
+    
+    return dataValue > value
+}
+
+func conditionEvaluatorsGreaterThanEqual(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+    autoLogger.log("Condition: GREATER_THAN_EQUAL")
+    
+    guard let dataValue = data[attribute], let value = value else {
+        return false
+    }
+    
+    guard let dataValue = Int("\(dataValue)") else {
+        return false
+    }
+    
+    guard let value = Int(String(describing: value)) else {
+        return false
+    }
+    
+    return dataValue >= value
+}
+
+func conditionEvaluatorsLessThan(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+    autoLogger.log("Condition: NOT_EXISTS")
+    
+    guard let dataValue = data[attribute], let value = value else {
+        return false
+    }
+    
+    guard let dataValue = Int("\(dataValue)") else {
+        return false
+    }
+    
+    guard let value = Int(String(describing: value)) else {
+        return false
+    }
+    
+    return dataValue < value
+}
+
+func conditionEvaluatorsLessThanEqual(data: Dictionary<String, AnyCodable>, attribute: String, value: AnyCodable?) -> Bool {
+    autoLogger.log("Condition: NOT_EXISTS")
+    
+    guard let dataValue = data[attribute], let value = value else {
+        return false
+    }
+    
+    guard let dataValue = Int("\(dataValue)") else {
+        return false
+    }
+    
+    guard let value = Int(String(describing: value)) else {
+        return false
+    }
+    
+    return dataValue <= value
+}
+
 let conditionEvaluators: [RowndAutomationRuleCondition: ( Dictionary<String, AnyCodable>, String, AnyCodable? ) -> Bool] = [
     RowndAutomationRuleCondition.equals: conditionEvaluatorsEquals,
     RowndAutomationRuleCondition.notEquals: conditionEvaluatorsNotEquals,
@@ -89,5 +161,9 @@ let conditionEvaluators: [RowndAutomationRuleCondition: ( Dictionary<String, Any
     RowndAutomationRuleCondition.isIn: conditionEvaluatorsIn,
     RowndAutomationRuleCondition.isNotIn: conditionEvaluatorsNotIn,
     RowndAutomationRuleCondition.exists: conditionEvaluatorsExists,
-    RowndAutomationRuleCondition.notExists: conditionEvaluatorsNotExists
+    RowndAutomationRuleCondition.notExists: conditionEvaluatorsNotExists,
+    RowndAutomationRuleCondition.greaterThan: conditionEvaluatorsGreaterThan,
+    RowndAutomationRuleCondition.greaterThanEqual: conditionEvaluatorsGreaterThanEqual,
+    RowndAutomationRuleCondition.lessThan: conditionEvaluatorsLessThan,
+    RowndAutomationRuleCondition.lessThanEqual: conditionEvaluatorsLessThanEqual,
 ]
