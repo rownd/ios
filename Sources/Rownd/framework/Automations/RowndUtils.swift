@@ -60,7 +60,7 @@ internal class RowndUtils {
         }
     }
     
-    static func stringifyJsonAny(_ any: Any?) -> String {
+    static func stringifyJsonAny(_ any: JsonAny?) -> String {
         var string = ""
         
         guard let any = any else {
