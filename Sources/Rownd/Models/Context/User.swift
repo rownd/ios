@@ -22,7 +22,7 @@ public struct UserState: Hashable {
 
 extension UserState: Codable {
     public enum CodingKeys: String, CodingKey {
-        case data, meta
+        case data, meta, isLoading
     }
 
     public func get() -> UserState {
