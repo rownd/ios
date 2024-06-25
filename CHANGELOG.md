@@ -1,5 +1,12 @@
 
 
+# [3.5.0](https://github.com/rownd/ios/compare/3.4.0...3.5.0) (2024-06-25)
+
+
+### Features
+
+* make is loading user public ([823596a](https://github.com/rownd/ios/commit/823596abcf9bd949363699273b495b71944add56))
+
 # [3.4.0](https://github.com/rownd/ios/compare/3.3.0...3.4.0) (2024-06-07)
 
 
