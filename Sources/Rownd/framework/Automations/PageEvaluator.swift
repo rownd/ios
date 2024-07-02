@@ -38,16 +38,45 @@ internal func evaluateScopeRule(rule: RowndAutomationRule, page: MobileAppPage?)
     return result
 }
 
+internal enum ReleaseVersionComparators {
+    case after
+}
+
+internal func compareReleaseVersions(v1: String, v2: String, comparator: ReleaseVersionComparators) throws -> Bool {
+    let v1Segments = v1.split(separator: ".")
+    let v2Segments = v2.split(separator: ".")
+    
+    guard let v1FirstSegment = v1Segments.first, let v1Number = Int(v1FirstSegment) else {
+        throw RowndError("Invalid release version \(v1)")
+    }
+    
+    guard let v2FirstSegment = v2Segments.first, let v2Number = Int(v2FirstSegment) else {
+        throw RowndError("Invalid release version \(v2)")
+    }
+    
+    let v1RemainingSegments = Array(v1Segments.dropFirst())
+    let v2RemainingSegments = Array(v2Segments.dropFirst())
+    
+    switch (comparator) {
+    case .after:
+        if v1Number > v2Number {
+            return false
+        }
+
+        if (v1RemainingSegments.count == 0 || v2RemainingSegments.count == 0) {
+            return false
+        }
+        
+        return try compareReleaseVersions(v1: v1RemainingSegments.joined(separator: "."), v2: v2RemainingSegments.joined(separator: "."), comparator: comparator)
+    }
+}
+
 internal func determineCapture(_ page: MobileAppPage?) -> MobileAppPageCapture? {
     guard let captures = page?.captures else {
         return nil
     }
     
-    guard let releaseVersion = getReleaseVersionNumber() else {
-        return nil
-    }
-    
-    guard let releaseVersionNumber = Double(releaseVersion) else {
+    guard let currentAppVersion = getReleaseVersionNumber() else {
         return nil
     }
     
@@ -56,14 +85,14 @@ internal func determineCapture(_ page: MobileAppPage?) -> MobileAppPageCapture? 
         if (capture.platform != "ios" ) {
             continue
         }
-        
-        guard let appVersion = Double(capture.capturedOnAppVersion) else {
-            continue
-        }
-        
-        // Don't use a capture version that is greater than the current build version
-        if (appVersion > releaseVersionNumber) {
-            continue
+                
+        do {
+            // Don't use a capture version that is greater than the current build version
+            if try compareReleaseVersions(v1: currentAppVersion, v2: capture.capturedOnAppVersion, comparator: .after) {
+                continue
+            }
+        } catch {
+            logger.error("\(error)")
         }
         
         guard let newCapture = selectedCapture else {
@@ -71,13 +100,15 @@ internal func determineCapture(_ page: MobileAppPage?) -> MobileAppPageCapture? 
             continue
         }
         
-        guard let newAppVersion = Double(newCapture.capturedOnAppVersion) else {
-            continue
-        }
+        let newAppVersion = newCapture.capturedOnAppVersion
         
-        // Use the closest version possible to the current build version
-        if (newAppVersion > appVersion) {
-            selectedCapture = capture
+        do {
+            // Use the closest version possible to the current build version
+            if try compareReleaseVersions(v1: currentAppVersion, v2: newAppVersion, comparator: .after) {
+                selectedCapture = capture
+            }
+        } catch {
+            logger.error("\(error)")
         }
         
     }
