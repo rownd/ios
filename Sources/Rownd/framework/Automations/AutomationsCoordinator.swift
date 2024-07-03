@@ -268,6 +268,15 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             }
             
             guard let lastRunTimestamp = lastRunTimestamp as? Date else {
+                Task { @MainActor in
+                    let dateString = currentDateString()
+                    var meta = state.user.meta
+                    let lastRunId = computeLastRunId(automation, trigger: trigger)
+                    if (onceTimeTrigger != nil) {
+                        meta[lastRunId] = AnyCodable(CompletedAutomationMetaData)
+                    }
+                    store.state.user.setMetaData(meta)
+                }
                 return false
             }
         
