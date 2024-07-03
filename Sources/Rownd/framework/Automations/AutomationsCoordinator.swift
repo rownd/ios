@@ -272,7 +272,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                     let dateString = currentDateString()
                     var meta = state.user.meta
                     let lastRunId = computeLastRunId(automation, trigger: trigger)
-                    meta[lastRunId] = AnyCodable(CompletedAutomationMetaData)
+                    meta[lastRunId] = dateString
                     store.state.user.setMetaData(meta)
                 }
                 return false
