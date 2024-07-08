@@ -1,5 +1,12 @@
 
 
+## [3.5.1](https://github.com/rownd/ios/compare/3.5.0...3.5.1) (2024-07-08)
+
+
+### Bug Fixes
+
+* user data response type ([#79](https://github.com/rownd/ios/issues/79)) ([7a63c13](https://github.com/rownd/ios/commit/7a63c137994232b592f8d0d4a0c01f606ae1165e))
+
 # [3.5.0](https://github.com/rownd/ios/compare/3.4.0...3.5.0) (2024-06-25)
 
 
