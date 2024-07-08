@@ -12,12 +12,14 @@ import ReSwiftThunk
 import AnyCodable
 import Get
 
+public typealias UserStateData = [String: AnyCodable]
+
 public struct UserState: Hashable {
     public var isLoading: Bool = false
     public var isErrored: Bool = false
     public var errorMessage: String?
-    public var data: [String: AnyCodable] = [:]
-    public var meta: [String: AnyCodable]? = [:]
+    public var data: UserStateData = [:]
+    public var meta: UserStateData? = [:]
 }
 
 extension UserState: Codable {
@@ -117,6 +119,15 @@ struct UserMetaDataPayload: Codable {
     var meta: [String: AnyCodable]
 }
 
+public struct UserStateResponse: Hashable, Codable {
+    public var data: UserStateData = [:]
+    public var meta: UserStateData? = [:]
+    
+    public enum CodingKeys: String, CodingKey {
+        case data, meta
+    }
+}
+
 public struct UserMetaDataResponse: Hashable {
     public var id: String = ""
     public var meta: [String: AnyCodable] = [:]
@@ -158,7 +169,7 @@ class UserData {
                 }
 
                 do {
-                    let user = try await Rownd.apiClient.send(Request<UserState?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+                    let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
 
                     logger.debug("Decoded user response: \(String(describing: user))")
 
@@ -214,7 +225,7 @@ class UserData {
                 let userDataPayload = UserDataPayload(data: data)
 
                 do {
-                    let user = try await Rownd.apiClient.send(Request<UserState?>(
+                    let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(
                         path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
                         method: .put,
                         body: userDataPayload
