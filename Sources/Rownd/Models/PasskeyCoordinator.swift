@@ -224,7 +224,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         authController.performRequests()
     }
 
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard #available(iOS 15.0, *) else {
             logger.trace("iOS 15.0 is required to sign in with Passkey")
             return
@@ -374,7 +374,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         ))
     }
 
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let store = Context.currentContext.store
         let hubViewController = getHubViewController()
         if let authorizationError = error as? ASAuthorizationError {
@@ -400,7 +400,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         }
     }
 
-    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
         let vc = windowScene?.windows.last?.rootViewController
