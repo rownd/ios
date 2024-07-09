@@ -27,7 +27,7 @@ public struct PasskeyState: Hashable {
     public var isInitialized: Bool = false
     public var isErrored: Bool = false
     public var errorMessage: String?
-    public var registration: [PasskeyRegistration]? = []
+    public var registration: [PasskeyRegistration] = []
 }
 
 extension PasskeyState: Codable {
