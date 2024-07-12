@@ -1,5 +1,18 @@
 
 
+# [3.6.0](https://github.com/rownd/ios/compare/3.5.1...3.6.0) (2024-07-12)
+
+
+### Bug Fixes
+
+* remove public ([86355fc](https://github.com/rownd/ios/commit/86355fc613709ccc70159a629f807b78dde938fb))
+* revert back to optional ([dc205a9](https://github.com/rownd/ios/commit/dc205a96e36ad4e158e172460259199771f6ff84))
+
+
+### Features
+
+* improve rownd passkey apis ([4f37708](https://github.com/rownd/ios/commit/4f3770805790e5ba9d2bf85e26559d8541717994))
+
 ## [3.5.1](https://github.com/rownd/ios/compare/3.5.0...3.5.1) (2024-07-08)
 
 
