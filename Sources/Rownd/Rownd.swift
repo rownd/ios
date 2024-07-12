@@ -27,7 +27,7 @@ public class Rownd: NSObject {
     private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
     internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
     internal var bottomSheetController: BottomSheetController = BottomSheetController()
-    private static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
+    internal static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static var authenticator = Authenticator()
     internal static let automationsCoordinator = AutomationsCoordinator()
@@ -152,6 +152,17 @@ public class Rownd: NSObject {
         }
 
         return false
+    }
+    
+    public class auth {
+        public class passkeys {
+            public static func register() {
+                inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary())
+            }
+            public static func authenticate() {
+                passkeyCoordinator.authenticate()
+            }
+        }
     }
 
     public static func getInstance() -> Rownd {

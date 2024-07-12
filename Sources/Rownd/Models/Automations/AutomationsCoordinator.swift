@@ -125,7 +125,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
 
     public func determineAutomationMetaData(_ state: AutomationStoreState) -> [String: AnyCodable] {
         var automationMeta = state.user.meta ?? [:]
-
+    
         var hasPasskeys = false
         if let passkeyCount = state.passkeys.registration?.count {
             hasPasskeys = passkeyCount > 0
