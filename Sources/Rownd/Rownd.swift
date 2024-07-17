@@ -132,6 +132,10 @@ public class Rownd: NSObject {
 
         if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
             logger.trace("handling url: \(String(describing: url.absoluteString))")
+            
+            if (url.path.starts(with: "/verified")) {
+                return false
+            }
 
             var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
             urlComponents?.scheme = "https"
