@@ -149,6 +149,27 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         }
     }
+    
+    private func handleMailToUrl() {
+        let gmailUrl = URL(string: "googlegmail://")
+        if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
+            UIApplication.shared.open(gmailUrl, options: [:], completionHandler: nil)
+            return
+        }
+
+        let outlookUrl = URL(string: "ms-outlook://")
+        if let outlookUrl = outlookUrl, UIApplication.shared.canOpenURL(outlookUrl) {
+            UIApplication.shared.open(outlookUrl, options: [:], completionHandler: nil)
+            return
+        }
+
+        let yahooUrl = URL(string: "ymail://")
+        if let yahooUrl = yahooUrl, UIApplication.shared.canOpenURL(yahooUrl) {
+            UIApplication.shared.open(yahooUrl, options: [:], completionHandler: nil)
+            return
+        }
+        UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
+    }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         let presentableUrls = [
@@ -161,6 +182,16 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             return .allow
         }
     }
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+            if let url = navigationAction.request.url,
+               url.scheme == "mailto" {
+                handleMailToUrl()
+                decisionHandler(.cancel, preferences)
+            } else {
+                decisionHandler(.allow, preferences)
+            }
+    }
 
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         // This function is called whenever the Webview attempts to navigate to a different url
@@ -171,26 +202,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                     return nil
                 }
-
-                let gmailUrl = URL(string: "googlegmail://")
-                if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
-                    UIApplication.shared.open(gmailUrl, options: [:], completionHandler: nil)
-                    return nil
-                }
-
-                let outlookUrl = URL(string: "ms-outlook://")
-                if let outlookUrl = outlookUrl, UIApplication.shared.canOpenURL(outlookUrl) {
-                    UIApplication.shared.open(outlookUrl, options: [:], completionHandler: nil)
-                    return nil
-                }
-
-                let yahooUrl = URL(string: "ymail://")
-                if let yahooUrl = yahooUrl, UIApplication.shared.canOpenURL(yahooUrl) {
-                    UIApplication.shared.open(yahooUrl, options: [:], completionHandler: nil)
-                    return nil
-                }
-
-                UIApplication.shared.open(URL(string: "message://")!, options: [:], completionHandler: nil)
+                handleMailToUrl()
+                return nil
             }
         }
         return nil
