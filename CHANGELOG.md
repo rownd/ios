@@ -1,5 +1,17 @@
 
 
+# [3.7.0](https://github.com/rownd/ios/compare/3.6.0...3.7.0) (2024-07-18)
+
+
+### Bug Fixes
+
+* disable verified magic link as sign in link ([#81](https://github.com/rownd/ios/issues/81)) ([3e2de09](https://github.com/rownd/ios/commit/3e2de097f4c2741e1b4bbb5c8f2c1102be5d3588))
+
+
+### Features
+
+* handle mail to links ([#82](https://github.com/rownd/ios/issues/82)) ([a5eb392](https://github.com/rownd/ios/commit/a5eb3928dd3c9fad7e7adc7e1ec828fe75ae424a))
+
 # [3.6.0](https://github.com/rownd/ios/compare/3.5.1...3.6.0) (2024-07-12)
 
 
