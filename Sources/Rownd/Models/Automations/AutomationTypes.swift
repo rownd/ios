@@ -17,11 +17,67 @@ public struct RowndAutomation: Hashable {
     public var rules: [RowndAutomationRuleUnknown]
     public var triggers: [RowndAutomationTrigger]
     public var platform: RowndAutomationPlatform
+    
+    static let defaultEncodedInstance = RowndAutomation(
+        id: "default_id",
+        name: "faield_to_encode",
+        template: "no_template",
+        state: .disabled,
+        actions: [],
+        rules: [],
+        triggers: [],
+        platform: .web
+    )
 }
 
 extension RowndAutomation: Codable {
     enum CodingKeys: String, CodingKey {
         case id, name, template, state, actions, rules, triggers, platform
+    }
+    
+    public init(from decoder: Decoder) throws {
+        do {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(String.self, forKey: .id)
+            name = try container.decode(String.self, forKey: .name)
+            template = try container.decode(String.self, forKey: .template)
+            state = try container.decode(RowndAutomationState.self, forKey: .state)
+            actions = try container.decode([RowndAutomationAction].self, forKey: .actions)
+            rules = try container.decode([RowndAutomationRuleUnknown].self, forKey: .rules)
+            triggers = try container.decode([RowndAutomationTrigger].self, forKey: .triggers)
+            platform = try container.decode(RowndAutomationPlatform.self, forKey: .platform)
+        } catch {
+            // If decoding fails, use the default instance
+            var defaultInstance = RowndAutomation.defaultEncodedInstance
+            defaultInstance.name = "failed_to_decode"
+            self = defaultInstance
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        do {
+            try encodeHelper(encoder: encoder)
+        } catch {
+            print("Failed to encode Rownd state, falling back to default: \(String(describing: error))")
+            try RowndAutomation.defaultEncodedInstance.encodeHelper(encoder: encoder)
+        }
+    }
+    private func encodeHelper(encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(template, forKey: .template)
+        try container.encode(state, forKey: .state)
+        try container.encode(actions, forKey: .actions)
+        try container.encode(rules, forKey: .rules)
+        try container.encode(triggers, forKey: .triggers)
+        try container.encode(platform, forKey: .platform)
+    }
+    
+    public func toDictionary() throws -> [String: Any?] {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(self)
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
     }
 }
 
@@ -95,6 +151,20 @@ extension RowndAutomationRuleUnknown: Hashable, Codable {
             self = .unknown
         }
     }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+           
+        switch self {
+        case .or(let orRule):
+           try container.encode(orRule)
+        case .rule(let rule):
+           try container.encode(rule)
+        case .unknown:
+           throw RowndError("Unknown automation rule: encoding failed")
+           break
+        }
+    }
 }
 
 public struct RowndAutomationOrRule: RowndAutomationRuleProto, Hashable, Codable {
@@ -120,6 +190,7 @@ public struct RowndAutomationRule: RowndAutomationRuleProto, Hashable, Codable {
 public enum RowndAutomationRuleEntityRule: String, Codable {
     case metadata
     case userData = "user_data"
+    case scope = "scope"
 }
 
 public enum RowndAutomationRuleCondition: String {
