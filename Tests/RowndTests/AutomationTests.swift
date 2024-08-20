@@ -10,15 +10,24 @@ import XCTest
 @testable import Rownd
 
 final class AutomationTests: XCTestCase {
+    
+    let appConfigStringWithAutomationOrRules = """
+    { "hub": { "customizations": { "rounded_corners": true, "visual_swoops": true, "blur_background": true, "dark_mode": "auto" }, "auth": { "sign_in_methods": { "email": { "enabled": true }, "phone": { "enabled": false }, "apple": { "enabled": false, "client_id": "" }, "google": { "enabled": false, "client_id": "", "ios_client_id": "", "scopes": [] }, "crypto_wallet": { "enabled": false }, "passkeys": { "enabled": false, "registration_prompt_frequency": "14d" }, "anonymous": { "enabled": true } }, "show_app_icon": false } }, "automations": [ { "rules": [ { "$or": [ { "entity_type": "metadata", "attribute": "is_authenticated", "condition": "EQUALS", "value": false }, { "entity_type": "metadata", "attribute": "auth_level", "condition": "EQUALS", "value": "instant" } ] }, { "entity_type": "scope", "attribute": "url", "condition": "EQUALS", "value": "https://app.rownd.io" } ], "triggers": [ { "type": "HTML_SELECTOR", "value": ".random" } ], "actions": [ { "type": "EDIT_ELEMENTS", "args": { "style": { "display": "none !important" }, "selector": ".random" } } ], "id": "cm01g3wji009e7fdjp6767sa8", "app_id": "406650865825350227", "platform": "web", "template": "hide_content", "name": "Untitled automation", "created_at": "2024-08-19T20:25:32.286Z", "updated_at": "2024-08-19T20:25:32.286Z", "state": "enabled", "order": 10 } ], "profile_storage_version": "v1" }
+    """
 
     func testDecodingAppConfigAutomation() {
         do {
-            let automationString = "{\"id\":\"cm010byrj007lcrws2mfnsesy\",\"state\":\"enabled\",\"platform\":\"web\",\"actions\":[{\"type\":\"REQUIRE_AUTHENTICATION\",\"args\":{\"prevent_closing\":true}}],\"template\":\"sign_in\",\"triggers\":[{\"type\":\"TIME\",\"value\":\"3h\"}],\"name\":\"Untitled automation\",\"rules\":[{\"$or\":[{\"value\":false,\"attribute\":\"is_authenticated\",\"condition\":\"EQUALS\",\"entity_type\":\"metadata\"},{\"value\":\"instant\",\"attribute\":\"auth_level\",\"condition\":\"EQUALS\",\"entity_type\":\"metadata\"}]}]}"
             let decoder = JSONDecoder()
-            let automation = try decoder.decode(
-                RowndAutomation.self,
-                from: (automationString.data(using: .utf8) ?? Data())
+            let appConfig = try decoder.decode(
+                AppConfigConfig.self,
+                from: (appConfigStringWithAutomationOrRules.data(using: .utf8) ?? Data())
             )
+            
+            guard let automations = appConfig.automations else {
+                return XCTFail("Automations are nil")
+            }
+            
+            let automation = automations[0]
             
             let hasOrRule = automation.rules.contains { rule in
                 if case .or(_) = rule {
@@ -29,10 +38,10 @@ final class AutomationTests: XCTestCase {
             }
             
             XCTAssertTrue(hasOrRule, "Rule contains a valid Automation OR rule")
-            XCTAssertTrue(automation.triggers.first?.type == RowndAutomationTriggerType.time, "TIME is the expected trigger type")
+            XCTAssertTrue(automation.triggers.first?.type == RowndAutomationTriggerType.htmlSelector, "HTML_SELECTOR is the expected trigger type")
             
             do {
-                let encoded = try automation.toDictionary()
+                let encoded = try appConfig.toDictionary()
             } catch {
                 XCTFail("Failed to encode app config string \(error)")
             }
@@ -46,14 +55,20 @@ final class AutomationTests: XCTestCase {
     
     func testDecodingAppConfigAutomation2() {
         do {
-            let automationString = """
-            {"rules":[{"entity_type":"metadata","attribute":"auth_level","condition":"EQUALS","value":"instant"}],"triggers":[{"type":"TIME","value":"3h"}],"actions":[{"type":"REQUIRE_AUTHENTICATION","args":{"prevent_closing":true}}],"id":"cm01d98qv008wcrwszrb2gmt5","app_id":"406650865825350227","platform":"web","template":"sign_in","name":"Untitled automation","created_at":"2024-08-19T19:05:42.535Z","updated_at":"2024-08-19T19:05:42.535Z","state":"enabled","order":20}
+            let appConfigString = """
+            { "hub": { "customizations": { "rounded_corners": true, "visual_swoops": true, "blur_background": true, "dark_mode": "auto" }, "auth": { "sign_in_methods": { "email": { "enabled": true }, "phone": { "enabled": false }, "apple": { "enabled": false, "client_id": "" }, "google": { "enabled": false, "client_id": "", "ios_client_id": "", "scopes": [] }, "crypto_wallet": { "enabled": false }, "passkeys": { "enabled": false, "registration_prompt_frequency": "14d" }, "anonymous": { "enabled": true } }, "show_app_icon": false } }, "automations": [ { "rules": [ { "entity_type": "metadata", "attribute": "auth_level", "condition": "EQUALS", "value": "instant" } ], "triggers": [ { "type": "TIME", "value": "3h" } ], "actions": [ { "type": "EDIT_ELEMENTS", "args": { "style": { "display": "none !important" }, "selector": ".random" } } ], "id": "cm01g3wji009e7fdjp6767sa8", "app_id": "406650865825350227", "platform": "web", "template": "hide_content", "name": "Untitled automation", "created_at": "2024-08-19T20:25:32.286Z", "updated_at": "2024-08-19T20:25:32.286Z", "state": "enabled", "order": 10 } ], "profile_storage_version": "v1" }
             """
             let decoder = JSONDecoder()
-            let automation = try decoder.decode(
-                RowndAutomation.self,
-                from: (automationString.data(using: .utf8) ?? Data())
+            let appConfig = try decoder.decode(
+                AppConfigConfig.self,
+                from: (appConfigString.data(using: .utf8) ?? Data())
             )
+            
+            guard let automations = appConfig.automations else {
+                return XCTFail("Automations are nil")
+            }
+            
+            let automation = automations[0]
             
             var automationRule: RowndAutomationRule? = nil
             automation.rules.forEach { rule in
@@ -66,7 +81,7 @@ final class AutomationTests: XCTestCase {
             XCTAssertTrue(automation.triggers.first?.value == "3h")
             
             do {
-                let encoded = try automation.toDictionary()
+                let encoded = try appConfig.toDictionary()
             } catch {
                 XCTFail("Failed to encode app config string \(error)")
             }
@@ -79,16 +94,22 @@ final class AutomationTests: XCTestCase {
     
     func testFailedDecodingAppConfigAutomationFallback() {
         do {
-            let automationString = """
-            {"random":"randy"}
+            let invalidAppConfigString = """
+            { "hub": { "customizations": { "rounded_corners": true, "visual_swoops": true, "blur_background": true, "dark_mode": "auto" }, "auth": { "sign_in_methods": { "email": { "enabled": true }, "phone": { "enabled": false }, "apple": { "enabled": false, "client_id": "" }, "google": { "enabled": false, "client_id": "", "ios_client_id": "", "scopes": [] }, "crypto_wallet": { "enabled": false }, "passkeys": { "enabled": false, "registration_prompt_frequency": "14d" }, "anonymous": { "enabled": true } }, "show_app_icon": false } }, "automations": [ { "rules": [ { "random": "randy" } ], "id": "cm01g3wji009e7fdjp6767sa8", "app_id": "406650865825350227", "platform": "web", "template": "hide_content", "name": "Untitled automation", "state": "enabled" } ] }
             """
             let decoder = JSONDecoder()
-            let automation = try decoder.decode(
-                RowndAutomation.self,
-                from: (automationString.data(using: .utf8) ?? Data())
+            let appConfig = try decoder.decode(
+                AppConfigConfig.self,
+                from: (invalidAppConfigString.data(using: .utf8) ?? Data())
             )
             
-            XCTAssertTrue(automation.state == .disabled)
+            XCTAssertNil(appConfig.automations)
+            
+            do {
+                let encoded = try appConfig.toDictionary()
+            } catch {
+                XCTFail("Failed to encode app config string \(error)")
+            }
         } catch {
             XCTFail("Failed to decode app config string \(error)")
         }
