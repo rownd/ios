@@ -1,5 +1,17 @@
 
 
+# [3.8.0](https://github.com/rownd/ios/compare/3.7.0...3.8.0) (2024-09-18)
+
+
+### Bug Fixes
+
+* package resolved ([6d64fd9](https://github.com/rownd/ios/commit/6d64fd935de0a7eb7dee790c1fcf68159740cf63))
+
+
+### Features
+
+* handle unique automation schemas with a default fallback ([#83](https://github.com/rownd/ios/issues/83)) ([d1ee2dc](https://github.com/rownd/ios/commit/d1ee2dc0b8a44b693af7348ce5d2fe4bfd21fee0))
+
 # [3.7.0](https://github.com/rownd/ios/compare/3.6.0...3.7.0) (2024-07-18)
 
 
