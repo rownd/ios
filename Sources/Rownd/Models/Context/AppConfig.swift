@@ -40,6 +40,57 @@ extension AppConfigConfig: Codable {
     enum CodingKeys: String, CodingKey {
         case hub, customizations, subdomain, automations
     }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Attempt to decode the automations array, handling each RowndAutomation individually
+        if var nestedContainer = try? container.nestedUnkeyedContainer(forKey: .automations) {
+            var tempAutomations = [RowndAutomation]()
+            
+            while !nestedContainer.isAtEnd {
+                if let automation = try? nestedContainer.decode(RowndAutomation.self) {
+                    tempAutomations.append(automation)
+                } else {
+                    _ = try? nestedContainer.decode(AnyCodable.self) // This line skips over the bad entry
+                }
+            }
+            
+            self.automations = tempAutomations.isEmpty ? nil : tempAutomations
+        } else {
+            self.automations = nil
+        }
+
+        self.hub = try? container.decode(AppHubConfigState.self, forKey: .hub)
+        self.customizations = try? container.decode(AppCustomizationsConfigState.self, forKey: .customizations)
+        self.subdomain = try? container.decode(String.self, forKey: .subdomain)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        // Encode automations, skipping any that fail to encode
+        if let automations = automations {
+            var nestedContainer = container.nestedUnkeyedContainer(forKey: .automations)
+            for automation in automations {
+                do {
+                    try nestedContainer.encode(automation)
+                } catch {
+                    continue // Skip the automation if encoding fails
+                }
+            }
+        }
+        
+        try container.encodeIfPresent(hub, forKey: .hub)
+        try container.encodeIfPresent(customizations, forKey: .customizations)
+        try container.encodeIfPresent(subdomain, forKey: .subdomain)
+    }
+    
+    public func toDictionary() throws -> [String: Any?] {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(self)
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
+    }
 }
 
 public struct AppSchemaField: Hashable {

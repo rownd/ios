@@ -153,6 +153,8 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             case .metadata, .userData:
                 let userData = _rule.entityType == RowndAutomationRuleEntityRule.metadata ? metaData : state?.user.data
                 return evaluateRule(userData: userData, rule: _rule)
+            case .scope:
+                return false
             }
         case .or(let _rule):
             return processRuleSet(rules: _rule.or, op: .or, metaData: metaData)

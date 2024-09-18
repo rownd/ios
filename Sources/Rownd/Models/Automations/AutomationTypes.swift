@@ -23,6 +23,12 @@ extension RowndAutomation: Codable {
     enum CodingKeys: String, CodingKey {
         case id, name, template, state, actions, rules, triggers, platform
     }
+    
+    public func toDictionary() throws -> [String: Any?] {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(self)
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
+    }
 }
 
 public enum RowndAutomationState: String {
@@ -95,6 +101,20 @@ extension RowndAutomationRuleUnknown: Hashable, Codable {
             self = .unknown
         }
     }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+           
+        switch self {
+        case .or(let orRule):
+           try container.encode(orRule)
+        case .rule(let rule):
+           try container.encode(rule)
+        case .unknown:
+           throw RowndError("Unknown automation rule: encoding failed")
+           break
+        }
+    }
 }
 
 public struct RowndAutomationOrRule: RowndAutomationRuleProto, Hashable, Codable {
@@ -120,6 +140,7 @@ public struct RowndAutomationRule: RowndAutomationRuleProto, Hashable, Codable {
 public enum RowndAutomationRuleEntityRule: String, Codable {
     case metadata
     case userData = "user_data"
+    case scope = "scope"
 }
 
 public enum RowndAutomationRuleCondition: String {
