@@ -12,8 +12,12 @@ import ReSwiftThunk
 import JWTDecode
 import Kronos
 import Get
+import KeychainSwift
+//import RowndTelemetry
 
 private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
+
+private let keychain = KeychainSwift()
 
 public struct AuthState: Hashable {
     public var isLoading: Bool = false
@@ -24,7 +28,13 @@ public struct AuthState: Hashable {
 }
 
 extension AuthState: Codable {
+    private func retrieveTokensFromKeychain() {
+        print("retrieveTokensFromKeychain")
+        print(keychain.getData("foo") as? String)
+    }
+    
     public var isAuthenticated: Bool {
+        retrieveTokensFromKeychain()
         return accessToken != nil
     }
 

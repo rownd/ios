@@ -72,7 +72,7 @@ class AuthenticatorSubscription: NSObject {
     /// This checks the incoming action to determine whether it contains an AuthState payload and pushes that
     /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
     /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
-    internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
+internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
         return { _, _ in
             return { next in
                 return { action in

@@ -83,6 +83,15 @@
         }
       },
       {
+        "package": "KeychainSwift",
+        "repositoryURL": "https://github.com/evgenyneu/keychain-swift.git",
+        "state": {
+          "branch": null,
+          "revision": "5e1b02b6a9dac2a759a1d5dbc175c86bd192a608",
+          "version": "24.0.0"
+        }
+      },
+      {
         "package": "Kronos",
         "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
         "state": {

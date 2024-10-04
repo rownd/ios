@@ -25,11 +25,12 @@ public struct RowndState: Codable, Hashable {
     public var user = UserState()
     public var passkeys = PasskeyState()
     public var signIn = SignInState()
+    public var lastUpdateTs = Date()
 }
 
 extension RowndState {
     enum CodingKeys: String, CodingKey {
-        case appConfig, auth, user, signIn, passkeys
+        case appConfig, auth, user, signIn, passkeys, lastUpdateTs
     }
 
     public var isInitialized: Bool {
@@ -43,12 +44,14 @@ extension RowndState {
         user = try container.decode(UserState.self, forKey: .user)
         passkeys = try container.decodeIfPresent(PasskeyState.self, forKey: .passkeys) ?? PasskeyState()
         signIn = try container.decodeIfPresent(SignInState.self, forKey: .signIn) ?? SignInState()
+        lastUpdateTs = try container.decodeIfPresent(Date.self, forKey: .lastUpdateTs) ?? Date()
     }
 
     internal func save() {
         debouncer.debounce(action: {
             if let encoded = try? self.toJson() {
                 Storage.shared.set(encoded, forKey: STORAGE_STATE_KEY)
+                DarwinNotificationManager.shared.postNotification(name: "io.rownd.events.StateUpdated")
                 log.debug("Wrote state to storage \(String(describing: self), privacy: .public)")
             }
         })
@@ -63,6 +66,14 @@ extension RowndState {
     internal func load(_ store: Store<RowndState>) async -> RowndState {
         let existingStateStr = Storage.shared.get(forKey: STORAGE_STATE_KEY)
 //        log.debug("initial store state: \(String(describing: existingStateStr))")
+
+        DarwinNotificationManager.shared.startObserving(name: "io.rownd.events.StateUpdated") {
+            debouncer.debounce {
+                Task {
+                    await self.reload()
+                }
+            }
+        }
 
         guard let existingStateStr = existingStateStr else {
             await MainActor.run {
@@ -111,6 +122,10 @@ extension RowndState {
             )
 
             log.debug("Retreived auth state: \(String(describing: decoded.auth), privacy: .public)")
+            
+            if decoded.lastUpdateTs.timeIntervalSinceReferenceDate == store.state.lastUpdateTs.timeIntervalSinceReferenceDate {
+                return
+            }
 
             await MainActor.run { [decoded] in
                 store.dispatch(ReloadRowndState(payload: decoded))
