@@ -85,11 +85,6 @@ let package = Package(
             .upToNextMajor(from: "4.2.1")
         ),
         .package(
-            name: "KeychainSwift",
-            url: "https://github.com/evgenyneu/keychain-swift.git",
-            .upToNextMajor(from: "24.0.0")
-        ),
-        .package(
             name: "Mocker",
             url: "https://github.com/WeTransfer/Mocker",
             .upToNextMajor(from: "3.0.1")
@@ -112,8 +107,7 @@ let package = Package(
                 "GoogleSignIn",
                 "Lottie",
                 "Factory",
-                "Kronos",
-                "KeychainSwift"
+                "Kronos"
             ],
             resources: [
                 .process("Resources")

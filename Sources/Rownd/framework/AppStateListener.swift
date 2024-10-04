@@ -18,12 +18,10 @@ class AppStateListener {
     }
 
     @objc func appMovedToBackground() {
+        // Future use
     }
 
     @objc func appMovedToForeground() {
-        print("Detected app in foreground")
-        Task {
-//            await Context.currentContext.store.state.load()
-        }
+        // Future use
     }
 }

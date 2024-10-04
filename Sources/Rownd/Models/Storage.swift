@@ -41,12 +41,7 @@ class Storage: NSObject, NSFilePresenter {
     }
 
     func presentedItemDidChange() {
-        debouncer.debounce(action: {
-            Self.log.debug("Change detected!")
-//            Task {
-//                await Context.currentContext.store.state.reload()
-//            }
-        })
+        // Future use
     }
 
     private func computeSharedStoragePath(_ prefix: String? = nil) -> URL? {
@@ -95,7 +90,7 @@ class Storage: NSObject, NSFilePresenter {
         var value: String?
         if let sharedFileUrl = computeSharedStoragePath(Rownd.config.appGroupPrefix) {
             value = readFromStorage(sharedFileUrl.appendingPathComponent(key))
-            Self.log.debug("Read from shared container: \(String(describing: value))")
+            Self.log.debug("Read from shared container: \(value?.data(using: .utf8)?.prettyPrintedJSONString)")
         }
 
         // If that fails, read from primary app container
@@ -106,7 +101,7 @@ class Storage: NSObject, NSFilePresenter {
 
         if let appFileUrl = computeAppStoragePath() {
             value = readFromStorage(appFileUrl.appendingPathComponent(key))
-            Self.log.debug("Read from app container: \(String(describing: value))")
+            Self.log.debug("Read from app container: \(value?.data(using: .utf8)?.prettyPrintedJSONString)")
         }
 
         guard value == nil else {
@@ -116,7 +111,7 @@ class Storage: NSObject, NSFilePresenter {
 
         // If we don't get anything, try the legacy UserDefaults store
         value = userDefaultsStore?.object(forKey: key) as? String
-        Self.log.debug("Read from UserDefaults: \(String(describing: value))")
+        Self.log.debug("Read from UserDefaults: \(value?.data(using: .utf8)?.prettyPrintedJSONString)")
         return value
     }
 

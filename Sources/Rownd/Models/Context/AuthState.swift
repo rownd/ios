@@ -28,13 +28,7 @@ public struct AuthState: Hashable {
 }
 
 extension AuthState: Codable {
-    private func retrieveTokensFromKeychain() {
-        print("retrieveTokensFromKeychain")
-        print(keychain.getData("foo") as? String)
-    }
-    
     public var isAuthenticated: Bool {
-        retrieveTokensFromKeychain()
         return accessToken != nil
     }
 

@@ -1,150 +1,151 @@
 {
-  "originHash" : "c578c8eaa610099818b25e4d7fc16553e81049dcd90480c6d1d8cd0b65a88e0c",
-  "pins" : [
-    {
-      "identity" : "anycodable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Flight-School/AnyCodable",
-      "state" : {
-        "revision" : "862808b2070cd908cb04f9aafe7de83d35f81b05",
-        "version" : "0.6.7"
+  "object": {
+    "pins": [
+      {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "862808b2070cd908cb04f9aafe7de83d35f81b05",
+          "version": "0.6.7"
+        }
+      },
+      {
+        "package": "AppAuth-iOS",
+        "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
+        "state": {
+          "branch": null,
+          "revision": "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
+          "version": "1.7.5"
+        }
+      },
+      {
+        "package": "CodeScanner_Rownd",
+        "repositoryURL": "https://github.com/rownd/CodeScanner_Rownd.git",
+        "state": {
+          "branch": null,
+          "revision": "22be2da64ca86d6a92578d95a35ae9792b2c1848",
+          "version": "2.2.1"
+        }
+      },
+      {
+        "package": "Factory",
+        "repositoryURL": "https://github.com/hmlongco/Factory",
+        "state": {
+          "branch": null,
+          "revision": "39ff6a675cd0272d833d184d35add0f8fddd63de",
+          "version": "1.3.7"
+        }
+      },
+      {
+        "package": "get",
+        "repositoryURL": "https://github.com/rownd/get",
+        "state": {
+          "branch": null,
+          "revision": "74dba201ebe42e9c15c1db6ee1cc893025bbef94",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "GoogleSignIn-iOS",
+        "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
+        "state": {
+          "branch": null,
+          "revision": "a7965d134c5d3567026c523e0a8a583f73b62b0d",
+          "version": "7.1.0"
+        }
+      },
+      {
+        "package": "gtm-session-fetcher",
+        "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
+        "state": {
+          "branch": null,
+          "revision": "a2ab612cb980066ee56d90d60d8462992c07f24b",
+          "version": "3.5.0"
+        }
+      },
+      {
+        "package": "GTMAppAuth",
+        "repositoryURL": "https://github.com/google/GTMAppAuth.git",
+        "state": {
+          "branch": null,
+          "revision": "5d7d66f647400952b1758b230e019b07c0b4b22a",
+          "version": "4.1.1"
+        }
+      },
+      {
+        "package": "JWTDecode.swift",
+        "repositoryURL": "https://github.com/auth0/JWTDecode.swift",
+        "state": {
+          "branch": null,
+          "revision": "3cd207fb9e943b6168a117baa3936c823204c2dc",
+          "version": "2.6.3"
+        }
+      },
+      {
+        "package": "Kronos",
+        "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
+        "state": {
+          "branch": null,
+          "revision": "f331821314f9b35867a18c5c8fc2f918536d79ac",
+          "version": "4.3.1"
+        }
+      },
+      {
+        "package": "LBBottomSheet",
+        "repositoryURL": "https://github.com/rownd/LBBottomSheet.git",
+        "state": {
+          "branch": null,
+          "revision": "047863471a722edab0eb4ce1a88d521142bc6425",
+          "version": "1.1.7"
+        }
+      },
+      {
+        "package": "lottie-ios",
+        "repositoryURL": "https://github.com/airbnb/lottie-ios",
+        "state": {
+          "branch": null,
+          "revision": "fe4c6fe3a0aa66cdeb51d549623c82ca9704b9a5",
+          "version": "4.5.0"
+        }
+      },
+      {
+        "package": "Mocker",
+        "repositoryURL": "https://github.com/WeTransfer/Mocker",
+        "state": {
+          "branch": null,
+          "revision": "95fa785c751f6bc40c49e112d433c3acf8417a97",
+          "version": "3.0.2"
+        }
+      },
+      {
+        "package": "ReSwift",
+        "repositoryURL": "https://github.com/ReSwift/ReSwift",
+        "state": {
+          "branch": null,
+          "revision": "cb5c3c02f652420ef413dea41e13ac5a76b6c0fd",
+          "version": "6.1.1"
+        }
+      },
+      {
+        "package": "ReSwift-Thunk",
+        "repositoryURL": "https://github.com/ReSwift/ReSwift-Thunk.git",
+        "state": {
+          "branch": null,
+          "revision": "5ee9816158a2115863b1458c66cf1be9e9143b39",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "SwiftKeychainWrapper",
+        "repositoryURL": "https://github.com/jrendel/SwiftKeychainWrapper",
+        "state": {
+          "branch": null,
+          "revision": "185a3165346a03767101c4f62e9a545a0fe0530f",
+          "version": "4.0.1"
+        }
       }
-    },
-    {
-      "identity" : "appauth-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/openid/AppAuth-iOS.git",
-      "state" : {
-        "revision" : "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
-        "version" : "1.7.5"
-      }
-    },
-    {
-      "identity" : "codescanner_rownd",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rownd/CodeScanner_Rownd.git",
-      "state" : {
-        "revision" : "22be2da64ca86d6a92578d95a35ae9792b2c1848",
-        "version" : "2.2.1"
-      }
-    },
-    {
-      "identity" : "factory",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hmlongco/Factory",
-      "state" : {
-        "revision" : "39ff6a675cd0272d833d184d35add0f8fddd63de",
-        "version" : "1.3.7"
-      }
-    },
-    {
-      "identity" : "get",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rownd/get",
-      "state" : {
-        "revision" : "74dba201ebe42e9c15c1db6ee1cc893025bbef94",
-        "version" : "2.2.0"
-      }
-    },
-    {
-      "identity" : "googlesignin-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/google/GoogleSignIn-iOS.git",
-      "state" : {
-        "revision" : "a7965d134c5d3567026c523e0a8a583f73b62b0d",
-        "version" : "7.1.0"
-      }
-    },
-    {
-      "identity" : "gtm-session-fetcher",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/google/gtm-session-fetcher.git",
-      "state" : {
-        "revision" : "a2ab612cb980066ee56d90d60d8462992c07f24b",
-        "version" : "3.5.0"
-      }
-    },
-    {
-      "identity" : "gtmappauth",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/google/GTMAppAuth.git",
-      "state" : {
-        "revision" : "5d7d66f647400952b1758b230e019b07c0b4b22a",
-        "version" : "4.1.1"
-      }
-    },
-    {
-      "identity" : "ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rownd/ios",
-      "state" : {
-        "revision" : "87df0d5f2f0ef9653fe5c91191951a22d02ff682",
-        "version" : "3.8.0"
-      }
-    },
-    {
-      "identity" : "jwtdecode.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/auth0/JWTDecode.swift",
-      "state" : {
-        "revision" : "3cd207fb9e943b6168a117baa3936c823204c2dc",
-        "version" : "2.6.3"
-      }
-    },
-    {
-      "identity" : "kronos",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/MobileNativeFoundation/Kronos",
-      "state" : {
-        "revision" : "f331821314f9b35867a18c5c8fc2f918536d79ac",
-        "version" : "4.3.1"
-      }
-    },
-    {
-      "identity" : "lbbottomsheet",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rownd/LBBottomSheet.git",
-      "state" : {
-        "revision" : "047863471a722edab0eb4ce1a88d521142bc6425",
-        "version" : "1.1.7"
-      }
-    },
-    {
-      "identity" : "lottie-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios",
-      "state" : {
-        "revision" : "fe4c6fe3a0aa66cdeb51d549623c82ca9704b9a5",
-        "version" : "4.5.0"
-      }
-    },
-    {
-      "identity" : "reswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReSwift/ReSwift",
-      "state" : {
-        "revision" : "cb5c3c02f652420ef413dea41e13ac5a76b6c0fd",
-        "version" : "6.1.1"
-      }
-    },
-    {
-      "identity" : "reswift-thunk",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReSwift/ReSwift-Thunk.git",
-      "state" : {
-        "revision" : "5ee9816158a2115863b1458c66cf1be9e9143b39",
-        "version" : "2.0.1"
-      }
-    },
-    {
-      "identity" : "swiftkeychainwrapper",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jrendel/SwiftKeychainWrapper",
-      "state" : {
-        "revision" : "185a3165346a03767101c4f62e9a545a0fe0530f",
-        "version" : "4.0.1"
-      }
-    }
-  ],
-  "version" : 3
+    ]
+  },
+  "version": 1
 }

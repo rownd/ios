@@ -91,6 +91,7 @@
 		B32C8A502BD6AD420082668F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B32C8A522BD6AD420082668F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B32C8A5A2BD6C1580082668F /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
+		B35DBA0D2CB091380076DDEB /* ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ios; path = ..; sourceTree = "<group>"; };
 		B3725D272A1D32B600A1E837 /* LandmarksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarksApp.swift; sourceTree = "<group>"; };
 		B3725D292A1D34CF00A1E837 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		B374E52628542AEF00955719 /* Landmarks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Landmarks.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -269,6 +270,7 @@
 		B3D5601429E0772100DA0F51 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				B35DBA0D2CB091380076DDEB /* ios */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
