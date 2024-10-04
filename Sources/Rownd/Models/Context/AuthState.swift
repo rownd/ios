@@ -12,12 +12,8 @@ import ReSwiftThunk
 import JWTDecode
 import Kronos
 import Get
-import KeychainSwift
-//import RowndTelemetry
 
 private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
-
-private let keychain = KeychainSwift()
 
 public struct AuthState: Hashable {
     public var isLoading: Bool = false
