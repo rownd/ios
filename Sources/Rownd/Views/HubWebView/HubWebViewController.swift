@@ -278,7 +278,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
         // We can access properties through the message body, like this:
         guard let response = message.body as? String else { return }
 
-        logger.trace("Received message from hub: \(response)")
+        logger.trace("Received message from hub: \(Redact.redactSensitiveKeys(in: response))")
 
         let store = Context.currentContext.store
 
@@ -293,6 +293,9 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 guard hubViewController?.targetPage == .signIn  else { return }
                 let initialJsFunctionArgsAsJson = self.jsFunctionArgsAsJson
                 DispatchQueue.main.async {
+                    // Ensure user.isLoading = false so that the data is fetched properly
+                    store.dispatch(SetUserLoading(isLoading: false))
+                    // Then set our tokens
                     store.dispatch(store.state.auth.onReceiveAuthTokens(
                         AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
                     ))

@@ -271,7 +271,7 @@ class AppConfig {
 
             return appConfig
         } catch {
-            logger.error("Failed to fetch app config: \(String(describing: error), privacy: .public)")
+            logger.error("Failed to fetch app config: \(String(describing: error), privacy: .auto)")
             return nil
         }
     }

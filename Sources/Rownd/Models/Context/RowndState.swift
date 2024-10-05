@@ -52,7 +52,7 @@ extension RowndState {
             if let encoded = try? self.toJson() {
                 Storage.shared.set(encoded, forKey: STORAGE_STATE_KEY)
                 DarwinNotificationManager.shared.postNotification(name: "io.rownd.events.StateUpdated")
-                log.debug("Wrote state to storage \(encoded.data(using: .utf8)?.prettyPrintedJSONString)")
+                log.debug("Wrote state to storage \(Redact.redactSensitiveKeys(in: encoded).data(using: .utf8)?.prettyPrintedJSONString)")
             }
         })
     }
@@ -108,7 +108,7 @@ extension RowndState {
 
     internal func reload(_ store: Store<RowndState>) async {
         let existingStateStr = Storage.shared.get(forKey: STORAGE_STATE_KEY)
-        log.debug("Retrieved store state: \(String(describing: existingStateStr), privacy: .auto)")
+        log.debug("Retrieved store state: \(Redact.redactSensitiveKeys(in: existingStateStr ?? ""), privacy: .private)")
 
         guard let existingStateStr = existingStateStr else {
             return
@@ -121,7 +121,7 @@ extension RowndState {
                 from: (existingStateStr.data(using: .utf8) ?? Data())
             )
 
-            log.debug("Retreived auth state: \(String(describing: decoded.auth), privacy: .private)")
+            log.debug("Retrieved auth state: \(String(describing: decoded.auth), privacy: .private)")
             
             if decoded.lastUpdateTs.timeIntervalSinceReferenceDate == store.state.lastUpdateTs.timeIntervalSinceReferenceDate {
                 return
@@ -195,7 +195,13 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
         newState.save()
     }
 
-    log.debug("Internal state update \(String(describing: action), privacy: .public)")
+    log.debug("Internal state update \(String(describing: action), privacy: .auto)")
+    
+    if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
+        if #available(iOS 15.0, *) {
+            fetchRecentLogs(secondsBack: 10)
+        }
+    }
 
     return newState
 }

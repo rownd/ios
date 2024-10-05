@@ -15,12 +15,16 @@ import Get
 
 private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
 
-public struct AuthState: Hashable {
+public struct AuthState: Hashable, CustomStringConvertible {
     public var isLoading: Bool = false
     public var accessToken: String?
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
     public var hasPreviouslySignedIn: Bool? = false
+    
+    public var description: String {
+        return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil")"
+    }
 }
 
 extension AuthState: Codable {

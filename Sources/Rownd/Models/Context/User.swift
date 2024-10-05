@@ -97,6 +97,7 @@ func userReducer(action: Action, state: UserState?) -> UserState {
     case let action as SetUserData:
         state.data = action.data
         state.meta = action.meta ?? [:]
+        state.isLoading = false
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
     case let action as SetUserState:
