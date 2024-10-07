@@ -42,13 +42,6 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack {
-                Button(action: {
-                    try! Rownd.transferEncryptionKey()
-                }, label: {
-                    Text("Transfer key")
-                })
-
-                Spacer()
 
                 Button("Edit name") {
                     firstName = user.current["first_name"]?.value as? String ?? ""
