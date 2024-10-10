@@ -197,11 +197,11 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
 
     log.debug("Internal state update \(String(describing: action), privacy: .auto)")
     
-    if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
-        if #available(iOS 15.0, *) {
-            fetchRecentLogs(secondsBack: 10)
-        }
-    }
+//    if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
+//        if #available(iOS 15.0, *) {
+//            fetchRecentLogs(secondsBack: 10)
+//        }
+//    }
 
     return newState
 }
