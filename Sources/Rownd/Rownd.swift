@@ -51,7 +51,7 @@ public class Rownd: NSObject {
             }
         })
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if Context.currentContext.store.state.clockSyncState == .waiting {
                 logger.warning("NTP clock not synced after \(ntpStart.distance(to: Date())) seconds.")
                 Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .unknown))
