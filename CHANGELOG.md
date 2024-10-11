@@ -1,5 +1,12 @@
 
 
+## [3.8.1](https://github.com/rownd/ios/compare/3.8.0...3.8.1) (2024-10-11)
+
+
+### Bug Fixes
+
+* reduce ntp sync delay ([3c1f502](https://github.com/rownd/ios/commit/3c1f5022b931617f62866e5758c716879130c4ca))
+
 # [3.8.0](https://github.com/rownd/ios/compare/3.7.0...3.8.0) (2024-09-18)
 
 
