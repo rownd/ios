@@ -123,7 +123,7 @@ struct UserMetaDataPayload: Codable {
 public struct UserStateResponse: Hashable, Codable {
     public var data: UserStateData = [:]
     public var meta: UserStateData? = [:]
-    
+
     public enum CodingKeys: String, CodingKey {
         case data, meta
     }

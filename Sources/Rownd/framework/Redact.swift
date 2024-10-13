@@ -9,7 +9,7 @@ import Foundation
 
 struct Redact {
     static func redactSensitiveKeys(in jsonString: String?) -> String {
-        
+
         guard let jsonString = jsonString else {
             return ""
         }

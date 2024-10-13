@@ -83,15 +83,6 @@
         }
       },
       {
-        "package": "Kronos",
-        "repositoryURL": "https://github.com/MobileNativeFoundation/Kronos",
-        "state": {
-          "branch": null,
-          "revision": "f331821314f9b35867a18c5c8fc2f918536d79ac",
-          "version": "4.3.1"
-        }
-      },
-      {
         "package": "LBBottomSheet",
         "repositoryURL": "https://github.com/rownd/LBBottomSheet.git",
         "state": {

@@ -10,7 +10,6 @@ import Get
 import AnyCodable
 import Rownd
 import UIKit
-import Kronos
 
 let client = APIClient(baseURL: URL(string: "https://5b24-99-37-55-241.ngrok-free.app"))
 
@@ -26,8 +25,8 @@ struct TokenResp: Serializable {
 func apiExchangeRowndToken(body: TokenExchangeBody) async throws -> TokenResp {
     do {
         let formatter = ISO8601DateFormatter()
-        let currentDate = Clock.now ?? Date()
-        let dateSource = Clock.now != nil ? "ntp" : "local"
+        let currentDate = Date()
+        let dateSource = "local"
 
         let userAgentStr = "Rownd SDK for iOS/\(String(describing: Bundle.main.bundleIdentifier)) (Language: Swift; Platform=\(await UIDevice.current.systemName) \(ProcessInfo.processInfo.operatingSystemVersionString); Timestamp=\(currentDate.ISO8601Format()); Timezone=\(TimeZone.current); TimeSource=\(dateSource)"
 

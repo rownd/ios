@@ -10,7 +10,6 @@ import UIKit
 import ReSwift
 import ReSwiftThunk
 import JWTDecode
-import Kronos
 import Get
 
 private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
@@ -21,7 +20,7 @@ public struct AuthState: Hashable, CustomStringConvertible {
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
     public var hasPreviouslySignedIn: Bool? = false
-    
+
     public var description: String {
         return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil")"
     }
@@ -40,7 +39,7 @@ extension AuthState: Codable {
         do {
             let jwt = try decode(jwt: accessToken)
 
-            let currentDate = Clock.now ?? Date()
+            let currentDate = NetworkTimeManager.shared.currentTime ?? Date()
             guard let expiresAt = jwt.expiresAt, let currentDateWithMargin = Calendar.current.date(byAdding: .second, value: 60, to: currentDate) else {
                 return false
             }
@@ -219,7 +218,7 @@ extension JWT {
             return false
         }
 
-        let ntpDate = Clock.now
+        let ntpDate = NetworkTimeManager.shared.currentTime
 
         guard let ntpDate = ntpDate else {
             return self.expired

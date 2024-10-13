@@ -12,7 +12,7 @@ class Storage: NSObject, NSFilePresenter {
     private static let log = Logger(subsystem: "io.rownd.sdk", category: "storage")
 
     private let defaultContainerName = "io.rownd.sdk"
-    
+
     @available(*, deprecated, message: "Use NSFileCoordinator instead")
     private lazy var userDefaultsStore = UserDefaults(suiteName: defaultContainerName)
 

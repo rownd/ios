@@ -80,11 +80,6 @@ let package = Package(
             .upToNextMajor(from: "1.2.8")
         ),
         .package(
-            name: "Kronos",
-            url: "https://github.com/MobileNativeFoundation/Kronos",
-            .upToNextMajor(from: "4.2.1")
-        ),
-        .package(
             name: "Mocker",
             url: "https://github.com/WeTransfer/Mocker",
             .upToNextMajor(from: "3.0.1")
@@ -107,7 +102,6 @@ let package = Package(
                 "GoogleSignIn",
                 "Lottie",
                 "Factory",
-                "Kronos"
             ],
             resources: [
                 .process("Resources")
@@ -128,8 +122,7 @@ let package = Package(
                 "GoogleSignIn",
                 "Lottie",
                 "Factory",
-                "Rownd",
-                "Kronos"
+                "Rownd"
             ]
         )
     ],

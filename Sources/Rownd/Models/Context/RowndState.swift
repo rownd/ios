@@ -9,7 +9,6 @@ import Foundation
 import OSLog
 import ReSwift
 import ReSwiftThunk
-import Kronos
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "state")
 
@@ -19,7 +18,7 @@ private let debouncer = Debouncer(delay: 0.1) // 100ms
 
 public struct RowndState: Codable, Hashable {
     public var isStateLoaded = false
-    internal var clockSyncState: ClockSyncState = Clock.now != nil ? .synced : .waiting
+    internal var clockSyncState: ClockSyncState = NetworkTimeManager.shared.currentTime != nil ? .synced : .waiting
     public var appConfig = AppConfigState()
     public var auth = AuthState()
     public var user = UserState()
@@ -89,7 +88,7 @@ extension RowndState {
                 from: (existingStateStr.data(using: .utf8) ?? Data())
             )
             decoded.isStateLoaded = true
-            decoded.clockSyncState = Clock.now != nil ? .synced : store.state.clockSyncState
+            decoded.clockSyncState = NetworkTimeManager.shared.currentTime != nil ? .synced : store.state.clockSyncState
             await MainActor.run { [decoded] in
                 store.dispatch(InitializeRowndState(payload: decoded))
             }
@@ -122,7 +121,7 @@ extension RowndState {
             )
 
             log.debug("Retrieved auth state: \(String(describing: decoded.auth), privacy: .private)")
-            
+
             if decoded.lastUpdateTs.timeIntervalSinceReferenceDate == store.state.lastUpdateTs.timeIntervalSinceReferenceDate {
                 return
             }
@@ -196,12 +195,12 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
     }
 
     log.debug("Internal state update \(String(describing: action), privacy: .auto)")
-    
-//    if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
-//        if #available(iOS 15.0, *) {
-//            fetchRecentLogs(secondsBack: 10)
-//        }
-//    }
+
+    if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
+        if #available(iOS 15.0, *) {
+            fetchRecentLogs(secondsBack: 10)
+        }
+    }
 
     return newState
 }

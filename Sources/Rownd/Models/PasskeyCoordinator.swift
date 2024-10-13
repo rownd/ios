@@ -93,7 +93,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
             return
         }
-        
+
         guard store.state.auth.isAuthenticated else {
             logger.trace("User must be authenticated in order to register a passkey")
             return
@@ -380,7 +380,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         if let authorizationError = error as? ASAuthorizationError {
             switch authorizationError.code {
             case .canceled:
-                if (method == .Authenticate) {
+                if method == .Authenticate {
                     Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                         loginStep: .initialize
                     ))

@@ -149,7 +149,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             }
         }
     }
-    
+
     private func handleMailToUrl() {
         let gmailUrl = URL(string: "googlegmail://")
         if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
@@ -182,7 +182,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             return .allow
         }
     }
-    
+
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
             if let url = navigationAction.request.url,
                url.scheme == "mailto" {
