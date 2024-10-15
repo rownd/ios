@@ -26,6 +26,20 @@ extension UserState: Codable {
     public enum CodingKeys: String, CodingKey {
         case data, meta, isLoading
     }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.data = try container.decode([String: AnyCodable].self, forKey: .data)
+        self.meta = try container.decodeIfPresent([String: AnyCodable].self, forKey: .meta) ?? [:]
+        self.isLoading = try container.decodeIfPresent(Bool.self, forKey: .isLoading) ?? false
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(data, forKey: .data)
+        try container.encode(meta, forKey: .meta)
+        try container.encode(isLoading, forKey: .isLoading)
+    }
 
     public func get() -> UserState {
         return self
