@@ -1,5 +1,12 @@
 
 
+## [3.8.2](https://github.com/rownd/ios/compare/3.8.1...3.8.2) (2024-10-15)
+
+
+### Bug Fixes
+
+* decoding is loading within user state ([#87](https://github.com/rownd/ios/issues/87)) ([0e9c1ec](https://github.com/rownd/ios/commit/0e9c1ec6e7425a4374fedb2095908991e4307dcb))
+
 ## [3.8.1](https://github.com/rownd/ios/compare/3.8.0...3.8.1) (2024-10-11)
 
 
