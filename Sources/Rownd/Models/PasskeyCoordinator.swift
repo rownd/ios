@@ -68,6 +68,7 @@ enum PasskeyCoordinatorMethods {
 internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
 
     var method: PasskeyCoordinatorMethods?
+    var intent: RowndSignInIntent?
 
     private func getWindowScene() -> UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
@@ -80,6 +81,10 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
             return hubViewController
         }
         return nil
+    }
+    
+    private func defaultSignInFlow() {
+        Rownd.requestSignIn(RowndSignInOptions(intent: intent))
     }
 
     func registerPasskey() {
@@ -146,13 +151,15 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         }
     }
 
-    func authenticate() {
+    func authenticate(_ intent: RowndSignInIntent?) {
         // Use passkey to sign in as a Rownd user
         method = PasskeyCoordinatorMethods.Authenticate
+        self.intent = intent
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
 
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
+            defaultSignInFlow()
             return
         }
 
@@ -176,10 +183,12 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
     internal func authenticate(anchor: ASPresentationAnchor, preferImmediatelyAvailableCredentials: Bool, challengeResponse: PasskeyAuthenticationResponse) {
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
+            defaultSignInFlow()
             return
         }
         guard #available(iOS 15.0, *) else {
             logger.trace("iOS 15.0 is required to sign in with Passkey")
+            defaultSignInFlow()
             return
         }
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension)
@@ -227,6 +236,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard #available(iOS 15.0, *) else {
             logger.trace("iOS 15.0 is required to sign in with Passkey")
+            defaultSignInFlow()
             return
         }
         switch authorization.credential {
