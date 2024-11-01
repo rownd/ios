@@ -141,7 +141,7 @@ public class Rownd: NSObject {
                 inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary())
             }
             public static func authenticate() {
-                passkeyCoordinator.authenticate()
+                passkeyCoordinator.authenticate(nil)
             }
         }
     }
@@ -161,10 +161,14 @@ public class Rownd: NSObject {
     public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
         let signInOptions = determineSignInOptions(signInOptions)
         switch with {
+        case .phone:
+            requestSignIn(determineSignInOptions(signInOptions, signInType: SignInType.phone))
+        case .email:
+            requestSignIn(determineSignInOptions(signInOptions, signInType: SignInType.email))
         case .appleId:
             appleSignUpCoordinator.signIn(signInOptions?.intent)
         case .passkey:
-            passkeyCoordinator.authenticate()
+            passkeyCoordinator.authenticate(signInOptions?.intent)
         case .googleId:
             Task {
                 await googleSignInCoordinator.signIn(
@@ -174,9 +178,7 @@ public class Rownd: NSObject {
                 completion?()
             }
         case .guest, .anonymous:
-            requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                signInType: .anonymous
-            ))
+            requestSignIn(determineSignInOptions(signInOptions, signInType: SignInType.anonymous))
         }
 
     }
@@ -221,10 +223,6 @@ public class Rownd: NSObject {
                 event: .signOut
             ))
         }
-    }
-
-    public static func transferEncryptionKey() throws {
-        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
     }
 
     public static func manageAccount() {
@@ -295,8 +293,12 @@ public class Rownd: NSObject {
             }
         }
     }
-
+    
     internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
+        return determineSignInOptions(signInOptions, signInType: nil)
+    }
+
+    internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?, signInType: SignInType?) -> RowndSignInOptions? {
         let store = Context.currentContext.store
         var signInOptions = signInOptions
         if signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn {
@@ -305,6 +307,11 @@ public class Rownd: NSObject {
                 logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
             }
         }
+        
+        if (signInType != nil) {
+            signInOptions?.signInType = signInType
+        }
+        
         return signInOptions
     }
 
@@ -455,7 +462,7 @@ public enum UserFieldAccessType {
 }
 
 public enum RowndSignInHint {
-    case appleId, googleId, passkey,
+    case appleId, googleId, passkey, email, phone,
          guest, anonymous // these two do the same thing
 }
 
@@ -473,11 +480,13 @@ public struct RowndSignInOptions: Encodable {
     public var postSignInRedirect: String? = Rownd.config.postSignInRedirect
     public var intent: RowndSignInIntent?
     public var hint: String?
+    internal var signInType: SignInType?
 
     enum CodingKeys: String, CodingKey {
         case intent
         case hint
         case postSignInRedirect = "post_login_redirect"
+        case signInType = "sign_in_type"
     }
 }
 

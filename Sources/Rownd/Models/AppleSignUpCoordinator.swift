@@ -212,12 +212,14 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
 
         // If there is any error will get it here
         logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
+        
+        func defaultSignInFlow() {
+            logger.error("Falling back to default sign flow")
+            Rownd.requestSignIn(RowndSignInOptions(intent: intent))
+        }
 
         guard let authorizationError = error as? ASAuthorizationError else {
-            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .error,
-                signInType: .apple
-            ))
+            defaultSignInFlow()
             return
         }
 
@@ -225,10 +227,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
         case .canceled:
             return
         default:
-            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .error,
-                signInType: .apple
-            ))
+            defaultSignInFlow()
         }
     }
 }
