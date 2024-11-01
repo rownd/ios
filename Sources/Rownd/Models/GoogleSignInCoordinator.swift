@@ -22,36 +22,35 @@ class GoogleSignInCoordinator: NSObject {
     func signIn(_ intent: RowndSignInIntent?) async {
         await signIn(intent, hint: nil)
     }
+    
+    func defaultSignInFlow() {
+        logger.error("Falling back to default sign flow")
+        Rownd.requestSignIn(RowndSignInOptions(intent: intent))
+    }
 
     func signIn(_ intent: RowndSignInIntent?, hint: String?) async {
         let googleConfig = Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.google
         guard googleConfig?.enabled == true, let googleConfig = googleConfig else {
-            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .error,
-                signInType: .google
-            ))
-            return logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
+            logger.error("Sign in with Google is not enabled. Turn it on in the Rownd platform")
+            defaultSignInFlow()
+            return
         }
 
         if googleConfig.serverClientId == nil ||
             googleConfig.serverClientId == "" ||
             googleConfig.iosClientId == nil ||
             googleConfig.iosClientId == "" {
-            Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                loginStep: .error,
-                signInType: .google
-            ))
-            return logger.error("Cannot sign in with Google. Missing client configuration")
+            logger.error("Cannot sign in with Google. Missing client configuration")
+            defaultSignInFlow()
+            return
         }
 
         let reversedClientId = googleConfig.iosClientId!.split(separator: ".").reversed().joined(separator: ".")
         if let url = NSURL(string: reversedClientId + "://") {
             if await UIApplication.shared.canOpenURL(url as URL) == false {
-                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .error,
-                    signInType: .google
-                ))
-                return logger.error("Cannot sign in with Google. \(String(describing: reversedClientId)) is not defined in URL schemes")
+                logger.error("Cannot sign in with Google. \(String(describing: reversedClientId)) is not defined in URL schemes")
+                defaultSignInFlow()
+                return
             }
         }
 
@@ -63,6 +62,7 @@ class GoogleSignInCoordinator: NSObject {
         Task { @MainActor in
             guard let rootViewController = parent.getRootViewController() else {
                 logger.error("Failed to retrieve root view controller")
+                defaultSignInFlow()
                 return
             }
 
