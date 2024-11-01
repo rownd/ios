@@ -104,11 +104,10 @@ public class Rownd: NSObject {
 
     @discardableResult public static func handleSignInLink(url: URL?) -> Bool {
         let store = Context.currentContext.store
-        if store.state.auth.isAuthenticated {
-            return true
-        }
 
-        if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
+        let matcher = NSPredicate(format: "SELF MATCHES %@", Rownd.config.signInLinkPattern)
+
+        if let host = url?.host, matcher.evaluate(with: host), let url = url {
             logger.trace("handling url: \(String(describing: url.absoluteString))")
 
             if url.path.starts(with: "/verified") {
