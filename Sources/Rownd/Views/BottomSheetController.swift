@@ -76,6 +76,10 @@ class BottomSheetController: UIViewController {
         debouncer.debounce(action: triggerSheetHeightUpdate)
     }
 
+    public func hideBottomSheet(_ completion: (() -> Void)? = nil) {
+        sheetController?.dismiss(completion)
+    }
+
     private func triggerSheetHeightUpdate() {
         if let sheetController = sheetController {
             guard let controller = self.controller else {
