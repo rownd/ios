@@ -13,13 +13,20 @@ struct SignInLinkResp: Hashable, Codable {
     public var refreshToken: String?
     public var appId: String?
     public var appUserId: String?
+    public var redirectUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case appId = "app_id"
         case appUserId = "app_user_id"
+        case redirectUrl = "redirect_url"
     }
+}
+
+public protocol RowndDeepLinkHandlerDelegate {
+    @discardableResult
+    func handle(linkUrl url: URL) -> Bool
 }
 
 class SignInLinks {
@@ -37,23 +44,36 @@ class SignInLinks {
                     ))
                 }
             }
-            let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(url: signInUrl)).value
+            let authResp: SignInLinkResp = try await Rownd.apiClient.send(Request(
+                url: signInUrl,
+                headers: [
+                    "x-rownd-magic-allow-exp" : "true"
+                ]
+            )).value
 
             Task { @MainActor in
-                Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
-                    accessToken: authResp.accessToken,
-                    refreshToken: authResp.refreshToken
-                )))
+                if let accessToken = authResp.accessToken, let refreshToken = authResp.refreshToken {
+                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
+                        accessToken: accessToken,
+                        refreshToken: refreshToken
+                    )))
 
-                Context.currentContext.store.dispatch(UserData.fetch())
+                    Context.currentContext.store.dispatch(UserData.fetch())
 
-                Context.currentContext.store.dispatch(PasskeyData.fetchPasskeyRegistration())
+                    Context.currentContext.store.dispatch(PasskeyData.fetchPasskeyRegistration())
 
-                if Rownd.isDisplayingHub() {
-                    Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                        loginStep: .success
-                    ))
+                    if Rownd.isDisplayingHub() {
+                        Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
+                            loginStep: .success
+                        ))
+                    }
                 }
+
+                guard let strRedirectUrl = authResp.redirectUrl, let redirectUrl = URL(string: strRedirectUrl) else {
+                    return
+                }
+
+                Rownd.config.deepLinkHandler?.handle(linkUrl: redirectUrl)
             }
         } catch {
             Task { @MainActor in
