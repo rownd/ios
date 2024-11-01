@@ -91,6 +91,7 @@
 		B32C8A502BD6AD420082668F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B32C8A522BD6AD420082668F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B32C8A5A2BD6C1580082668F /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
+		B35DBA0D2CB091380076DDEB /* ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ios; path = ..; sourceTree = "<group>"; };
 		B3725D272A1D32B600A1E837 /* LandmarksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarksApp.swift; sourceTree = "<group>"; };
 		B3725D292A1D34CF00A1E837 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		B374E52628542AEF00955719 /* Landmarks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Landmarks.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,7 +112,6 @@
 		B38A4091287F5EC200FD0813 /* ios-native-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ios-native-Info.plist"; sourceTree = SOURCE_ROOT; };
 		B38A40A22881E7FC00FD0813 /* ios native.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ios native.entitlements"; sourceTree = "<group>"; };
 		B38A40DC28873FFB00FD0813 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
-		B38B1FBB2BF51C1D00350714 /* ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ios; path = ..; sourceTree = "<group>"; };
 		B38B1FBC2BF51F9D00350714 /* RowndEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowndEventHandler.swift; sourceTree = "<group>"; };
 		B39ECA9828E24A180055CB60 /* check-mark4.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "check-mark4.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -150,7 +150,6 @@
 		B302E2B12863BB76005FD927 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B38B1FBB2BF51C1D00350714 /* ios */,
 				B38A40DC28873FFB00FD0813 /* AuthenticationServices.framework */,
 				B32C8A472BD6AD3F0082668F /* WidgetKit.framework */,
 				B32C8A492BD6AD3F0082668F /* SwiftUI.framework */,
@@ -271,6 +270,7 @@
 		B3D5601429E0772100DA0F51 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				B35DBA0D2CB091380076DDEB /* ios */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -298,9 +298,9 @@
 			productReference = B32C8A462BD6AD3F0082668F /* rownd_widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		B374E52528542AEF00955719 /* rownd_ios_example */ = {
+		B374E52528542AEF00955719 /* landmarks */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B374E53428542AF100955719 /* Build configuration list for PBXNativeTarget "rownd_ios_example" */;
+			buildConfigurationList = B374E53428542AF100955719 /* Build configuration list for PBXNativeTarget "landmarks" */;
 			buildPhases = (
 				B374E52228542AEF00955719 /* Sources */,
 				B374E52328542AEF00955719 /* Frameworks */,
@@ -313,7 +313,7 @@
 			dependencies = (
 				B32C8A542BD6AD420082668F /* PBXTargetDependency */,
 			);
-			name = rownd_ios_example;
+			name = landmarks;
 			packageProductDependencies = (
 				B33B218F2A042C97006B592E /* Rownd */,
 			);
@@ -339,7 +339,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B374E52128542AEF00955719 /* Build configuration list for PBXProject "rownd_ios_example" */;
+			buildConfigurationList = B374E52128542AEF00955719 /* Build configuration list for PBXProject "landmarks" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -361,7 +361,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				B374E52528542AEF00955719 /* rownd_ios_example */,
+				B374E52528542AEF00955719 /* landmarks */,
 				B32C8A452BD6AD3F0082668F /* rownd_widget */,
 			);
 		};
@@ -644,7 +644,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ios-native-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Rownd Example";
+				INFOPLIST_KEY_CFBundleDisplayName = "Rownd Landmarks";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Landmarks require access to your device's camera to scan QR codes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -680,7 +680,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ios-native-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Rownd Example";
+				INFOPLIST_KEY_CFBundleDisplayName = "Rownd Landmarks";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Landmarks require access to your device's camera to scan QR codes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -714,7 +714,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B374E52128542AEF00955719 /* Build configuration list for PBXProject "rownd_ios_example" */ = {
+		B374E52128542AEF00955719 /* Build configuration list for PBXProject "landmarks" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B374E53228542AF100955719 /* Debug */,
@@ -723,7 +723,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B374E53428542AF100955719 /* Build configuration list for PBXNativeTarget "rownd_ios_example" */ = {
+		B374E53428542AF100955719 /* Build configuration list for PBXNativeTarget "landmarks" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B374E53528542AF100955719 /* Debug */,
@@ -739,8 +739,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rownd/ios";
 			requirement = {
-				kind = exactVersion;
-				version = 3.2.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

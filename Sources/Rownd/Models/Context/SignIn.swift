@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 import ReSwift
 import ReSwiftThunk
-import Kronos
 
 extension Date {
     static func ISOStringFromDate(date: Date) -> String {
@@ -67,7 +66,7 @@ func signInReducer(action: Action, state: SignInState?) -> SignInState {
         state = SignInState()
     case let action as SetLastSignInMethod:
         state.lastSignIn = action.payload
-        state.lastSignInDate = Date.ISOStringFromDate(date: Clock.now ?? Date())
+        state.lastSignInDate = Date.ISOStringFromDate(date: NetworkTimeManager.shared.currentTime ?? Date())
     default:
         break
     }

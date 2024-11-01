@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import Kronos
 
 func getFrameworkBundle() -> Bundle {
     return Bundle(for: Rownd.self)
@@ -61,8 +60,8 @@ struct Constants {
     static var TIME_META_HEADER_NAME = "X-Rownd-Time-Meta"
     static var TIME_META_HEADER: String {
         get {
-            let currentTime = Clock.now ?? Date()
-            let timeSource = Clock.now != nil ? "ntp" : "local"
+            let currentTime = NetworkTimeManager.shared.currentTime ?? Date()
+            let timeSource = NetworkTimeManager.shared.currentTime != nil ? "ntp" : "local"
             return "timestamp=\(formatter.string(from: currentTime))&timesource=\(timeSource)"
         }
     }

@@ -7,7 +7,6 @@
 
 import Foundation
 import ReSwift
-import Kronos
 import AnyCodable
 
 public struct AutomationStoreState {
@@ -115,7 +114,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         // Save automatino action in meta data
         let lastRunId = computeLastRunId(automation)
         Task { @MainActor in
-            let date = Clock.now ?? Date()
+            let date = NetworkTimeManager.shared.currentTime ?? Date()
             let dateFormatter = ISO8601DateFormatter()
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             let dateString = AnyCodable(dateFormatter.string(from: date))
@@ -125,7 +124,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
 
     public func determineAutomationMetaData(_ state: AutomationStoreState) -> [String: AnyCodable] {
         var automationMeta = state.user.meta ?? [:]
-    
+
         var hasPasskeys = false
         if let passkeyCount = state.passkeys.registration?.count {
             hasPasskeys = passkeyCount > 0
@@ -206,7 +205,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
                 }
 
                 let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
-                let currentDate = Clock.now ?? Date()
+                let currentDate = NetworkTimeManager.shared.currentTime ?? Date()
                 return currentDate > dateOfNextPrompt
             default:
                 return false

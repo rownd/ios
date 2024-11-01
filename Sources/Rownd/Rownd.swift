@@ -15,7 +15,6 @@ import AuthenticationServices
 import LBBottomSheet
 import GoogleSignIn
 import LocalAuthentication
-import Kronos
 import Get
 
 public class Rownd: NSObject {
@@ -36,27 +35,6 @@ public class Rownd: NSObject {
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
         Rownd.automationsCoordinator.processAutomations()
-    }
-
-    private override init() {
-        super.init()
-
-        // Start NTP sync
-        let ntpStart = Date()
-        Clock.sync(from: "time.cloudflare.cox", first: { date, offset in
-            logger.debug("NTP sync complete after \(ntpStart.distance(to: Date())) seconds. (Date: \(String(describing: date)); Offset: \(String(describing: offset)))")
-
-            if Context.currentContext.store.state.clockSyncState != .synced {
-                Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .synced))
-            }
-        })
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if Context.currentContext.store.state.clockSyncState == .waiting {
-                logger.warning("NTP clock not synced after \(ntpStart.distance(to: Date())) seconds.")
-                Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .unknown))
-            }
-        }
     }
 
     @discardableResult
@@ -132,8 +110,8 @@ public class Rownd: NSObject {
 
         if (url?.host?.hasSuffix("rownd.link")) != nil, let url = url {
             logger.trace("handling url: \(String(describing: url.absoluteString))")
-            
-            if (url.path.starts(with: "/verified")) {
+
+            if url.path.starts(with: "/verified") {
                 return false
             }
 
@@ -157,7 +135,7 @@ public class Rownd: NSObject {
 
         return false
     }
-    
+
     public class auth {
         public class passkeys {
             public static func register() {

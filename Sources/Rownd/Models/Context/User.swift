@@ -111,6 +111,7 @@ func userReducer(action: Action, state: UserState?) -> UserState {
     case let action as SetUserData:
         state.data = action.data
         state.meta = action.meta ?? [:]
+        state.isLoading = false
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
     case let action as SetUserState:
@@ -136,7 +137,7 @@ struct UserMetaDataPayload: Codable {
 public struct UserStateResponse: Hashable, Codable {
     public var data: UserStateData = [:]
     public var meta: UserStateData? = [:]
-    
+
     public enum CodingKeys: String, CodingKey {
         case data, meta
     }

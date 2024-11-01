@@ -10,6 +10,7 @@ import Foundation
 import AnyCodable
 import Rownd
 import WidgetKit
+import OSLog
 
 protocol AuthRepositoryProtocol {
     var internalAuthState: InternalAuthState { get }
@@ -71,6 +72,8 @@ final class AuthRepository: AuthRepositoryProtocol {
 //            }
 //        }
 //    }
+    
+    let log = Logger(subsystem: "io.rownd.landmarks", category: "auth_repository")
 
     @Published var rowndUser: RowndUser?
     @Published var internalAuthState: InternalAuthState = .loading
@@ -183,10 +186,9 @@ final class AuthRepository: AuthRepositoryProtocol {
     @MainActor func exchangeRowndToken(idToken: String) async {
         do {
             let resp = try await apiExchangeRowndToken(body: TokenExchangeBody( idToken: idToken ))
-            print(String(describing: resp))
-
+            log.debug("Token response: \(String(describing: resp))")
         } catch {
-            print("Error exchanging token: \(String(describing: error))")
+            log.error("Error exchanging token: \(String(describing: error))")
             if shouldRetry {
                 self.shouldRetry = false
                 // Only try once if the query timesout or fails

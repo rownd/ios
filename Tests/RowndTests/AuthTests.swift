@@ -89,7 +89,7 @@ class AuthTests: XCTestCase {
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            contentType: .json,
+            dataType: .json,
             statusCode: 200,
             data: [
                 .post : try JSONEncoder().encode(responseData)
@@ -149,7 +149,7 @@ class AuthTests: XCTestCase {
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            contentType: .json,
+            dataType: .json,
             statusCode: 500,
             data: [
                 .post : try JSONEncoder().encode(["error": "Something went wrong"])
@@ -162,7 +162,7 @@ class AuthTests: XCTestCase {
                 do {
                     Mock(
                         url: URL(string: "https://api.rownd.io/hub/auth/token")!,
-                        contentType: .json,
+                        dataType: .json,
                         statusCode: 200,
                         data: [
                             .post : try JSONEncoder().encode(responseData)
@@ -208,7 +208,7 @@ class AuthTests: XCTestCase {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            contentType: .json,
+            dataType: .json,
             statusCode: 200,
             data: [
                 .post : try JSONEncoder().encode(responseData)
@@ -236,7 +236,7 @@ class AuthTests: XCTestCase {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            contentType: .json,
+            dataType: .json,
             statusCode: 400,
             data: [
                 .post : try JSONEncoder().encode([
@@ -283,7 +283,7 @@ class AuthTests: XCTestCase {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
-            contentType: .json,
+            dataType: .json,
             statusCode: 504,
             data: [
                 .post : try JSONEncoder().encode(responseData)

@@ -23,7 +23,7 @@ extension RowndAutomation: Codable {
     enum CodingKeys: String, CodingKey {
         case id, name, template, state, actions, rules, triggers, platform
     }
-    
+
     public func toDictionary() throws -> [String: Any?] {
         let encoder = JSONEncoder()
         let data = try encoder.encode(self)
@@ -101,10 +101,10 @@ extension RowndAutomationRuleUnknown: Hashable, Codable {
             self = .unknown
         }
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-           
+
         switch self {
         case .or(let orRule):
            try container.encode(orRule)
