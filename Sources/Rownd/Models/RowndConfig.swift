@@ -19,6 +19,8 @@ public struct RowndConfig: Encodable {
     public var postSignInRedirect: String? = "NATIVE_APP"
     public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
+    public var signInLinkPattern: String = ".*\\.rownd\\.link$"
+    public var deepLinkHandler: RowndDeepLinkHandlerDelegate?
 
     // These should never be encoded
     public var appGroupPrefix: String?
