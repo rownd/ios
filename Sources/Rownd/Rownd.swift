@@ -248,10 +248,6 @@ public class Rownd: NSObject {
         }
     }
 
-    public static func transferEncryptionKey() throws {
-        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
-    }
-
     public static func manageAccount() {
         _ = inst.displayHub(.manageAccount)
     }
