@@ -1,5 +1,15 @@
 
 
+## 3.9.0 (2024-11-01)
+
+* chore: update release deps ([c9ddc50](https://github.com/rownd/ios/commit/c9ddc50))
+* chore: update resolved packages ([0435fa1](https://github.com/rownd/ios/commit/0435fa1))
+* fix: close bottom sheet controller before hub view controller (#92) ([50abb33](https://github.com/rownd/ios/commit/50abb33)), closes [#92](https://github.com/rownd/ios/issues/92)
+* fix(appex): Prevent race conditions between app extensions which might lead to a sign-out (#89) ([bbb4a86](https://github.com/rownd/ios/commit/bbb4a86)), closes [#89](https://github.com/rownd/ios/issues/89)
+* feat(magic): handle generic deep links (#91) ([a6a1c6b](https://github.com/rownd/ios/commit/a6a1c6b)), closes [#91](https://github.com/rownd/ios/issues/91)
+* remove instances of transfer key (#85) ([6b1d21f](https://github.com/rownd/ios/commit/6b1d21f)), closes [#85](https://github.com/rownd/ios/issues/85)
+* Sign in fallback (#88) ([380f54e](https://github.com/rownd/ios/commit/380f54e)), closes [#88](https://github.com/rownd/ios/issues/88)
+
 ## [3.8.2](https://github.com/rownd/ios/compare/3.8.1...3.8.2) (2024-10-15)
 
 
