@@ -55,11 +55,6 @@ let package = Package(
             .upToNextMajor(from: "4.0.1")
         ),
         .package(
-            name: "CodeScanner_Rownd",
-            url: "https://github.com/rownd/CodeScanner_Rownd",
-            .upToNextMajor(from: "2.1.2")
-        ),
-        .package(
             name: "Get",
             url: "https://github.com/rownd/Get",
             .upToNextMajor(from: "2.2.0")
@@ -97,7 +92,6 @@ let package = Package(
                 "JWTDecode",
                 "LBBottomSheet",
                 "SwiftKeychainWrapper",
-                "CodeScanner_Rownd",
                 "Get",
                 "GoogleSignIn",
                 "Lottie",
@@ -117,7 +111,6 @@ let package = Package(
                 "JWTDecode",
                 "LBBottomSheet",
                 "SwiftKeychainWrapper",
-                "CodeScanner_Rownd",
                 "Get",
                 "GoogleSignIn",
                 "Lottie",
