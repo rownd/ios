@@ -27,7 +27,8 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: BottomSheetController?
-
+    var isBottomSheetDismissing: Bool = false
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -159,7 +160,20 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     }
 
     func hide() {
-        self.dismiss(animated: true)
+        guard let bottomSheetController = hostController else {
+            self.dismiss(animated: true)
+            return
+        }
+        
+        if (isBottomSheetDismissing) {
+            return
+        }
+        
+        isBottomSheetDismissing = true
+        bottomSheetController.hideBottomSheet({
+            self.dismiss(animated: true)
+            self.isBottomSheetDismissing = false
+        })
     }
 
     func show() {
