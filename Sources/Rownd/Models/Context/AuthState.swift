@@ -30,6 +30,16 @@ extension AuthState: Codable {
     public var isAuthenticated: Bool {
         return accessToken != nil
     }
+    
+    public var isAuthenticatedWithUserData: Bool {
+        if (accessToken == nil) {
+            return false
+        }
+        
+        let userId = Context.currentContext.store.state.user.data["user_id"]
+        
+        return userId != nil
+    }
 
     public var isAccessTokenValid: Bool {
         guard let accessToken = accessToken, !isLoading, Context.currentContext.store.state.clockSyncState != .waiting else {
