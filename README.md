@@ -334,14 +334,6 @@ that the user should sign-in normally via `Rownd.requestSignIn()`.
     }
 ```
 
-### Rownd.auth.isAuthenticated -> Bool
-
-Returns `true` if the user is authenticated with an access token, `false` otherwise.
-
-### Rownd.auth.isAuthenticatedWithUserData -> Bool
-
-Returns `true` if the user is authenticated and the user data is available.
-
 ### Rownd.user.get() -> Dictionary<String, AnyCodable>
 
 Returns the entire user profile as a dictionary object
