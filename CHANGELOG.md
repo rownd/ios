@@ -1,5 +1,10 @@
 
 
+## 3.10.0 (2024-11-13)
+
+* fix(logs): missing redact for app container logs ([91feaf5](https://github.com/rownd/ios/commit/91feaf5))
+* feat: add api for checking if authenticated and has user data (#93) ([178b239](https://github.com/rownd/ios/commit/178b239)), closes [#93](https://github.com/rownd/ios/issues/93)
+
 ## 3.9.0 (2024-11-01)
 
 * chore: update release deps ([c9ddc50](https://github.com/rownd/ios/commit/c9ddc50))
