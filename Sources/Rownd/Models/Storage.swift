@@ -101,7 +101,7 @@ class Storage: NSObject, NSFilePresenter {
 
         if let appFileUrl = computeAppStoragePath() {
             value = readFromStorage(appFileUrl.appendingPathComponent(key))
-            Self.log.trace("Read from app container: \(value?.data(using: .utf8)?.prettyPrintedJSONString)")
+            Self.log.trace("Read from app container: \(Redact.redactSensitiveKeys(in: value).data(using: .utf8)?.prettyPrintedJSONString)")
         }
 
         guard value == nil else {
@@ -111,7 +111,7 @@ class Storage: NSObject, NSFilePresenter {
 
         // If we don't get anything, try the legacy UserDefaults store
         value = userDefaultsStore?.object(forKey: key) as? String
-        Self.log.trace("Read from UserDefaults: \(value?.data(using: .utf8)?.prettyPrintedJSONString)")
+        Self.log.trace("Read from UserDefaults: \(Redact.redactSensitiveKeys(in: value).data(using: .utf8)?.prettyPrintedJSONString)")
         return value
     }
 
