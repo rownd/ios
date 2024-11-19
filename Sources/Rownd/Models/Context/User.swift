@@ -163,6 +163,11 @@ class UserData {
         }
     }
 
+    static func fetchUserData(state: RowndState) async throws -> UserStateResponse? {
+        let response = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+        return response
+    }
+    
     static func fetch() -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
@@ -184,7 +189,8 @@ class UserData {
                 }
 
                 do {
-                    let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+
+                    let user = try await fetchUserData(state: state)
 
                     logger.debug("Decoded user response: \(String(describing: user))")
 

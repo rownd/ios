@@ -115,7 +115,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         try await Task.sleep(nanoseconds: UInt64(2 * Double(NSEC_PER_SEC)))
 
                         DispatchQueue.main.async {
-                            Context.currentContext.store.dispatch(Context.currentContext.store.state.auth.onReceiveAuthTokens(
+                            Context.currentContext.store.dispatch(Context.currentContext.store.state.auth.onReceiveAppleAuthTokens(
                                 AuthState(
                                     accessToken: tokenResponse?.accessToken,
                                     refreshToken: tokenResponse?.refreshToken
@@ -123,36 +123,54 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             ))
 
                             Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
-
                             Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
+                               
                                 guard let state = getState() else { return }
 
-                                var userData = state.user.data
-
-                                let defaults = UserDefaults.standard
-                                // use UserDefault values for Email and fullName if available
-                                if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
-                                    let decoder = JSONDecoder()
-                                    if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
-                                        userData["email"] = AnyCodable(loadedAppleSignInData.email)
-                                        userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
-                                        userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
-                                        userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
+                                Task {
+                                        do {
+                                            
+                                            if let userStateResponse = try await UserData.fetchUserData(state: state) {
+                                                
+                                                var userData = state.user.data
+                                                userData.merge(userStateResponse.data) { (current, _) in current }
+                                                
+                                                let defaults = UserDefaults.standard
+                                                // use UserDefault values for Email and fullName if available
+                                                if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
+                                                    let decoder = JSONDecoder()
+                                                    if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
+                                                        userData["email"] = AnyCodable(loadedAppleSignInData.email)
+                                                        userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
+                                                        userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
+                                                        userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
+                                                    }
+                                                } else {
+                                                    if let email = email {
+                                                        userData["email"] = AnyCodable(email)
+                                                        userData["first_name"] = AnyCodable(fullName?.givenName)
+                                                        userData["last_name"] = AnyCodable(fullName?.familyName)
+                                                        userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
+                                                    }
+                                                }
+                                                
+                                                DispatchQueue.main.async {
+                                                    // Dispatch to save the merged data
+                                                    if !userData.isEmpty {
+                                                        dispatch(UserData.save(userData))
+                                                        logger.debug("UserData to save after signin: \(String(describing: userData))")
+                                                    }
+                                                }
+                                                
+                                            } else {
+                                                // Handle the case where userStateResponse is nil
+                                                logger.error("Failed to fetch user state response")
+                                            }
+                                        } catch {
+                                            // Handle any errors that occurred during fetch
+                                            logger.error("Error fetching user data: \(error)")
+                                        }
                                     }
-                                } else {
-                                    if let email = email {
-                                        userData["email"] = AnyCodable(email)
-                                        userData["first_name"] = AnyCodable(fullName?.givenName)
-                                        userData["last_name"] = AnyCodable(fullName?.familyName)
-                                        userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
-                                    }
-                                }
-
-                                if !userData.isEmpty {
-                                    DispatchQueue.main.async {
-                                        dispatch(UserData.save(userData))
-                                    }
-                                }
                             })
 
                             RowndEventEmitter.emit(RowndEvent(
