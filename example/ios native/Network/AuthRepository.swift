@@ -96,7 +96,7 @@ final class AuthRepository: AuthRepositoryProtocol {
 
                 self.isRowndStateInitialized = true
 
-                guard state.auth.isAuthenticated else {
+                guard state.auth.isAuthenticatedWithUserData else {
                     self.internalAuthState = .loggedOut
                     return
                 }
@@ -108,7 +108,7 @@ final class AuthRepository: AuthRepositoryProtocol {
             .sink { state in
                 WidgetCenter.shared.reloadAllTimelines()
 
-                guard self.isRowndStateInitialized, state.isAuthenticated else { return }
+                guard self.isRowndStateInitialized, state.isAuthenticatedWithUserData else { return }
                 self.internalAuthState = .loading
                 if let accessToken = state.accessToken,
                    state.isAccessTokenValid {

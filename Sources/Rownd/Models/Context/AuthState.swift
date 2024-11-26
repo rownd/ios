@@ -12,17 +12,16 @@ import ReSwiftThunk
 import JWTDecode
 import Get
 
-private let tokenQueue = DispatchQueue(label: "Rownd refresh token queue")
-
 public struct AuthState: Hashable, CustomStringConvertible {
     public var isLoading: Bool = false
     public var accessToken: String?
     public var refreshToken: String?
     public var isVerifiedUser: Bool?
     public var hasPreviouslySignedIn: Bool? = false
+    public var userId: String?
 
     public var description: String {
-        return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil")"
+        return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil"), userId: \(userId ?? "nil")"
     }
 }
 
@@ -32,7 +31,7 @@ extension AuthState: Codable {
     }
     
     public var isAuthenticatedWithUserData: Bool {
-        if (accessToken == nil) {
+        if (!isAuthenticated) {
             return false
         }
         
@@ -138,6 +137,8 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
     switch action {
     case let action as SetAuthState:
         state = action.payload
+    case let action as SetUserData:
+        state.userId = action.data["user_id"]?.value as? String
     default:
         break
     }
