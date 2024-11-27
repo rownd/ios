@@ -159,11 +159,10 @@ class UserData {
             guard let _ = getState() else { return }
 
             dispatch(action)
-//            dispatch(RefreshAuthState())
         }
     }
 
-    internal static func _fetch(_ state: RowndState) async throws -> UserStateResponse? {
+    internal static func fetchUserData(_ state: RowndState) async throws -> UserStateResponse? {
         if let handle = fetchTask {
             log.debug("User data fetch is already in progress")
             return try await handle.value
@@ -230,7 +229,7 @@ class UserData {
                 }
 
                 do {
-                    let user = try await _fetch(state)
+                    let user = try await fetchUserData(state)
 
                     guard let user = user else {
                         return
@@ -241,7 +240,6 @@ class UserData {
                             data: user.data,
                             meta: user.meta)
                         )
-//                        dispatch(RefreshAuthState())
                     }
                 } catch {
                     log.error("Something went wrong while fetching the user's profile \(String(describing: error))")
