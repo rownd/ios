@@ -1,5 +1,10 @@
 
 
+## <small>3.10.1 (2024-11-27)</small>
+
+* fix(auth): computed property not triggering state observers (#95) ([4ccfa46](https://github.com/rownd/ios/commit/4ccfa46)), closes [#95](https://github.com/rownd/ios/issues/95)
+* fetch user profile before saving apple user data (#94) ([dcba80b](https://github.com/rownd/ios/commit/dcba80b)), closes [#94](https://github.com/rownd/ios/issues/94)
+
 ## 3.10.0 (2024-11-13)
 
 * fix(logs): missing redact for app container logs ([91feaf5](https://github.com/rownd/ios/commit/91feaf5))
