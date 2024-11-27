@@ -129,8 +129,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
 
                                 Task {
                                         do {
-                                            
-                                            if let userStateResponse = try await UserData.fetchUserData(state: state) {
+                                            if let userStateResponse = try await UserData.fetchUserData(state) {
                                                 
                                                 var userData = state.user.data
                                                 userData.merge(userStateResponse.data) { (current, _) in current }

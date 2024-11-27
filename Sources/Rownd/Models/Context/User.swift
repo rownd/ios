@@ -11,6 +11,9 @@ import ReSwift
 import ReSwiftThunk
 import AnyCodable
 import Get
+import OSLog
+
+private let log = Logger(subsystem: "io.rownd.sdk", category: "user")
 
 public typealias UserStateData = [String: AnyCodable]
 
@@ -86,10 +89,6 @@ extension UserState: Codable {
     }
 }
 
-struct SetUserState: Action {
-    public var payload = UserState()
-}
-
 struct SetUserLoading: Action {
     var isLoading: Bool
 }
@@ -114,8 +113,6 @@ func userReducer(action: Action, state: UserState?) -> UserState {
         state.isLoading = false
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
-    case let action as SetUserState:
-        state = action.payload
     default:
         break
     }
@@ -155,23 +152,66 @@ extension UserMetaDataResponse: Codable {
 }
 
 class UserData {
-    static func onReceiveUserData(_ newUserState: UserState) -> Thunk<RowndState> {
+    private static var fetchTask: Task<UserStateResponse?, Error>?
+
+    static func onReceiveUserData(_ action: SetUserData) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let _ = getState() else { return }
 
-            dispatch(SetUserState(payload: newUserState))
+            dispatch(action)
         }
     }
 
-    static func fetchUserData(state: RowndState) async throws -> UserStateResponse? {
-        let response = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
-        return response
+    internal static func fetchUserData(_ state: RowndState) async throws -> UserStateResponse? {
+        if let handle = fetchTask {
+            log.debug("User data fetch is already in progress")
+            return try await handle.value
+        }
+
+        let task = Task.retrying { () throws -> UserStateResponse? in
+
+            guard state.auth.isAuthenticated else {
+                throw RowndError("User must be authenticated before fetching profile")
+            }
+
+            defer {
+                fetchTask = nil
+            }
+
+            do {
+                let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+
+                log.debug("Decoded user response: \(String(describing: user))")
+
+                guard let user = user else {
+                    throw RowndError("Failed to load or decode user")
+                }
+
+                return user
+            } catch {
+                log.error("Failed to retrieve user: \(String(describing: error))")
+
+                // If the user doesn't exist, sign out (user may have been deleted)
+                if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode == 404 {
+                    log.warning("This user was not found (likely deleted), so they will be signed out.")
+                    Rownd.signOut()
+                    return nil
+                }
+
+                throw RowndError(
+                    "Failed to retireve user: \(error.localizedDescription)"
+                )
+            }
+        }
+
+        self.fetchTask = task
+
+        return try await task.value
     }
-    
+
     static func fetch() -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let state = getState() else { return }
-            guard !state.user.isLoading else { return }
 
             Task {
                 guard state.auth.isAuthenticated else {
@@ -189,23 +229,20 @@ class UserData {
                 }
 
                 do {
+                    let user = try await fetchUserData(state)
 
-                    let user = try await fetchUserData(state: state)
-
-                    logger.debug("Decoded user response: \(String(describing: user))")
+                    guard let user = user else {
+                        return
+                    }
 
                     DispatchQueue.main.async {
-                        dispatch(SetUserData(data: user?.data ?? [:], meta: user?.meta ?? [:]))
+                        dispatch(SetUserData(
+                            data: user.data,
+                            meta: user.meta)
+                        )
                     }
                 } catch {
-                    logger.error("Failed to retrieve user: \(String(describing: error))")
-
-                    // If the user doesn't exist, sign out (user may have been deleted)
-                    if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode == 404 {
-                        logger.warning("This user was not found (likely deleted), so they will be signed out.")
-                        Rownd.signOut()
-                    }
-
+                    log.error("Something went wrong while fetching the user's profile \(String(describing: error))")
                 }
             }
         }

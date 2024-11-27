@@ -24,7 +24,7 @@ struct SplashView: View {
                 Spacer()
             }
 
-            if rowndState.current.isInitialized && !authState.current.isAuthenticated {
+            if rowndState.current.isInitialized && !authState.current.isAuthenticatedWithUserData {
                 Spacer()
                 VStack(spacing: 20) {
                     Button("Sign up as a guest", action: {

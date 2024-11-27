@@ -16,7 +16,7 @@ struct LandmarksApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if authState.current.isAuthenticated {
+            if authState.current.isAuthenticatedWithUserData {
                 ContentView()
             } else {
                 SplashView()

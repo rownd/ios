@@ -66,12 +66,12 @@ struct ContentView: View {
 
                 Spacer()
 
-                if authState.current.isAuthenticated {
+                if authState.current.isAuthenticatedWithUserData {
                     Menu {
                         Button(action: {
                             Rownd.manageAccount()
                         }, label: {
-                            Text(user.current["first_name"]?.value as? String ?? "My account" )
+                            Text((user.current["first_name"]?.value as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "My account" )
                         })
 
                         Section {
