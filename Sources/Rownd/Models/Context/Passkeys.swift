@@ -74,6 +74,10 @@ func passkeyReducer(action: Action, state: PasskeyState?) -> PasskeyState {
     case let action as SetPasskeyRegistration:
         state.isInitialized = true
         state.registration = action.payload
+    case let action as SetAuthState:
+        if !action.payload.isAuthenticated {
+            state = PasskeyState()
+        }
     default:
         break
     }

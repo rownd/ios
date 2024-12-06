@@ -198,7 +198,10 @@ func rowndStateReducer(action: Action, state: RowndState?) -> RowndState {
 
     if !newState.auth.isAuthenticated && (state?.auth.isAuthenticated == true) {
         if #available(iOS 15.0, *) {
-            fetchRecentLogs(secondsBack: 10)
+            Task {
+                // TODO: enable w/ telemetry
+                // fetchRecentLogs(secondsBack: 10)
+            }
         }
     }
 
