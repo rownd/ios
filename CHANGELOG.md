@@ -1,5 +1,9 @@
 
 
+## <small>3.10.2 (2024-12-06)</small>
+
+* fix(sign out): main thread hang (#96) ([bbb662d](https://github.com/rownd/ios/commit/bbb662d)), closes [#96](https://github.com/rownd/ios/issues/96)
+
 ## <small>3.10.1 (2024-11-27)</small>
 
 * fix(auth): computed property not triggering state observers (#95) ([4ccfa46](https://github.com/rownd/ios/commit/4ccfa46)), closes [#95](https://github.com/rownd/ios/issues/95)
