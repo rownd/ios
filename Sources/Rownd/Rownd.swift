@@ -213,15 +213,15 @@ public class Rownd: NSObject {
     }
 
     public static func signOut() {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let store = Context.currentContext.store
             store.dispatch(SetAuthState(payload: AuthState()))
-            store.dispatch(SetUserData(data: [:], meta: [:]))
-            store.dispatch(SetPasskeyState())
 
-            RowndEventEmitter.emit(RowndEvent(
-                event: .signOut
-            ))
+            Task {
+                RowndEventEmitter.emit(RowndEvent(
+                    event: .signOut
+                ))
+            }
         }
     }
 

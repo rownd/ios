@@ -113,6 +113,10 @@ func userReducer(action: Action, state: UserState?) -> UserState {
         state.isLoading = false
     case let action as SetUserLoading:
         state.isLoading = action.isLoading
+    case let action as SetAuthState:
+        if !action.payload.isAuthenticated {
+            state = UserState()
+        }
     default:
         break
     }
