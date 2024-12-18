@@ -293,7 +293,7 @@ public class Rownd: NSObject {
             }
         }
     }
-    
+
     internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
         return determineSignInOptions(signInOptions, signInType: nil)
     }
@@ -307,11 +307,11 @@ public class Rownd: NSObject {
                 logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
             }
         }
-        
+
         if (signInType != nil) {
             signInOptions?.signInType = signInType
         }
-        
+
         return signInOptions
     }
 
@@ -517,12 +517,14 @@ internal struct RowndSignInJsOptions: Encodable {
     public var loginStep: RowndSignInLoginStep?
     public var intent: RowndSignInIntent?
     public var userType: UserType?
+    public var appVariantUserType: UserType?
     public var signInType: SignInType?
 
     enum CodingKeys: String, CodingKey {
         case token, intent
         case loginStep = "login_step"
         case userType = "user_type"
+        case appVariantUserType = "app_variant_user_type"
         case signInType = "sign_in_type"
     }
 }

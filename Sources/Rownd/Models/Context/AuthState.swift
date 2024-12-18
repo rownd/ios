@@ -29,14 +29,14 @@ extension AuthState: Codable {
     public var isAuthenticated: Bool {
         return accessToken != nil
     }
-    
+
     public var isAuthenticatedWithUserData: Bool {
         if (!isAuthenticated) {
             return false
         }
-        
+
         let userId = Context.currentContext.store.state.user.data["user_id"]
-        
+
         return userId != nil
     }
 
@@ -121,7 +121,7 @@ extension AuthState: Codable {
 
         }
     }
-    
+
     func onReceiveAppleAuthTokens(_ newAuthState: AuthState) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
             guard let _ = getState() else { return }
@@ -173,6 +173,13 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
 public enum UserType: String, Codable {
     case NewUser = "new_user"
     case ExistingUser = "existing_user"
+    case Unknown = "unknown"
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        self = UserType(rawValue: rawValue) ?? .Unknown
+    }
 }
 
 struct TokenRequest: Codable {

@@ -202,6 +202,7 @@ class RowndEventHandler: RowndEventHandlerDelegate {
         switch event.event {
         case .signInCompleted:
             let userType = event.data?["user_type"]
+            let appVariantUserType = event.data?["app_variant_user_type"]
             break
 
         default:
@@ -252,6 +253,7 @@ Here's a list of events that the Rownd SDK emits and the corresponding data that
 {
 	method: "google" | "apple" | "phone" | "email" | "passkey" | etc,
 	user_type: "new_user" | "existing_user"
+    app_variant_user_type: "new_user" | "existing_user"
 }
 ```
 
@@ -351,7 +353,6 @@ Replaces the user's data with that contained in the dictionary. This may overwri
 Hint: use `AnyCodable.init(value)` to conform your values to the required type.
 
 ### Rownd.user.set(field: String, value: AnyCodable) -> void
-
 Sets a specific user profile field to the provided value, overwriting if a value already exists. If the field is flagged as `encrypted`, it will be encrypted on-device prior to storing in Rownd's platform.
 
 Hint: use `AnyCodable.init(value)` to conform your values to the required type.
