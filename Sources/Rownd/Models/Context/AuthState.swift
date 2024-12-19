@@ -195,11 +195,13 @@ struct TokenResponse: Codable {
     var refreshToken: String?
     var accessToken: String?
     var userType: UserType?
+    var appVariantUserType: UserType?
 
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
         case accessToken = "access_token"
         case userType = "user_type"
+        case appVariantUserType = "app_variant_user_type"
     }
 }
 

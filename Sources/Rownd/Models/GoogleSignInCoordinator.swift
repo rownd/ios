@@ -110,7 +110,8 @@ class GoogleSignInCoordinator: NSObject {
                             event: .signInCompleted,
                             data: [
                                 "method": AnyCodable(SignInType.google.rawValue),
-                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue)
+                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
+                                "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
                             ]
                         ))
                     }
