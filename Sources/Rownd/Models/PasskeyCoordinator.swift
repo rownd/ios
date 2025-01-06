@@ -334,8 +334,8 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         event: .signInCompleted,
                         data: [
                             "method": AnyCodable(SignInType.passkey.rawValue),
-                            "user_type": AnyCodable(challengeAuthenticationCompleteResponse.user_type.rawValue),
-                            "app_variant_user_type": AnyCodable(challengeAuthenticationCompleteResponse.app_variant_user_type.rawValue)
+                            "user_type": AnyCodable(challengeAuthenticationCompleteResponse.user_type),
+                            "app_variant_user_type": AnyCodable(challengeAuthenticationCompleteResponse.app_variant_user_type)
                         ]
                     ))
                 } catch {
