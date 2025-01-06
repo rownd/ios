@@ -320,13 +320,13 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         Context.currentContext.store.dispatch(UserData.fetch())
                     }
 
-                    await hubViewController?.loadNewPage(
+                    hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: RowndSignInLoginStep.success,
                             intent: .signIn,
-                            userType: UserType(rawValue: challengeAuthenticationCompleteResponse.user_type),
-                            appVariantUserType: UserType(rawValue: challengeAuthenticationCompleteResponse.app_variant_user_type)
+                            userType: challengeAuthenticationCompleteResponse.user_type,
+                            appVariantUserType: challengeAuthenticationCompleteResponse.app_variant_user_type
                         )
                     )
 
@@ -334,13 +334,13 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         event: .signInCompleted,
                         data: [
                             "method": AnyCodable(SignInType.passkey.rawValue),
-                            "user_type": AnyCodable(challengeAuthenticationCompleteResponse.user_type),
-                            "app_variant_user_type": AnyCodable(challengeAuthenticationCompleteResponse.app_variant_user_type)
+                            "user_type": AnyCodable(challengeAuthenticationCompleteResponse.user_type?.rawValue),
+                            "app_variant_user_type": AnyCodable(challengeAuthenticationCompleteResponse.app_variant_user_type?.rawValue)
                         ]
                     ))
                 } catch {
                     logger.error("Failed passkey POST authentication: \(String(describing: error))")
-                    await hubViewController?.loadNewPage(
+                    hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: .error,
@@ -498,8 +498,8 @@ struct PasskeyAuthenticationCompleteResponse: Hashable, Codable {
     public var verified: Bool
     public var access_token: String
     public var refresh_token: String
-    public var user_type: String
-    public var app_variant_user_type: String
+    public var user_type: UserType?
+    public var app_variant_user_type: UserType?
 
     enum CodingKeys: String, CodingKey {
         case verified, access_token, refresh_token, user_type, app_variant_user_type
