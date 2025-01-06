@@ -320,7 +320,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         Context.currentContext.store.dispatch(UserData.fetch())
                     }
 
-                    hubViewController?.loadNewPage(
+                    await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: RowndSignInLoginStep.success,
@@ -340,7 +340,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                     ))
                 } catch {
                     logger.error("Failed passkey POST authentication: \(String(describing: error))")
-                    hubViewController?.loadNewPage(
+                   await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: .error,
