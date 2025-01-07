@@ -107,7 +107,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                                 loginStep: RowndSignInLoginStep.success,
                                 intent: self.intent,
-                                userType: tokenResponse?.userType
+                                userType: tokenResponse?.userType,
+                                appVariantUserType: tokenResponse?.appVariantUserType
                             ))
                         }
 
@@ -176,7 +177,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                 event: .signInCompleted,
                                 data: [
                                     "method": AnyCodable(SignInType.apple.rawValue),
-                                    "user_type": AnyCodable(tokenResponse?.userType?.rawValue)
+                                    "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
+                                    "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
                                 ]
                             ))
                         }

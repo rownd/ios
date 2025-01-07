@@ -13,6 +13,7 @@ class RowndEventHandler: RowndEventHandlerDelegate {
         switch event.event {
         case .signInCompleted:
             let userType = event.data?["user_type"]
+            let appVariantUserType = event.data?["app_variant_user_type"]
             break
 
         default:

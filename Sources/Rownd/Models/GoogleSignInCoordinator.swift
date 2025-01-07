@@ -102,7 +102,8 @@ class GoogleSignInCoordinator: NSObject {
                             jsFnOptions: RowndSignInJsOptions(
                                 loginStep: .success,
                                 intent: intent,
-                                userType: tokenResponse?.userType
+                                userType: tokenResponse?.userType,
+                                appVariantUserType: tokenResponse?.appVariantUserType
                             )
                         )
 
@@ -110,7 +111,8 @@ class GoogleSignInCoordinator: NSObject {
                             event: .signInCompleted,
                             data: [
                                 "method": AnyCodable(SignInType.google.rawValue),
-                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue)
+                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
+                                "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
                             ]
                         ))
                     }

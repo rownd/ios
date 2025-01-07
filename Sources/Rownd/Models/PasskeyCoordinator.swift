@@ -82,7 +82,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         }
         return nil
     }
-    
+
     private func defaultSignInFlow() {
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
     }
@@ -325,7 +325,8 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: RowndSignInLoginStep.success,
                             intent: .signIn,
-                            userType: .ExistingUser
+                            userType: challengeAuthenticationCompleteResponse.user_type,
+                            appVariantUserType: challengeAuthenticationCompleteResponse.app_variant_user_type
                         )
                     )
 
@@ -333,12 +334,13 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         event: .signInCompleted,
                         data: [
                             "method": AnyCodable(SignInType.passkey.rawValue),
-                            "user_type": AnyCodable(UserType.ExistingUser.rawValue)
+                            "user_type": AnyCodable(challengeAuthenticationCompleteResponse.user_type?.rawValue),
+                            "app_variant_user_type": AnyCodable(challengeAuthenticationCompleteResponse.app_variant_user_type?.rawValue)
                         ]
                     ))
                 } catch {
                     logger.error("Failed passkey POST authentication: \(String(describing: error))")
-                    await hubViewController?.loadNewPage(
+                   await hubViewController?.loadNewPage(
                         targetPage: .signIn,
                         jsFnOptions: RowndSignInJsOptions(
                             loginStep: .error,
@@ -496,8 +498,10 @@ struct PasskeyAuthenticationCompleteResponse: Hashable, Codable {
     public var verified: Bool
     public var access_token: String
     public var refresh_token: String
+    public var user_type: UserType?
+    public var app_variant_user_type: UserType?
 
     enum CodingKeys: String, CodingKey {
-        case verified, access_token, refresh_token
+        case verified, access_token, refresh_token, user_type, app_variant_user_type
     }
 }
