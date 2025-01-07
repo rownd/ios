@@ -19,6 +19,7 @@ class RowndUnauthenticatedApiClientDelegate: APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
+        request.setValue(Rownd.config.appKey, forHTTPHeaderField: "X-Rownd-App-Key")
         if request.httpMethod?.lowercased() != "get", request.value(forHTTPHeaderField: "Content-Type") == nil {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
