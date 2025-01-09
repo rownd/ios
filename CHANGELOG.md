@@ -1,5 +1,10 @@
 
 
+## <small>3.10.3 (2025-01-09)</small>
+
+* fix(tokkens): include app key in token requests (#98) ([4bda382](https://github.com/rownd/ios/commit/4bda382)), closes [#98](https://github.com/rownd/ios/issues/98)
+* Draft: add app_variant_user_type to sign in event (#97) ([90254dd](https://github.com/rownd/ios/commit/90254dd)), closes [#97](https://github.com/rownd/ios/issues/97)
+
 ## <small>3.10.2 (2024-12-06)</small>
 
 * fix(sign out): main thread hang (#96) ([bbb662d](https://github.com/rownd/ios/commit/bbb662d)), closes [#96](https://github.com/rownd/ios/issues/96)
