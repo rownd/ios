@@ -1,5 +1,10 @@
 
 
+## <small>3.10.4 (2025-01-10)</small>
+
+* chore(test): throw when no token is present after sign in ([fe6cc3f](https://github.com/rownd/ios/commit/fe6cc3f))
+* fix(events): fire sign-in events after auth events ([ef0fa83](https://github.com/rownd/ios/commit/ef0fa83))
+
 ## <small>3.10.3 (2025-01-09)</small>
 
 * fix(tokkens): include app key in token requests (#98) ([4bda382](https://github.com/rownd/ios/commit/4bda382)), closes [#98](https://github.com/rownd/ios/issues/98)
