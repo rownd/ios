@@ -10,6 +10,7 @@ import UIKit
 import WebKit
 import SwiftUI
 import LocalAuthentication
+import ReSwiftThunk
 
 public enum HubPageSelector {
     case signIn
@@ -375,13 +376,19 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 break
             case .event:
                 guard case .event(let eventMessage) = hubMessage.payload else { return }
-                RowndEventEmitter.emit(eventMessage)
+                // Make this async so that auth state updates fire before
+                // sign-in events
+                Task {
+                    DispatchQueue.main.async {
+                        RowndEventEmitter.emit(eventMessage)
+                    }
+                }
                 break
             case .unknown:
                 break
             }
         } catch {
-            logger.error("Failed to decode incoming interop message: \(String(describing: error))")
+            logger.debug("Failed to decode incoming interop message: \(String(describing: error))")
         }
     }
 
