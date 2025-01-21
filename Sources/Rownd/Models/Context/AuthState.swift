@@ -19,9 +19,11 @@ public struct AuthState: Hashable, CustomStringConvertible {
     public var isVerifiedUser: Bool?
     public var hasPreviouslySignedIn: Bool? = false
     public var userId: String?
+    public var challengeId: String?
+    public var userIdentifier: String?
 
     public var description: String {
-        return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil"), userId: \(userId ?? "nil")"
+        return "AuthState(isLoading: \(isLoading), isAuthenticated: \(isAuthenticated), accessToken: \(isAuthenticated ? "[REDACTED]" : "nil"), refreshToken: \(isAuthenticated ? "[REDACTED]" : "nil"), userId: \(userId ?? "nil"), challengeId: \(challengeId ?? "nil"), userIdentifier: \(userIdentifier ?? "nil"))"
     }
 }
 
@@ -64,6 +66,8 @@ extension AuthState: Codable {
         case refreshToken = "refresh_token"
         case isVerifiedUser = "is_verified_user"
         case hasPreviouslySignedIn = "has_previously_signed_in"
+        case challengeId = "challenge_id"
+        case userIdentifier = "user_identifier"
     }
 
     func toRphInitHash() -> String? {

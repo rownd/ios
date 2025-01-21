@@ -386,6 +386,23 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 break
             case .unknown:
                 break
+            case .authChallengeInitiated:
+                guard case .authChallengeInitiated(let authChallengeMessage) = hubMessage.payload else { return }
+                DispatchQueue.main.async {
+                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
+                        challengeId: authChallengeMessage.challengeId,
+                        userIdentifier: authChallengeMessage.userIdentifier
+                    )))
+                }
+                break
+            case .authChallengeCleared:
+                DispatchQueue.main.async {
+                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
+                        accessToken: store.state.auth.accessToken,
+                        refreshToken: store.state.auth.refreshToken
+                    )))
+                }
+                break;
             }
         } catch {
             logger.debug("Failed to decode incoming interop message: \(String(describing: error))")
