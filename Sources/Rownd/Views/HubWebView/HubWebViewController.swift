@@ -399,7 +399,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 DispatchQueue.main.async {
                     Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
                         accessToken: store.state.auth.accessToken,
-                        refreshToken: store.state.auth.refreshToken
+                        refreshToken: store.state.auth.refreshToken,
+                        isVerifiedUser: store.state.auth.isVerifiedUser,
+                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn,
+                        userId: store.state.auth.userId
                     )))
                 }
                 break;
