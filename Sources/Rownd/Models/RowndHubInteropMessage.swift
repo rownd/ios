@@ -55,6 +55,8 @@ enum MessageType: String, Codable {
     case hubResize = "hub_resize"
     case canTouchBackgroundToDismiss = "can_touch_background_to_dismiss"
     case event = "event"
+    case authChallengeInitiated = "auth_challenge_initiated"
+    case authChallengeCleared = "auth_challenge_cleared"
     case unknown
 
     enum CodingKeys: String, CodingKey {
@@ -87,6 +89,8 @@ enum MessagePayload: Decodable {
     case hubResize(TriggerHubResize)
     case canTouchBackgroundToDismiss(CanTouchBackgroundToDismiss)
     case event(RowndEvent)
+    case authChallengeInitiated(PayloadAuthChallengeInitiated)
+    case authChallengeCleared
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -151,6 +155,23 @@ enum MessagePayload: Decodable {
 
         case .unknown:
             self = .unknown
+            
+        case .authChallengeInitiated:
+            let payload = try objectContainer.decode(PayloadAuthChallengeInitiated.self)
+            self = .authChallengeInitiated(payload)
+            
+        case .authChallengeCleared:
+            self = .authChallengeCleared
+        }
+    }
+    
+    public struct PayloadAuthChallengeInitiated: Codable {
+        var challengeId: String
+        var userIdentifier: String
+
+        enum CodingKeys: String, CodingKey {
+            case challengeId = "challenge_id"
+            case userIdentifier = "user_identifier"
         }
     }
 
@@ -206,6 +227,8 @@ enum MessagePayload: Decodable {
             case enable
         }
     }
+    
+    
 }
 
 class MessageTypeHolder {
