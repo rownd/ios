@@ -1,5 +1,9 @@
 
 
+## <small>3.10.6 (2025-01-23)</small>
+
+* fix(events): wait for isAccessTokenValid before propagating .signInComplete (#101) ([da12133](https://github.com/rownd/ios/commit/da12133)), closes [#101](https://github.com/rownd/ios/issues/101)
+
 ## <small>3.10.5 (2025-01-21)</small>
 
 * fix(auth): handle previously initiated auth challenges (#100) ([8418c7e](https://github.com/rownd/ios/commit/8418c7e)), closes [#100](https://github.com/rownd/ios/issues/100)
