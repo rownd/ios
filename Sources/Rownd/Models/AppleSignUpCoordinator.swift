@@ -172,7 +172,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                         }
                                     }
                             })
-
+                            
                             RowndEventEmitter.emit(RowndEvent(
                                 event: .signInCompleted,
                                 data: [
@@ -181,6 +181,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                     "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
                                 ]
                             ))
+
                         }
                     } catch ApiError.generic(let errorInfo) {
                         if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
