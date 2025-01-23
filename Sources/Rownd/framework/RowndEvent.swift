@@ -7,6 +7,7 @@
 
 import Foundation
 import AnyCodable
+import Combine
 
 public enum RowndEventType: String, Codable {
     case signInStarted = "sign_in_started"
@@ -30,9 +31,22 @@ public protocol RowndEventHandlerDelegate: AnyObject {
 }
 
 class RowndEventEmitter {
+    static private var cancellables = Set<AnyCancellable>()
     static func emit(_ event: RowndEvent) {
-        Context.currentContext.eventListeners.forEach { listener in
-            listener.handleRowndEvent(event)
+        if event.event == .signInCompleted {
+            let subscription = Context.currentContext.store.subscribe { $0.auth.isAccessTokenValid }
+            subscription.$current.sink { isAccessTokenValid in
+                if isAccessTokenValid {
+                    subscription.unsubscribe()
+                    Context.currentContext.eventListeners.forEach { listener in
+                        listener.handleRowndEvent(event)
+                    }
+                }
+            }.store(in: &Self.cancellables)
+        } else {
+            Context.currentContext.eventListeners.forEach { listener in
+                listener.handleRowndEvent(event)
+            }
         }
     }
 }

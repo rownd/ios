@@ -376,13 +376,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 break
             case .event:
                 guard case .event(let eventMessage) = hubMessage.payload else { return }
-                // Make this async so that auth state updates fire before
-                // sign-in events
-                Task {
-                    DispatchQueue.main.async {
-                        RowndEventEmitter.emit(eventMessage)
-                    }
-                }
+                RowndEventEmitter.emit(eventMessage)
                 break
             case .unknown:
                 break

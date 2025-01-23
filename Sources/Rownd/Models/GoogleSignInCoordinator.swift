@@ -106,7 +106,7 @@ class GoogleSignInCoordinator: NSObject {
                                 appVariantUserType: tokenResponse?.appVariantUserType
                             )
                         )
-
+                        
                         RowndEventEmitter.emit(RowndEvent(
                             event: .signInCompleted,
                             data: [
