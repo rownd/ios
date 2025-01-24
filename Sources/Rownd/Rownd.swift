@@ -54,7 +54,7 @@ public class Rownd: NSObject {
         inst.loadAppleSignIn()
 
         let store = Context.currentContext.store
-        if store.state.isInitialized &&
+        if store.state.isStateLoaded &&
             !store.state.auth.isAuthenticated {
             if !Bundle.main.bundlePath.hasSuffix(".appex") {
                 var launchUrl: URL?
