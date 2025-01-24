@@ -10,6 +10,7 @@ import AuthenticationServices
 import UIKit
 import AnyCodable
 import ReSwiftThunk
+import Combine
 
 private let appleSignInDataKey = "userAppleSignInData"
 
@@ -30,6 +31,7 @@ struct AppleSignInData: Codable {
 class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     var parent: Rownd?
     var intent: RowndSignInIntent?
+    var cancellables = Set<AnyCancellable>()
 
     init(_ parent: Rownd) {
         self.parent = parent
@@ -124,54 +126,14 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                             ))
 
                             Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
-                            Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
-                               
-                                guard let state = getState() else { return }
 
-                                Task {
-                                        do {
-                                            if let userStateResponse = try await UserData.fetchUserData(state) {
-                                                
-                                                var userData = state.user.data
-                                                userData.merge(userStateResponse.data) { (current, _) in current }
-                                                
-                                                let defaults = UserDefaults.standard
-                                                // use UserDefault values for Email and fullName if available
-                                                if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
-                                                    let decoder = JSONDecoder()
-                                                    if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
-                                                        userData["email"] = AnyCodable(loadedAppleSignInData.email)
-                                                        userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
-                                                        userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
-                                                        userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
-                                                    }
-                                                } else {
-                                                    if let email = email {
-                                                        userData["email"] = AnyCodable(email)
-                                                        userData["first_name"] = AnyCodable(fullName?.givenName)
-                                                        userData["last_name"] = AnyCodable(fullName?.familyName)
-                                                        userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
-                                                    }
-                                                }
-                                                
-                                                DispatchQueue.main.async {
-                                                    // Dispatch to save the merged data
-                                                    if !userData.isEmpty {
-                                                        dispatch(UserData.save(userData))
-                                                        logger.debug("UserData to save after signin: \(String(describing: userData))")
-                                                    }
-                                                }
-                                                
-                                            } else {
-                                                // Handle the case where userStateResponse is nil
-                                                logger.error("Failed to fetch user state response")
-                                            }
-                                        } catch {
-                                            // Handle any errors that occurred during fetch
-                                            logger.error("Error fetching user data: \(error)")
-                                        }
-                                    }
-                            })
+                            let subscriber = Context.currentContext.store.subscribe { $0.auth.isAccessTokenValid }
+                            subscriber.$current.sink { isAccessTokenValid in
+                                if isAccessTokenValid {
+                                    subscriber.unsubscribe()
+                                    self.updateUserDataWithAppleData(fullName: fullName, email: email)
+                                }
+                            }.store(in: &self.cancellables)
                             
                             RowndEventEmitter.emit(RowndEvent(
                                 event: .signInCompleted,
@@ -225,6 +187,50 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
             ))
             break
         }
+    }
+
+    func updateUserDataWithAppleData(fullName: PersonNameComponents?, email: String?) {
+        Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
+            guard let state = getState() else { return }
+            Task {
+                do {
+                    if let userStateResponse = try await UserData.fetchUserData(state) {
+                        var userData = state.user.data
+                        userData.merge(userStateResponse.data) { (current, _) in current }
+
+                        let defaults = UserDefaults.standard
+                        // use UserDefault values for Email and fullName if available
+                        if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
+                            let decoder = JSONDecoder()
+                            if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
+                                userData["email"] = AnyCodable(loadedAppleSignInData.email)
+                                userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
+                                userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
+                                userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
+                            }
+                        } else {
+                            if let email = email {
+                                userData["email"] = AnyCodable(email)
+                                userData["first_name"] = AnyCodable(fullName?.givenName)
+                                userData["last_name"] = AnyCodable(fullName?.familyName)
+                                userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
+                            }
+                        }
+
+                        if !userData.isEmpty {
+                            dispatch(UserData.save(userData))
+                            logger.debug("UserData to save after signin: \(String(describing: userData))")
+                        }
+                    } else {
+                        // Handle the case where userStateResponse is nil
+                        logger.error("Failed to fetch user state response")
+                    }
+                } catch {
+                    // Handle any errors that occurred during fetch
+                    logger.error("Error fetching user data: \(error)")
+                }
+            }
+        })
     }
 
     // If authorization faced any issue then this method will get triggered
