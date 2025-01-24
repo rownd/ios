@@ -1,5 +1,9 @@
 
 
+## <small>3.10.7 (2025-01-24)</small>
+
+* fix(init): no need to wait for clock sync during boot ([2797056](https://github.com/rownd/ios/commit/2797056))
+
 ## <small>3.10.6 (2025-01-23)</small>
 
 * fix(events): wait for isAccessTokenValid before propagating .signInComplete (#101) ([da12133](https://github.com/rownd/ios/commit/da12133)), closes [#101](https://github.com/rownd/ios/issues/101)
