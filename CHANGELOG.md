@@ -1,5 +1,9 @@
 
 
+## <small>3.10.8 (2025-01-24)</small>
+
+* fix(appleid): update profile data when state is valid (#102) ([245ee16](https://github.com/rownd/ios/commit/245ee16)), closes [#102](https://github.com/rownd/ios/issues/102)
+
 ## <small>3.10.7 (2025-01-24)</small>
 
 * fix(init): no need to wait for clock sync during boot ([2797056](https://github.com/rownd/ios/commit/2797056))

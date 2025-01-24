@@ -1,1 +1,1 @@
-internal let SDK_VERSION="3.10.7"
+internal let SDK_VERSION="3.10.8"
