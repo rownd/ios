@@ -222,6 +222,24 @@ public class Rownd: NSObject {
         }
     }
 
+    public static func signOut(with: RowndSignoutScope) {
+        switch with {
+        case .all:
+            Task {
+                do {
+                    let signOutRequest = SignOutRequest(signoutAll: true)
+                    try await Auth.signOutUser(signOutRequest: signOutRequest)
+                    //sign out of current session
+                    signOut()
+                } catch {
+                    logger.error("Failed to sign out user from all sessions: \(String(describing: error))")
+                }
+            }
+        }
+       
+    }
+
+    
     public static func signOut() {
         Task { @MainActor in
             let store = Context.currentContext.store
@@ -578,4 +596,8 @@ struct RowndError: Error, CustomStringConvertible {
     public var description: String {
         return message
     }
+}
+
+public enum RowndSignoutScope: String, Codable {
+    case all
 }

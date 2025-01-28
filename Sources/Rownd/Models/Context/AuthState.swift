@@ -186,6 +186,15 @@ public enum UserType: String, Codable {
     }
 }
 
+
+struct SignOutRequest: Codable {
+    var signoutAll: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case signoutAll = "sign_out_all"
+    }
+}
+
 struct TokenRequest: Codable {
     var refreshToken: String?
     var idToken: String?
@@ -251,6 +260,18 @@ class Auth {
         ))
 
         return tokenResp.value
+    }
+    
+    static func signOutUser(signOutRequest: SignOutRequest) async throws {
+
+        guard let appId = Context.currentContext.store.state.appConfig.id else {  throw RowndError("AppId not found") }
+        
+        try await Rownd.apiClient.send(Request(
+            path: "/me/applications/\(appId)/signout",
+            method: .post,
+            body: signOutRequest
+        ))
+        
     }
 }
 
