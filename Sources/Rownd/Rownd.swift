@@ -222,17 +222,18 @@ public class Rownd: NSObject {
         }
     }
 
-    public static func signOut(with: RowndSignoutScope) {
-        switch with {
+    public static func signOut(scope: RowndSignoutScope) throws {
+        switch scope {
         case .all:
             Task {
                 do {
-                    let signOutRequest = SignOutRequest(signoutAll: true)
+                    let signOutRequest = SignOutRequest(signOutAll: true)
                     try await Auth.signOutUser(signOutRequest: signOutRequest)
                     //sign out of current session
                     signOut()
                 } catch {
                     logger.error("Failed to sign out user from all sessions: \(String(describing: error))")
+                    throw RowndError("Failed to sign out user from all sessions: \(error.localizedDescription)")
                 }
             }
         }

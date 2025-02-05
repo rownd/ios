@@ -188,10 +188,10 @@ public enum UserType: String, Codable {
 
 
 struct SignOutRequest: Codable {
-    var signoutAll: Bool
+    var signOutAll: Bool
 
     enum CodingKeys: String, CodingKey {
-        case signoutAll = "sign_out_all"
+        case signOutAll = "sign_out_all"
     }
 }
 
