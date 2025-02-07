@@ -1,5 +1,10 @@
 
 
+## 3.11.0 (2025-02-07)
+
+* fix(sign-out): ios may ignore sign-out messages in some cases (#104) ([de87199](https://github.com/rownd/ios/commit/de87199)), closes [#104](https://github.com/rownd/ios/issues/104)
+* feat: support signing users out of all sessions (#103) ([9383f50](https://github.com/rownd/ios/commit/9383f50)), closes [#103](https://github.com/rownd/ios/issues/103)
+
 ## <small>3.10.8 (2025-01-24)</small>
 
 * fix(appleid): update profile data when state is valid (#102) ([245ee16](https://github.com/rownd/ios/commit/245ee16)), closes [#102](https://github.com/rownd/ios/issues/102)

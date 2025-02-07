@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Rownd"
-  s.version          = "3.10.8"
+  s.version          = "3.11.0"
   s.summary          = "Rownd bindings for iOS"
   s.description      = <<-DESC
                         Rownd is a user management platform designed to make authentication
