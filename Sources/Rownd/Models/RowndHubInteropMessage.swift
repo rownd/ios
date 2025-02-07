@@ -77,7 +77,7 @@ enum MessageType: String, Codable {
 enum MessagePayload: Decodable {
     case authentication(AuthenticationMessage)
     case userDataUpdate(UserDataUpdateMessage)
-    case signOut
+    case signOut(SignOutMessage)
     case closeHubViewController
     case unknown
     case triggerSignInWithApple(TriggerSignInWithAppleMessage)
@@ -141,7 +141,8 @@ enum MessagePayload: Decodable {
             self = .canTouchBackgroundToDismiss(payload)
 
         case .signOut:
-            self = .signOut
+            let payload = try objectContainer.decode(SignOutMessage.self)
+            self = .signOut(payload)
 
         case .tryAgain:
             self = .tryAgain
@@ -182,6 +183,14 @@ enum MessagePayload: Decodable {
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
             case refreshToken = "refresh_token"
+        }
+    }
+
+    public struct SignOutMessage: Codable {
+        var wasUserInitiated: Bool?
+
+        enum CodingKeys: String, CodingKey {
+            case wasUserInitiated = "was_user_initiated"
         }
     }
 
