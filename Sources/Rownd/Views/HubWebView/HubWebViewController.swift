@@ -347,7 +347,19 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 Rownd.requestSignIn(with: .passkey)
 
             case .signOut:
-                guard hubViewController?.targetPage == .signOut  else { return }
+                // Occasionally, the hub may send a sign-out message due to expired token
+                // or possible race condition. This check prevents accidental sign-outs
+                // from occurring
+                var signOutMessage: MessagePayload.SignOutMessage?
+                if case .signOut(let message) = hubMessage.payload {
+                    signOutMessage = message
+                }
+
+                if hubViewController?.targetPage != .signOut &&
+                    signOutMessage?.wasUserInitiated != true {
+                    return;
+                }
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
                     self?.hubViewController?.hide()
                 }
