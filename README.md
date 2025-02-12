@@ -295,6 +295,20 @@ Supported values:
 
 - `.appleId` - Prompt user to sign in with their Apple ID
 
+
+### Rownd.signOut() -> Void
+
+Clears the user's access token, removes the user's profile data, and returns the user to a completely unauthenticated state.
+
+### Rownd.signOut(scope: RowndSignoutScope) -> Void
+
+Revokes all tokens for the specified user causing them to be signed out on all devices.
+
+Supported values:
+
+- `.all` - All devices
+
+
 ### Rownd.getAccessToken() async throws -> String?
 
 Assuming a user is signed-in, returns a valid access token, refreshing the current one if needed.
