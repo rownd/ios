@@ -13,10 +13,16 @@ import OSLog
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "authenticator")
 
-enum AuthenticationError: Error {
+protocol AuthenticatorProtocol {
+    func getValidToken() async throws -> AuthState
+    func refreshToken() async throws -> AuthState
+}
+
+enum AuthenticationError: Error, Equatable {
     case noAccessTokenPresent
     case refreshTokenAlreadyConsumed
-    case networkConnectionFailure
+    case networkConnectionFailure(details: String)
+    case serverError(details: String)
 }
 
 internal let tokenApiConfig = APIClient.Configuration(
@@ -49,6 +55,8 @@ private class TokenApiClientDelegate: APIClientDelegate {
             .some(.cannotFindHost),
             .some(.cannotConnectToHost),
             .some(.networkConnectionLost),
+            .some(.notConnectedToInternet),
+            .some(.cancelled),
             .some(.dnsLookupFailed):
             if attempts <= 5 {
                 return true
@@ -98,7 +106,7 @@ internal static func createAuthenticatorMiddleware<State>() -> Middleware<State>
     }
 }
 
-actor Authenticator {
+actor Authenticator: AuthenticatorProtocol {
     private let tokenApi = Container.tokenApi()
     private var refreshTask: Task<AuthState, Error>?
 
@@ -159,7 +167,7 @@ actor Authenticator {
                 if
                     case .unacceptableStatusCode(let statusCode) = error as? APIError,
                     statusCode != 400 {
-                    throw AuthenticationError.networkConnectionFailure
+                    throw AuthenticationError.serverError(details: "\(String(describing: error))")
                 }
 
                 switch (error as? URLError)?.code {
@@ -170,7 +178,10 @@ actor Authenticator {
                     .some(.cannotConnectToHost),
                     .some(.networkConnectionLost),
                     .some(.dnsLookupFailed):
-                        throw AuthenticationError.networkConnectionFailure
+                    throw AuthenticationError
+                        .networkConnectionFailure(
+                            details: "\(String(describing: error))"
+                        )
                 default: break
                 }
 

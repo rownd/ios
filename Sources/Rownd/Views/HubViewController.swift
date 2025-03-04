@@ -26,7 +26,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     var customLoadingAnimationView: LottieAnimationView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
-    var hostController: BottomSheetController?
+    var hostController: BottomSheetViewController?
     var isBottomSheetDismissing: Bool = false
     
     public override func viewWillAppear(_ animated: Bool) {

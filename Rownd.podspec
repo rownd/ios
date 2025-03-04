@@ -19,8 +19,6 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target     = '14.0'
 
-  s.dependency 'LBBottomSheet', '~> 1.1.7'
-  s.dependency 'AnyCodable-FlightSchool', '~> 0.6.5'
   s.dependency 'JWTDecode', '~> 3.0.0'
   s.dependency 'ReSwift', '~> 6.1.1'
   s.dependency 'ReSwiftThunk', '~> 2.0.1'
@@ -29,6 +27,17 @@ Pod::Spec.new do |s|
   s.dependency 'GoogleSignIn', '~> 7.0.0'
   s.dependency 'lottie-ios', '~> 4.3.3'
   s.dependency 'Factory', '~> 1.2.8'
+
+  s.dependency 'LBBottomSheet'
+  s.dependency 'AnyCodable'
+
+  s.subspec 'LBBottomSheet' do |ss|
+    ss.source_files = 'Packages/LBBottomSheet/Sources/**/*'
+  end
+
+  s.subspec 'AnyCodable' do |ss|
+    ss.source_files = 'Packages/AnyCodable/Sources/**/*'
+  end
 
   s.requires_arc     = true
   s.source_files     = 'Sources/**/*'

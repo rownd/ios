@@ -13,10 +13,10 @@ protocol BottomSheetControllerProtocol {
 }
 
 protocol BottomSheetHostProtocol {
-    var hostController: BottomSheetController? { get set }
+    var hostController: BottomSheetViewController? { get set }
 }
 
-class BottomSheetController: UIViewController {
+class BottomSheetViewController: UIViewController {
 
     let debouncer = Debouncer(delay: 0.1) // 500ms
     var controller: UIViewController?
@@ -105,7 +105,7 @@ class BottomSheetController: UIViewController {
     }
 }
 
-extension BottomSheetController {
+extension BottomSheetViewController {
     func subscribeToNotification(_ notification: NSNotification.Name, selector: Selector) {
         NotificationCenter.default.addObserver(self, selector: selector, name: notification, object: nil)
     }

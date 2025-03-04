@@ -90,16 +90,23 @@ extension AuthState: Codable {
         }
     }
 
-    func getAccessToken() async throws -> String? {
+    func getAccessToken(throwIfMissing: Bool) async throws -> String? {
         do {
-            let authState = try await Rownd.authenticator.getValidToken()
+            let authState = try await Context.currentContext.authenticator.getValidToken()
             return authState.accessToken
         } catch {
             logger.warning("Failed to retrieve access token: \(String(describing: error))")
 
-            switch error as? AuthenticationError {
-            case .networkConnectionFailure:
+            if throwIfMissing {
                 throw error
+            }
+
+            switch error as? AuthenticationError {
+            case
+                .networkConnectionFailure,
+                .serverError:
+                throw error
+
             default: break
             }
 

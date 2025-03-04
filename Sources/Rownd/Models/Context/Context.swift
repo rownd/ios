@@ -15,6 +15,8 @@ class Context {
 
     var eventListeners: [RowndEventHandlerDelegate] = []
 
+    var authenticator: AuthenticatorProtocol = Authenticator()
+
     init() {
         store = createStore()
     }

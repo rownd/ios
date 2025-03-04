@@ -25,10 +25,9 @@ public class Rownd: NSObject {
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
     internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
-    internal var bottomSheetController: BottomSheetController = BottomSheetController()
+    internal var bottomSheetController: BottomSheetViewController = BottomSheetViewController()
     internal static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
-    internal static var authenticator = Authenticator()
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
 
@@ -229,7 +228,7 @@ public class Rownd: NSObject {
                 do {
                     let signOutRequest = SignOutRequest(signOutAll: true)
                     try await Auth.signOutUser(signOutRequest: signOutRequest)
-                    //sign out of current session
+                    // sign out of current session
                     signOut()
                 } catch {
                     logger.error("Failed to sign out user from all sessions: \(String(describing: error))")
@@ -239,7 +238,6 @@ public class Rownd: NSObject {
         }
        
     }
-
     
     public static func signOut() {
         Task { @MainActor in
@@ -264,9 +262,9 @@ public class Rownd: NSObject {
         }
     }
 
-    @discardableResult public static func getAccessToken() async throws -> String? {
+    @discardableResult public static func getAccessToken(throwIfMissing: Bool = false) async throws -> String? {
         let store = Context.currentContext.store
-        return try await store.state.auth.getAccessToken()
+        return try await store.state.auth.getAccessToken(throwIfMissing: throwIfMissing)
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
@@ -297,7 +295,7 @@ public class Rownd: NSObject {
     public static func _refreshToken() {
         Task {
             do {
-                let refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await Context.currentContext.authenticator.refreshToken()
                 print("refresh 1: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 1: \(String(describing: error))")
@@ -306,7 +304,7 @@ public class Rownd: NSObject {
 
         Task {
             do {
-                let refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await Context.currentContext.authenticator.refreshToken()
                 print("refresh 2: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 2: \(String(describing: error))")
@@ -315,7 +313,7 @@ public class Rownd: NSObject {
 
         Task {
             do {
-                let refreshResp = try await authenticator.refreshToken()
+                let refreshResp = try await Context.currentContext.authenticator.refreshToken()
                 print("refresh 3: \(String(describing: refreshResp))")
             } catch {
                 print("Error refreshing token 3: \(String(describing: error))")
