@@ -1,5 +1,9 @@
 
 
+## <small>3.12.1 (2025-03-05)</small>
+
+* fix(auth): add details to refresh token errors ([7297ff8](https://github.com/rownd/ios/commit/7297ff8))
+
 ## 3.12.0 (2025-03-05)
 
 * feat(auth): opt-in to throwing on unavailable token; fix some crashes (#106) ([27b009e](https://github.com/rownd/ios/commit/27b009e)), closes [#106](https://github.com/rownd/ios/issues/106)
