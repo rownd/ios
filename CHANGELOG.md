@@ -1,5 +1,9 @@
 
 
+## <small>3.12.2 (2025-03-05)</small>
+
+* fix: spm does not resolve local packages (#107) ([c946e32](https://github.com/rownd/ios/commit/c946e32)), closes [#107](https://github.com/rownd/ios/issues/107)
+
 ## <small>3.12.1 (2025-03-05)</small>
 
 * fix(auth): add details to refresh token errors ([7297ff8](https://github.com/rownd/ios/commit/7297ff8))
