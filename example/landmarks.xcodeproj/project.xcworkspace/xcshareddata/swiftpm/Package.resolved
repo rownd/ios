@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "AnyCodable",
-        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
-        "state": {
-          "branch": null,
-          "revision": "862808b2070cd908cb04f9aafe7de83d35f81b05",
-          "version": "0.6.7"
-        }
-      },
-      {
         "package": "AppAuth-iOS",
         "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
         "state": {
@@ -71,15 +62,6 @@
           "branch": null,
           "revision": "3cd207fb9e943b6168a117baa3936c823204c2dc",
           "version": "2.6.3"
-        }
-      },
-      {
-        "package": "LBBottomSheet",
-        "repositoryURL": "https://github.com/rownd/LBBottomSheet.git",
-        "state": {
-          "branch": null,
-          "revision": "047863471a722edab0eb4ce1a88d521142bc6425",
-          "version": "1.1.7"
         }
       },
       {

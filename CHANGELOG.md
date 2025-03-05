@@ -1,5 +1,10 @@
 
 
+## 3.12.0 (2025-03-05)
+
+* feat(auth): opt-in to throwing on unavailable token; fix some crashes (#106) ([27b009e](https://github.com/rownd/ios/commit/27b009e)), closes [#106](https://github.com/rownd/ios/issues/106)
+* chore: add signout api documentation (#105) ([c033add](https://github.com/rownd/ios/commit/c033add)), closes [#105](https://github.com/rownd/ios/issues/105)
+
 ## 3.11.0 (2025-02-07)
 
 * fix(sign-out): ios may ignore sign-out messages in some cases (#104) ([de87199](https://github.com/rownd/ios/commit/de87199)), closes [#104](https://github.com/rownd/ios/issues/104)
