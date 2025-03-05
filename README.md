@@ -1,10 +1,10 @@
 # Rownd SDK for iOS
 
-The Rownd SDK for iOS provides authentication, account and user profile management, deep linking, encryption and more for native iPhone, iPad, and even macOS applications.
+The Rownd SDK for iOS provides authentication, account and user profile management, deep linking, and more for native iPhone, iPad, and even macOS applications.
 
 Using the Rownd platform, you can easily bring the same authentication that's on your website to your mobile apps. Or if you only authenticate users on your mobile apps, you can streamline the authentication process using Rownd's passwordless sign-in links, enabling you to seamlessly authenticate users from an app link sent to their email or phone number.
 
-Once a user is authenticated, you can retrieve and update their profile information on the fly using native APIs. Leverage Rownd's pre-built mobile app components to give users profile management tools. Additionally, you can manage encryption of data on-device before sending it back to Rownd or your own backend.
+Once a user is authenticated, you can retrieve and update their profile information on the fly using native APIs. Leverage Rownd's pre-built mobile app components to give users profile management tools.
 
 ## Installation
 
@@ -83,6 +83,31 @@ struct MyView_Previews: PreviewProvider {
 }
 ```
 
+#### Example usage outside of SwiftUI
+
+```swift
+class Auth {
+    private var authState = Rownd.getInstance().state().subscribe { $0.auth }
+    private var cancellables = Set<AnyCancellable>()
+    init() {
+        self.authState.$current
+            .sink { [weak self] state in
+                // Called whenever the auth state changes
+                guard !state.isLoading else { return }
+
+                guard state.auth.isAuthenticated else {
+                    return
+                }
+
+                // User is authenticated. Change app state accordingly.
+                // This is also a good time to get the latest access token.
+                let accessToken = await Rownd.getAccessToken()
+            }
+            .store(in: &cancellables)
+    }
+}
+```
+
 You can subscribe to any state object that Rownd supports. Here's a list of available states and their structures:
 
 #### .auth
@@ -90,6 +115,8 @@ You can subscribe to any state object that Rownd supports. Here's a list of avai
 ```swift
 public struct AuthState {
     public var accessToken: String?     // Current, valid access token for the user (valid for one hour)
+    public var isAuthenticated: Bool    // Whether the user is currently authenticated
+    public var isAccessTokenValid: Bool // Whether the current access token is valid
     public var isVerifiedUser: Bool?    // Whether the current user has verified at least one identifier (e.g., email)
     public var hasPreviouslySignedIn: Bool    // Whether the app has been previously signed in before
 }
@@ -97,12 +124,22 @@ public struct AuthState {
 
 #### .user
 
-```
+```swift
 public struct UserState {
     public var id: String?                           // The user's ID as known to Rownd
     public var data: Dictionary<String, AnyCodable>  // Contains key/value pairs for the current user based on your Rownd's app config
 }
 ```
+
+### Getting an access token
+
+Whenever your app needs to make an authenticated request to your backend, you'll need to get an access token. You can do this by calling `await Rownd.getAccessToken(throwIfMissing: true)`. If the user is not authenticated, this function will throw an `AuthenticationError.noAccessTokenPresent` error.
+
+If there is an issue fetching the access token (e.g., during a token refresh), an `AuthenticationError.serverError` or `AuthenticationError.networkConnectionFailure` error will be thrown. Server and network failures are automatically retried before throwing an error.
+
+If the user is signed in, but the refresh token is expired, invalidated, or has been used previously, the user will be signed out and the function will throw an `AuthenticationError.invalidRefreshToken` error.
+
+See the [API reference](#rownd-getaccesstoken-token-string-async-string) for more information.
 
 ### Customizing the UI
 
@@ -112,7 +149,7 @@ The `RowndCustomizations` class exists to facilitate these customizations. It pr
 
 - `sheetBackgroundColor: UIColor` (default: `light: .white`, `dark: .systemGray6`; requires subclassing) - Allows changing the background color underlaying the bottom sheet that appears when signing in, managing the user account, etc.
 - `sheetCornerBorderRadius: CGFloat` (default: `25.0`) - Modifies the curvature radius of the bottom sheet corners.
-- `loadingAnimation: Lottie.Animation` (default: nil) - Replace Rownd's use of the system default loading spinner (i.e., `UIActivityIndicatorView` or `ProgressView`) with a custom animation. Any animation compatible with [Lottie](https://airbnb.design/lottie/) should work but will be scaled to fit a 1:1 aspect ratio (usually with a `CGRect` frame width/height of `100`)
+- `loadingAnimation: Lottie.Animation` (default: nil) - Replace Rownd's use of the system default loading spinner (i.e., `UIActivityIndicatorView` or `ProgressView`) with a custom animation. Any animation compatible with [Lottie](https://airbnb.design/lottie/) should work, but will be scaled to fit a 1:1 aspect ratio (usually with a `CGRect` frame width/height of `100`)
 
 To apply customizations, we recommend subclassing the `RowndCustomizations` class. Here's an example:
 
@@ -141,11 +178,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 ```
 
 ### Usage within app extensions
-
 It's possible to access the Rownd state from within an app extension, like a widget. You'll need to include the Rownd package in the extension's dependencies and set up an app group for data sharing between the app and the extension. Without the app group, extensions will not be able to sync with your app's authentication state.
 
 Follow these steps to configure your app and extension to work with Rownd:
-
 1. Add an [app group](https://developer.apple.com/documentation/xcode/configuring-app-groups) entitlement to both your app and any extensions that will use Rownd.
    This app group **must** be named like this: `<prefix>.io.rownd.sdk`. For example, if you work at a company with the acme.com domain, your app group might look like this: `com.acme.app.io.rownd.sdk`. Rownd will store its data in this app group. Your app should store data in a separate app group to prevent any collisions.
 
@@ -164,28 +199,29 @@ Follow these steps to configure your app and extension to work with Rownd:
     }
    ```
 
-> NOTE: If you're building widgets that need access to Rownd auth state, you should listen for Rownd auth events and notify `WidgetCenter` that widgets may need updating any time the state changes. That way, they'll re-render while your app is in the foreground and will show an accurate state. Here's a simple example:
->
-> ```swift
-> import Foundation
-> import Combine
-> import WidgetKit
-> import Rownd
->
-> class SomeClass {
->    private var authState = Rownd.getInstance().state().subscribe { $0.auth }
->    private var cancellables = Set<AnyCancellable>()
->
->    init() {
->        self.authState
->            .$current
->            .sink { [weak self] state in
->                WidgetCenter.shared.reloadAllTimelines()
->            }
->            .store(in: &cancellables)
->    }
-> }
-> ```
+<Note>
+If you're building widgets that need access to Rownd auth state, you should listen for Rownd auth events and notify `WidgetCenter` that widgets may need updating any time the state changes. That way, they'll re-render while your app is in the foreground and will show an accurate state. Here's a simple example:
+```swift
+import Foundation
+import Combine
+import WidgetKit
+import Rownd
+
+class SomeClass {
+    private var authState = Rownd.getInstance().state().subscribe { $0.auth }
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        self.authState
+            .$current
+            .sink { [weak self] state in
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+            .store(in: &cancellables)
+    }
+}
+```
+</Note>
 
 ### Events
 
@@ -225,76 +261,86 @@ Once the event handler is registered, it will receive events as they occur. The 
 Here's a list of events that the Rownd SDK emits and the corresponding data that should be present in the event data dictionary. Remember to write your code defensively, as the data dictionary may be missing keys in some cases.
 
 <table>
-<tr>
-<th>Event</th>
-<th>Type</th>
-<th>Payload</th>
-</tr>
-<tr>
-<td>User started signing in</td>
-<td>.signInStarted</td>
-<td>
+    <tr>
+        <th>Event</th>
+        <th>Type</th>
+        <th>Payload</th>
+    </tr>
+    <tr>
+        <td>User started signing in</td>
+        <td>`.signInStarted`</td>
+        <td>
 
-```javascript
-{
-  method: "google" | "apple" | "phone" | "email" | "passkey" | etc;
-}
-```
+        ```javascript
+        {
+            method: "google" | "apple" | "phone" | "email" | "passkey" | etc;
+        }
+        ```
+        </td>
+    </tr>
 
-</td>
-</tr>
+    <tr>
+        <td>User signed in successfully</td>
+        <td>`.signInCompleted`</td>
+        <td>
 
-<tr>
-<td>User signed in successfully</td>
-<td>.signInCompleted</td>
-<td>
+        ```javascript
+        {
+            method: "google" | "apple" | "phone" | "email" | "passkey" | etc,
+            user_type: "new_user" | "existing_user",
+            app_variant_user_type: "new_user" | "existing_user" | optional
+        }
+        ```
 
-```javascript
-{
-	method: "google" | "apple" | "phone" | "email" | "passkey" | etc,
-	user_type: "new_user" | "existing_user"
-    app_variant_user_type: "new_user" | "existing_user"
-}
-```
+        </td>
+    </tr>
 
-</td>
-</tr>
+    <tr>
+        <td>User sign in failed</td>
+        <td>`.signInFailed`</td>
+        <td>
 
-<tr>
-<td>User sign in failed</td>
-<td>.signInFailed</td>
-<td>
+        ```javascript
+        {
+            reason: String;
+        }
+        ```
 
-```javascript
-{
-  reason: String;
-}
-```
-
-</td>
-</tr>
+        </td>
+    </tr>
 </table>
 
-## API reference
+### API reference
 
 In addition to the state observable APIs, Rownd provides imperative APIs that you can call to request sign in, get and retrieve user profile information, retrieve a current access token, or encrypt user data with the user's local key.
 
-### Rownd.requestSignIn() -> Void
+#### Rownd.requestSignIn() -> Void
 
 Opens the Rownd sign-in dialog for authentication.
 
-### Rownd.requestSignIn(RowndSignInOptions(postSignInRedirect: "https://my-domain.com")) -> Void
+#### Rownd.requestSignIn(RowndSignInOptions(postSignInRedirect: "https://my-domain.com")) -> Void
+#### Rownd.requestSignIn(RowndSignInOptions(postSignInRedirect: "https://my-domain.com", intent: .signIn)) -> Void
 
 Opens the Rownd sign-in dialog for authentication, as above. When the user completes the authentication challenge via email or SMS, they'll be redirected to the URL set for `postSignInRedirect`. If this is a [Universal Link](https://developer.apple.com/ios/universal-links/), it will redirect the user back to your app.
 
-### Rownd.requestSignIn(with: RowndSignInHint) -> Void
+#### Rownd.requestSignIn(with: RowndSignInHint) -> Void
+#### Rownd.requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?) -> Void
 
 Requests a sign-in, but with a specific authentication provider (e.g., Sign in with Apple). Rownd treats this information as a hint. If the specified authentication provider is enabled within your Rownd app configuration, it will be honored. If not, Rownd will fall back to the default flow.
 
 Supported values:
 
 - `.appleId` - Prompt user to sign in with their Apple ID
+- `.google` - Prompt user to sign in with their Google account
+- `.passkey` - Prompt user to sign in with a passkey if they've previously set one up
+- `.guest` - Sign in the user anonymously as a guest.
 
+#### RowndSignInOptions
+
+Some of the `requestSignIn()` methods accept an optional `RowndSignInOptions` parameter. This class contains the following properties:
+
+- `postSignInRedirect: String?` (not recommended) - When the user completes the authentication challenge via email or SMS, they'll be redirected to the URL set for `postSignInRedirect`. If this is a [Universal Link](https://developer.apple.com/ios/universal-links/), it will redirect the user back to your app. If you don't set this value, the user will be redirected to your app's subdomain as configured in the Rownd dashboard.
+- `intent: RowndSignInIntent?` - This option applies only when you have opted to split the sign-up/sign-in flow via the Rownd dashboard. Valid values are `.signIn` or `.signUp`. If you don't set this value, the user will be presented with the unified sign-in/sign-up flow.
 
 ### Rownd.signOut() -> Void
 
@@ -308,26 +354,41 @@ Supported values:
 
 - `.all` - All devices
 
-
-### Rownd.getAccessToken() async throws -> String?
+### Rownd.getAccessToken(throwIfMissing: Bool = false) async throws -> String?
 
 Assuming a user is signed-in, returns a valid access token, refreshing the current one if needed.
-If an access token cannot be returned due to a temporary condition (e.g., inaccessible network), this function will `throw`.
-If an access token cannot be returned because the refresh token is invalid, `nil` will be returned and the Rownd state
-will sign out the user.
+
+By default, this function will return `nil` if an access token cannot be returned, either because the user is not signed in or because the refresh token is invalid.
+
+If an access token cannot be returned due to a temporary condition (e.g., inaccessible network), this function will throw an `AuthenticationError` indicating the failure reason (e.g., server or network error).
+
+You may also set `throwIfMissing` to `true` to force an error to be thrown if an access token cannot be returned. This will provide more granular reasons for the failure. The possible error cases for `AuthenticationError` are:
+
+- `.noAccessTokenPresent` - the user is not signed in
+- `.invalidRefreshToken(details: String)` - the refresh token was invalid (e.g., the token was expired, revoked, or a previous exchange failed to complete successfully). The user will be signed out.
+- `.networkConnectionFailure(details: String)` - a network condition prevented the token from being refreshed, even after several retries and should be re-attempted later
+- `.serverError(details: String)` - an error occurred on the server and you should try again later
 
 Example:
 
 ```swift
     do {
-        let accessToken = try await Rownd.getAccessToken()
+        let accessToken = try await Rownd.getAccessToken(throwIfMissing: true)
     } catch {
-        // Alert the user that they should try again due to some recoverable error
+        switch error {
+        case AuthenticationError.noAccessTokenPresent:
+            // The user is not signed in
+        case AuthenticationError.invalidRefreshToken(let details):
+            // The refresh token was invalid. Request that the user sign in again.
+        case AuthenticationError.networkConnectionFailure(let details),
+             AuthenticationError.serverError(let details):
+            // Alert the user that they should try again due to some recoverable error
+            print("Server error occurred: \(details)")
+        }
     }
-}
 ```
 
-### Rownd.getAccessToken(\_ token: String) async -> String?
+#### Rownd.getAccessToken(\_ token: String) async -> String?
 
 When possible, exchanges a non-Rownd access token for a Rownd access token. This is primarily used in scenarios
 where an app is migrating from some other authentication mechanism to Rownd. Using Rownd integrations,
@@ -350,51 +411,24 @@ that the user should sign-in normally via `Rownd.requestSignIn()`.
     }
 ```
 
-### Rownd.user.get() -> Dictionary<String, AnyCodable>
+#### Rownd.user.get() -> Dictionary\<String, AnyCodable>
 
 Returns the entire user profile as a dictionary object
 
-### Rownd.user.get<T>(field: String) -> T?
+#### Rownd.user.get\<T>(field: String) -> T?
 
 Returns the value of a specific field in the user's data dictionary. `"id"` is a special case that will return the user's ID, even though it's technically not in the dictionary itself.
 
 Your application code is responsible for knowing which type the value should cast to. If the cast fails or the entry doesn't exist, a `nil` value will be returned.
 
-### Rownd.user.set(data: Dictionary<String, AnyCodable>) -> void
+#### Rownd.user.set(data: Dictionary\<String, AnyCodable>) -> void
 
 Replaces the user's data with that contained in the dictionary. This may overwrite existing values, but must match the schema you defined within your Rownd application dashboard. Any fields that are flagged as `encrypted` will be encrypted on-device prior to storing in Rownd's platform.
 
 Hint: use `AnyCodable.init(value)` to conform your values to the required type.
 
-### Rownd.user.set(field: String, value: AnyCodable) -> void
+#### Rownd.user.set(field: String, value: AnyCodable) -> void
+
 Sets a specific user profile field to the provided value, overwriting if a value already exists. If the field is flagged as `encrypted`, it will be encrypted on-device prior to storing in Rownd's platform.
 
 Hint: use `AnyCodable.init(value)` to conform your values to the required type.
-
-## Data encryption
-
-As indicated previously, Rownd can automatically assist you in protecting sensitive user data by encrypting it on-device with a user's unique encryption key prior to saving it in Rownd's own platform storage.
-
-When you configure your app within the Rownd platform, you can indicate that it supports on-device encryption. When this flag is set, Rownd will automatically generate a cryptographically secure, unrecoverable encryption key on the user's device after they sign in. The key is stored in the device Keychain and all encryption is handled on the device. The key is never transmitted to Rownd's servers and the Rownd SDK does not provide any APIs to for your code to programmatically retrieve the encryption key.
-
-Only fields that you designate `encrypted` are encrypted on-device prior to storing within Rownd. Some identifying fields like email and phone number do not support on-device encryption at this time, since they are frequently used for indexing purposes.
-
-Of course, all data within the Rownd platform is encrypted at rest on disk and in transit, but this does not afford the same privacy guarantees as data encrypted on a user's local device. For especially sensitive data, we recommend enabling field-level encryption.
-
-> NOTE: Data encrypted on-device will not be accessible by you, the app developer, outside of the context of your app. In other words, your app can use encrypted data in its plaintext (decrypted) form while the user is signed in, but you won't be able to retrieve that data from the Rownd servers in a decrypted form. For data that you choose to encrypt, you should never transmit the plain text value across a network.
-
-In some cases, you may want to encrypt data on-device that you'll send to your own servers for storage. Rownd provides convenience methods to encrypt and decrypt that data with the same user-owned key.
-
-### Rownd.user.encrypt(plaintext: String) throws -> String
-
-Encrypts the provided String `data` using the user's symmetric encryption key and returns the ciphertext as a string. You can encrypt anything that can be represented as a string (e.g., Int, Dictionary, Array, etc), but it's currently up to you to get it into a string format first.
-
-If the encryption fails, an `EncryptionError` will be thrown with a message explaining the failure.
-
-### Rownd.user.decrypt(ciphertext: String) throws -> String
-
-Attempts to decrypt the provided String `data`, returning the plaintext as a string. If the data originated as some other type (e.g., Dictionary), you'll need to decode the data back into its original type.
-
-If the decryption fails, an `EncryptionError` will be thrown with a message explaining the failure.
-
-> NOTE: Encryption is only possible once a user has authenticated. Rownd supports multiple levels of authentication (e.g., guest, unverified, and verified), but the lowest level of authentication must be achieved prior to encrypting or decrypting data. If you need to explicitly check whether encryption is possible at a specific point in time, call `Rownd.user.isEncryptionPossible() -> Bool` prior to calling `encrypt()` or `decrypt()`.

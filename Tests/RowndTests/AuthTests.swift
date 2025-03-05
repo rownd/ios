@@ -326,8 +326,11 @@ import Testing
         Context.currentContext.authenticator = authenticator
 
         // Refresh token has already been used
-        authenticator.refreshTokenBehavior = AuthenticationError.refreshTokenAlreadyConsumed
-        await #expect(throws: AuthenticationError.refreshTokenAlreadyConsumed) {
+        authenticator.refreshTokenBehavior = AuthenticationError
+            .invalidRefreshToken(details: "Refresh token has been consumed")
+        await #expect(
+            throws: AuthenticationError.invalidRefreshToken(details: "Refresh token has been consumed")
+        ) {
             try await store.state.auth.getAccessToken(throwIfMissing: true)
         }
 
@@ -354,7 +357,8 @@ import Testing
         Context.currentContext.authenticator = authenticator
 
         // Refresh token has already been used
-        authenticator.refreshTokenBehavior = AuthenticationError.refreshTokenAlreadyConsumed
+        authenticator.refreshTokenBehavior = AuthenticationError
+            .invalidRefreshToken(details: "Refresh token has been consumed")
         #expect(try await store.state.auth.getAccessToken(throwIfMissing: false) == nil)
 
         // Network is down

@@ -18,9 +18,9 @@ protocol AuthenticatorProtocol {
     func refreshToken() async throws -> AuthState
 }
 
-enum AuthenticationError: Error, Equatable {
+public enum AuthenticationError: Error, Equatable {
     case noAccessTokenPresent
-    case refreshTokenAlreadyConsumed
+    case invalidRefreshToken(details: String)
     case networkConnectionFailure(details: String)
     case serverError(details: String)
 }
@@ -188,7 +188,8 @@ actor Authenticator: AuthenticatorProtocol {
                 // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
                 Rownd.signOut()
 
-                throw AuthenticationError.refreshTokenAlreadyConsumed
+                throw AuthenticationError
+                    .invalidRefreshToken(details: (String(describing: error)))
             }
         }
 
