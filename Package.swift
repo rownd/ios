@@ -26,10 +26,6 @@ let package = Package(
     
     dependencies: [
         .package(
-            name: "AnyCodable",
-            path: "Packages/AnyCodable"
-        ),
-        .package(
             name: "ReSwift",
             url: "https://github.com/ReSwift/ReSwift",
             .upToNextMajor(from: "6.1.0")
@@ -43,9 +39,6 @@ let package = Package(
             name: "JWTDecode",
             url: "https://github.com/auth0/JWTDecode.swift",
             .upToNextMajor(from: "2.6.3")
-        ),
-        .package(
-            path: "Packages/LBBottomSheet"
         ),
         .package(
             name: "SwiftKeychainWrapper",
@@ -82,6 +75,20 @@ let package = Package(
     
     targets: [
         .target(
+            name: "LBBottomSheet",
+            dependencies: [],
+            path: "Packages/LBBottomSheet",
+            resources: [.process("Resources")],
+            swiftSettings: [
+                .define("SPM")
+            ]
+        ),
+        .target(
+            name: "AnyCodable",
+            path: "Packages/AnyCodable",
+            exclude: ["Tests"]
+        ),
+        .target(
             name: "Rownd",
             dependencies: [
                 "AnyCodable",
@@ -98,6 +105,11 @@ let package = Package(
             resources: [
                 .process("Resources")
             ]
+        ),
+        .testTarget(
+            name: "AnyCodableTests",
+            dependencies: ["AnyCodable"],
+            path: "Packages/AnyCodable/Tests/AnyCodableTests"
         ),
         .testTarget(
             name: "RowndTests",
