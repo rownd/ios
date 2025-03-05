@@ -27,8 +27,7 @@ let package = Package(
     dependencies: [
         .package(
             name: "AnyCodable",
-            url: "https://github.com/Flight-School/AnyCodable",
-            .upToNextMajor(from: "0.6.0")
+            path: "Packages/AnyCodable"
         ),
         .package(
             name: "ReSwift",
@@ -46,8 +45,7 @@ let package = Package(
             .upToNextMajor(from: "2.6.3")
         ),
         .package(
-            url: "https://github.com/rownd/LBBottomSheet.git",
-            .upToNextMajor(from: "1.1.7")
+            path: "Packages/LBBottomSheet"
         ),
         .package(
             name: "SwiftKeychainWrapper",
