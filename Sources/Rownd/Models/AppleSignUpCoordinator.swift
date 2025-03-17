@@ -26,6 +26,22 @@ struct AppleSignInData: Codable {
         case email = "email"
         case fullName = "full_name"
     }
+
+    func toDictionary() -> Dictionary<String, AnyCodable> {
+        var dictionary: Dictionary<String, AnyCodable> = [
+            "email": AnyCodable(email)
+        ]
+        if let firstName = firstName {
+            dictionary["first_name"] = AnyCodable(firstName)
+        }
+        if let lastName = lastName {
+            dictionary["last_name"] = AnyCodable(lastName)
+        }
+        if let fullName = fullName {
+            dictionary["full_name"] = AnyCodable(fullName)
+        }
+        return dictionary
+    }
 }
 
 class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
@@ -104,12 +120,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
 
                 Task { [userAppleSignInData] in
                     do {
-                        let userData = [
-                            "email": AnyCodable(userAppleSignInData?.email),
-                            "first_name": AnyCodable(userAppleSignInData?.firstName),
-                            "last_name": AnyCodable(userAppleSignInData?.lastName),
-                            "full_name": AnyCodable(userAppleSignInData?.fullName),
-                        ]
+                        let userData = userAppleSignInData?.toDictionary()
 
                         let tokenResponse = try await Auth.fetchToken(idToken: idToken, userData: userData, intent: intent)
 
@@ -215,6 +226,9 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                                 userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
                                 userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
                             }
+                            
+                            // Remove the data since we no longer need it for subsequent signins.
+                            defaults.removeObject(forKey: appleSignInDataKey)
                         } else {
                             if let email = email {
                                 userData["email"] = AnyCodable(email)
