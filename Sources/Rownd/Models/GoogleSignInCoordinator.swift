@@ -87,7 +87,7 @@ class GoogleSignInCoordinator: NSObject {
 
                 logger.debug("Sign-in handshake with Google completed successfully.")
                 do {
-                    let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, intent: intent)
+                    let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, userData: nil, intent: intent)
                     DispatchQueue.main.async {
                         Context.currentContext.store.dispatch(SetAuthState(
                             payload: AuthState(
