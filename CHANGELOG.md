@@ -1,5 +1,10 @@
 
 
+## 3.13.0 (2025-03-21)
+
+* feat: support custom uiviews for loading animations (#109) ([1ab2cc8](https://github.com/rownd/ios/commit/1ab2cc8)), closes [#109](https://github.com/rownd/ios/issues/109)
+* fix(apple): include apple user data to token request (#108) ([301a712](https://github.com/rownd/ios/commit/301a712)), closes [#108](https://github.com/rownd/ios/issues/108)
+
 ## <small>3.12.2 (2025-03-05)</small>
 
 * fix: spm does not resolve local packages (#107) ([c946e32](https://github.com/rownd/ios/commit/c946e32)), closes [#107](https://github.com/rownd/ios/issues/107)
