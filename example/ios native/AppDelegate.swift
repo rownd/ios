@@ -24,12 +24,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
         Rownd.config.baseUrl = "https://hub.dev.rownd.io"
-        Rownd.config.apiUrl = "https://api.us-east-2.dev.rownd.io"
+        Rownd.config.apiUrl = "https://api.dev.rownd.io"
         Rownd.config.subdomainExtension = ".dev.rownd.link"
         Rownd.config.appGroupPrefix = "group.rowndexample"
 
         Rownd.config.customizations = AppCustomizations()
-        
+//        Rownd.config.customizations.loadingAnimationUiView = CustomLoadingAnimationView()
+        Rownd.config.customizations.loadingAnimation = LottieAnimation.named("loading")
+
         Rownd.addEventHandler(RowndEventHandler())
 
         Task {

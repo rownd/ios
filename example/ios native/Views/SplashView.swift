@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Rownd
+import Lottie
 
 struct SplashView: View {
     @StateObject var rowndState = Rownd.getInstance().state().subscribe { $0 }
