@@ -38,7 +38,6 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
 //        }
 
         if let customLoadingAnimationView = customLoadingAnimationView {
-            customLoadingAnimationView.frame = view.bounds
             NSLayoutConstraint.activate([
                 customLoadingAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
                 customLoadingAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor)

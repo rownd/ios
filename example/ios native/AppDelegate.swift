@@ -30,7 +30,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         Rownd.config.customizations = AppCustomizations()
 //        Rownd.config.customizations.loadingAnimationUiView = CustomLoadingAnimationView()
-        Rownd.config.customizations.loadingAnimation = LottieAnimation.named("loading-indicator-stardust")
+        Rownd.config.customizations.loadingAnimation = LottieAnimation.named("loading")
 
         Rownd.addEventHandler(RowndEventHandler())
 
