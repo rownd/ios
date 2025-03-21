@@ -34,9 +34,19 @@ open class RowndCustomizations: Encodable {
 
     open var loadingAnimation: LottieAnimation?
 
+    open var loadingAnimationUiView: UIView?
+
     public var defaultFontSize: CGFloat = UIFontMetrics(forTextStyle: .body).scaledFont(for: .preferredFont(forTextStyle: .body)).pointSize - 5
 
-    internal var loadingAnimationView: LottieAnimationView {
+    internal var loadingAnimationView: UIView? {
+        if let animationView = loadingAnimationUiView {
+            return animationView
+        }
+
+        guard let loadingAnimation = loadingAnimation else {
+            return nil
+        }
+
         let aniView = LottieAnimationView(animation: loadingAnimation)
         aniView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         aniView.contentMode = .scaleAspectFit
@@ -49,6 +59,7 @@ open class RowndCustomizations: Encodable {
 
         aniView.loopMode = .loop
         aniView.startAnimating()
+
         return aniView
     }
 

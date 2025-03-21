@@ -23,7 +23,7 @@ protocol HubViewProtocol {
 public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHostProtocol {
     @objc var preferredHeightInBottomSheet: CGFloat = UIScreen.main.bounds.height * 0.3
     var activityIndicator = UIActivityIndicatorView(style: .large)
-    var customLoadingAnimationView: LottieAnimationView?
+    var customLoadingAnimationView: UIView?
     var hubWebController = HubWebViewController()
     var targetPage = HubPageSelector.unknown
     var hostController: BottomSheetViewController?
@@ -38,6 +38,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
 //        }
 
         if let customLoadingAnimationView = customLoadingAnimationView {
+            customLoadingAnimationView.frame = view.bounds
             NSLayoutConstraint.activate([
                 customLoadingAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
                 customLoadingAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
@@ -85,6 +86,7 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
 
         view = UIView()
         view.backgroundColor = Rownd.config.customizations.sheetBackgroundColor
+        initLoadingIndicator(view)
 
         // This ensures that the Hub in the webview doesn't attempt to refresh its own tokens,
         // which might trigger an undesired sign-out now or in the future
@@ -119,18 +121,20 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
         if Rownd.config.forceDarkMode {
             self.overrideUserInterfaceStyle = .dark
         }
+    }
 
-        if Rownd.config.customizations.loadingAnimation != nil {
-            customLoadingAnimationView = Rownd.config.customizations.loadingAnimationView
+    private func initLoadingIndicator(_ parentView: UIView) {
+        if let animationView = Rownd.config.customizations.loadingAnimationView {
+            customLoadingAnimationView = animationView
         }
 
         if let customLoadingAnimationView = customLoadingAnimationView {
-            view.addSubview(customLoadingAnimationView)
+            parentView.addSubview(customLoadingAnimationView)
         } else {
             activityIndicator.hidesWhenStopped = true
             activityIndicator.translatesAutoresizingMaskIntoConstraints = false
             activityIndicator.startAnimating()
-            view.addSubview(activityIndicator)
+            parentView.addSubview(activityIndicator)
         }
     }
 
@@ -143,17 +147,32 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
     }
 
     func setLoading(_ isLoading: Bool) {
-        if customLoadingAnimationView != nil {
-            if isLoading {
-                customLoadingAnimationView?.startAnimating()
-            } else {
-                customLoadingAnimationView?.stopAnimating()
-            }
-        } else {
+        guard let aniView = customLoadingAnimationView else {
             if isLoading {
                 activityIndicator.startAnimating()
             } else {
                 activityIndicator.stopAnimating()
+            }
+            return
+        }
+
+        if let aniView = aniView as? LottieAnimationView {
+            if isLoading {
+                aniView.startAnimating()
+            } else {
+                aniView.stopAnimating()
+            }
+        } else {
+            if !isLoading {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    aniView.removeFromSuperview()
+                }
+            } else {
+                if aniView.superview == nil {
+                    view.addSubview(aniView)
+                    // Reapply constraints if needed
+                }
+                aniView.isHidden = false
             }
         }
 
