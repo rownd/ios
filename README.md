@@ -151,7 +151,6 @@ The `RowndCustomizations` class exists to facilitate these customizations. It pr
 - `sheetCornerBorderRadius: CGFloat` (default: `25.0`) - Modifies the curvature radius of the bottom sheet corners.
 - `loadingAnimation: Lottie.Animation?` (default: nil) - Use this animation instead of the system default loading spinner (i.e., `UIActivityIndicatorView` or `ProgressView`). Any animation compatible with [Lottie](https://airbnb.design/lottie/) should work, but will be scaled to fit a 1:1 aspect ratio (usually with a `CGRect` frame width/height of `100`)
 - `loadingAnimationUiView: UiView?` (default: nil) - Display this UIView instead of the system default loading spinner. When using this option, you are responsible for starting the animation and ensuring that the view displays the animation vertically and horizontally centered in the view. Rownd will add and remove the view to a parent view as needed. Here's an [example implementation.](/example/ios native/Views/CustomLoadingAnimationView.swift)
-    ```
 
 To apply customizations, we recommend subclassing the `RowndCustomizations` class. Here's an example:
 
