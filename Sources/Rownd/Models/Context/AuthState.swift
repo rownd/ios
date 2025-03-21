@@ -11,6 +11,7 @@ import ReSwift
 import ReSwiftThunk
 import JWTDecode
 import Get
+import AnyCodable
 
 public struct AuthState: Hashable, CustomStringConvertible {
     public var isLoading: Bool = false
@@ -193,7 +194,6 @@ public enum UserType: String, Codable {
     }
 }
 
-
 struct SignOutRequest: Codable {
     var signOutAll: Bool
 
@@ -202,12 +202,15 @@ struct SignOutRequest: Codable {
     }
 }
 
+typealias TokenRequestUserData = [String: AnyCodable?]
+
 struct TokenRequest: Codable {
     var refreshToken: String?
     var idToken: String?
     var appId: String?
     var intent: RowndSignInIntent?
     var intentMismatchBehavior: String?
+    var userData: TokenRequestUserData?
 
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
@@ -215,6 +218,7 @@ struct TokenRequest: Codable {
         case appId = "app_id"
         case intentMismatchBehavior = "intent_mismatch_behavior"
         case intent
+        case userData = "user_data"
     }
 }
 
@@ -245,16 +249,17 @@ struct TokenResource: APIResource {
 
 class Auth {
     static func fetchToken(_ token: String) async throws -> TokenResponse? {
-        return try await fetchToken(idToken: token, intent: nil)
+        return try await fetchToken(idToken: token, userData: nil, intent: nil)
     }
 
-    static func fetchToken(idToken: String, intent: RowndSignInIntent?) async throws -> TokenResponse? {
+    static func fetchToken(idToken: String, userData: TokenRequestUserData?, intent: RowndSignInIntent?) async throws -> TokenResponse? {
         guard let appId = Context.currentContext.store.state.appConfig.id else { return nil }
         let tokenRequest = TokenRequest(
             idToken: idToken,
             appId: appId,
             intent: intent,
-            intentMismatchBehavior: "throw"
+            intentMismatchBehavior: "throw",
+            userData: userData
         )
         return try await fetchToken(tokenRequest: tokenRequest)
     }
