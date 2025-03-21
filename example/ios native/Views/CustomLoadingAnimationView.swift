@@ -1,5 +1,4 @@
 import Foundation
-import Lottie
 import UIKit
 
 class CustomLoadingAnimationView: UIView {
