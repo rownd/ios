@@ -18,11 +18,24 @@ protocol AuthenticatorProtocol {
     func refreshToken() async throws -> AuthState
 }
 
-public enum AuthenticationError: Error, Equatable {
+public enum AuthenticationError: Error, LocalizedError, Equatable {
     case noAccessTokenPresent
     case invalidRefreshToken(details: String)
     case networkConnectionFailure(details: String)
     case serverError(details: String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .noAccessTokenPresent:
+            return "No access token present"
+        case .invalidRefreshToken(let details):
+            return "Invalid refresh token: \(details)"
+        case .networkConnectionFailure(let details):
+            return "Network connection failure: \(details)"
+        case .serverError(let details):
+            return "Server error: \(details)"
+        }
+    }
 }
 
 internal let tokenApiConfig = APIClient.Configuration(

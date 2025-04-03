@@ -30,7 +30,7 @@ open class RowndCustomizations: Encodable {
         }
     }
 
-    open var sheetCornerBorderRadius: CGFloat = CGFloat(25.0)
+    open var sheetCornerBorderRadius: CGFloat = CGFloat(24.0)
 
     open var loadingAnimation: LottieAnimation?
 
