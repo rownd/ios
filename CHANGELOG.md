@@ -1,5 +1,10 @@
 
 
+## <small>3.13.1 (2025-04-04)</small>
+
+* fix: error descriptions, disabling clipboard, ui controller threading (#110) ([146e1d5](https://github.com/rownd/ios/commit/146e1d5)), closes [#110](https://github.com/rownd/ios/issues/110)
+* chore: add app clip example ([743ec04](https://github.com/rownd/ios/commit/743ec04))
+
 ## 3.13.0 (2025-03-21)
 
 * feat: support custom uiviews for loading animations (#109) ([1ab2cc8](https://github.com/rownd/ios/commit/1ab2cc8)), closes [#109](https://github.com/rownd/ios/issues/109)
