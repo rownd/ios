@@ -21,6 +21,7 @@ public struct RowndConfig: Encodable {
     public var customizations: RowndCustomizations = RowndCustomizations()
     public var signInLinkPattern: String = ".*\\.rownd\\.link$"
     public var deepLinkHandler: RowndDeepLinkHandlerDelegate?
+    public var enableSmartLinkPasteBehavior: Bool = true
 
     // These should never be encoded
     public var appGroupPrefix: String?

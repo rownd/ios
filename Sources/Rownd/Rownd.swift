@@ -25,7 +25,7 @@ public class Rownd: NSObject {
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
     internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
-    internal var bottomSheetController: BottomSheetViewController = BottomSheetViewController()
+    @MainActor internal var bottomSheetController: BottomSheetViewController = BottomSheetViewController()
     internal static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static let automationsCoordinator = AutomationsCoordinator()
@@ -55,30 +55,7 @@ public class Rownd: NSObject {
         let store = Context.currentContext.store
         if store.state.isStateLoaded &&
             !store.state.auth.isAuthenticated {
-            if !Bundle.main.bundlePath.hasSuffix(".appex") {
-                var launchUrl: URL?
-                if let _launchUrl = launchOptions?[.url] as? URL {
-                    launchUrl = _launchUrl
-                    handleSignInLink(url: launchUrl)
-                } else if UIPasteboard.general.hasStrings {
-                    UIPasteboard.general.detectPatterns(for: [UIPasteboard.DetectionPattern.probableWebURL]) { result in
-                        switch result {
-                        case .success(let detectedPatterns):
-                            if detectedPatterns.contains(UIPasteboard.DetectionPattern.probableWebURL) {
-                                if var _launchUrl = UIPasteboard.general.string {
-                                    if !_launchUrl.starts(with: "http") {
-                                        _launchUrl = "https://\(_launchUrl)"
-                                    }
-                                    launchUrl = URL(string: _launchUrl)
-                                    handleSignInLink(url: launchUrl)
-                                }
-                            }
-                        default:
-                            break
-                        }
-                    }
-                }
-            }
+            SmartLinks.handleSmartLinkLaunchBehavior(launchOptions: launchOptions)
 
             if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
                 do {
@@ -101,7 +78,7 @@ public class Rownd: NSObject {
         }
 
         // Fetch user if authenticated and app is in foreground
-        DispatchQueue.main.async {
+        await MainActor.run {
             if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
                 store.dispatch(UserData.fetch())
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
@@ -111,37 +88,15 @@ public class Rownd: NSObject {
         return state
     }
 
-    @discardableResult public static func handleSignInLink(url: URL?) -> Bool {
-        let store = Context.currentContext.store
+    @available(*, deprecated, renamed: "handleSmartLink")
+    @discardableResult
+    public static func handleSignInLink(url: URL?) -> Bool {
+        return SmartLinks.handleSmartLink(url: url)
+    }
 
-        let matcher = NSPredicate(format: "SELF MATCHES %@", Rownd.config.signInLinkPattern)
-
-        if let host = url?.host, matcher.evaluate(with: host), let url = url {
-            logger.trace("handling url: \(String(describing: url.absoluteString))")
-
-            if url.path.starts(with: "/verified") {
-                return false
-            }
-
-            var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            urlComponents?.scheme = "https"
-
-            guard let url = urlComponents?.url else {
-                return false
-            }
-
-            Task {
-                do {
-                    try await SignInLinks.signInWithLink(url)
-                } catch {
-                    logger.error("Sign-in attempt failed during launch: \(String(describing: error))")
-                }
-            }
-
-            return true
-        }
-
-        return false
+    @discardableResult
+    public static func handleSmartLink(url: URL?) -> Bool {
+        return SmartLinks.handleSmartLink(url: url)
     }
 
     public class auth {
@@ -253,7 +208,7 @@ public class Rownd: NSObject {
     }
 
     public static func manageAccount() {
-        _ = inst.displayHub(.manageAccount)
+        inst.displayHub(.manageAccount)
     }
 
     public class firebase {
@@ -270,7 +225,7 @@ public class Rownd: NSObject {
     @discardableResult public static func getAccessToken(token: String) async -> String? {
         guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
 
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let store = Context.currentContext.store
             store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
             store.dispatch(UserData.fetch())
@@ -355,11 +310,11 @@ public class Rownd: NSObject {
                 return
             }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 store.dispatch(SetAppConfig(payload: appConfig.app))
             }
         } else {
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 // Refresh in background if already present
                 store.dispatch(AppConfig.requestAppState())
             }
@@ -373,37 +328,24 @@ public class Rownd: NSObject {
         return await store.state.load()
     }
 
-    private func displayHub(_ page: HubPageSelector) -> HubViewController {
-        return displayHub(page, jsFnOptions: nil)
+    private func displayHub(_ page: HubPageSelector) {
+        displayHub(page, jsFnOptions: nil)
     }
 
-    @discardableResult
-    private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) -> HubViewController {
-        let hubController = getHubViewController()
-
+    private func displayHub(_ page: HubPageSelector, jsFnOptions: Encodable?) {
         Task { @MainActor in
+            let hubController = getHubViewController()
             displayViewControllerOnTop(hubController)
             hubController.loadNewPage(targetPage: page, jsFnOptions: jsFnOptions)
         }
-
-        return hubController
     }
 
-    private func getHubViewController() -> HubViewController {
-
-        if bottomSheetController.controller is HubViewController {
-            return bottomSheetController.controller as! HubViewController
+    @MainActor private func getHubViewController() -> HubViewController {
+        if let hubViewController = bottomSheetController.controller as? HubViewController {
+            return hubViewController
         }
 
-        if Thread.isMainThread {
-            return HubViewController()
-        } else {
-            var hubViewController: HubViewController?
-            DispatchQueue.main.sync {
-                hubViewController = HubViewController()
-            }
-            return hubViewController!
-        }
+        return HubViewController()
     }
 
     internal func getRootViewController() -> UIViewController? {
@@ -419,7 +361,7 @@ public class Rownd: NSObject {
             let rootViewController = getRootViewController()
 
             // Don't try to present again if it's already presented
-            if bottomSheetController.presentingViewController != nil {
+            guard bottomSheetController.presentingViewController == nil else {
                 return
             }
 
@@ -428,13 +370,11 @@ public class Rownd: NSObject {
             bottomSheetController.controller = viewController
             bottomSheetController.modalPresentationStyle = .overFullScreen
 
-            DispatchQueue.main.async {
-                rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
-            }
+            rootViewController?.present(self.bottomSheetController, animated: true, completion: nil)
         }
     }
 
-    internal static func isDisplayingHub() -> Bool {
+    @MainActor internal static func isDisplayingHub() -> Bool {
         return inst.bottomSheetController.controller != nil && inst.bottomSheetController.presentingViewController != nil
     }
 
