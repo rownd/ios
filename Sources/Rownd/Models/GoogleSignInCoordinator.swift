@@ -19,13 +19,52 @@ class GoogleSignInCoordinator: NSObject {
         super.init()
     }
 
-    func signIn(_ intent: RowndSignInIntent?) async {
-        await signIn(intent, hint: nil)
-    }
-    
     func defaultSignInFlow() {
         logger.error("Falling back to default sign flow")
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
+    }
+    
+    /// Sign in funciton for customer-provided web views
+    func signIn(webViewId: String, iosClientId: String, serverClientId: String, intent: RowndSignInIntent?, hint: String?) -> Void {
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(
+            clientID: iosClientId,   // (IOS)
+            serverClientID: serverClientId  // (Web)
+        )
+
+        Task { @MainActor in
+            guard let rootViewController = parent.getRootViewController() else {
+                logger.error("Failed to retrieve root view controller")
+                return
+            }
+            
+            do {
+                let result = try await GIDSignIn.sharedInstance.signIn(
+                    withPresenting: rootViewController,
+                    hint: hint
+                )
+                
+                guard let idToken = result.user.idToken else {
+                    Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'error', 'sign_in_type': 'google' });")
+                    logger.error("Google sign-in failed. Either no ID token was present, or an error was thrown.")
+                    return
+                }
+                
+                Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'completing' });")
+                
+                logger.debug("Sign-in handshake with Google completed successfully.")
+                do {
+                    let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, userData: nil, intent: intent)
+                    
+                    Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'success' }); window.rownd.auth.setTokens({ 'access_token': '\(String(describing: tokenResponse?.accessToken))', 'refresh_token': '\(String(describing: tokenResponse?.refreshToken))' });")
+ 
+                    return
+                } catch ApiError.generic(let errorInfo) {
+                    logger.error("Google sign-in failed during Rownd token exchange. Error: \(String(describing: errorInfo))")
+                }
+            } catch {
+                logger.error("Google sign-in failed during Rownd token exchange. Error: \(String(describing: error))")
+            }
+        }
     }
 
     func signIn(_ intent: RowndSignInIntent?, hint: String?) async {

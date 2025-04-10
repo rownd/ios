@@ -30,6 +30,7 @@ public class Rownd: NSObject {
     internal static var apiClient = RowndApi().client
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
+    internal static var customerWebViews = CustomerWebViewManager()
 
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -209,6 +210,10 @@ public class Rownd: NSObject {
 
     public static func manageAccount() {
         inst.displayHub(.manageAccount)
+    }
+    
+    public static func registerWebView(_ webView: WKWebView) -> Void {
+        customerWebViews.register(webView)
     }
 
     public class firebase {

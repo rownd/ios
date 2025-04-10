@@ -75,7 +75,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         return scenes.first as? UIWindowScene
     }
 
-    private func getHubViewController() -> HubViewController? {
+    @MainActor private func getHubViewController() -> HubViewController? {
         let bottomSheetController = Rownd.getInstance().bottomSheetController
         if let hubViewController = bottomSheetController.controller as? HubViewController {
             return hubViewController
@@ -87,7 +87,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
     }
 
-    func registerPasskey() {
+    @MainActor func registerPasskey() {
         // Add passkey to the Rownd user
         method = PasskeyCoordinatorMethods.Register
         let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
@@ -233,7 +233,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         authController.performRequests()
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    @MainActor func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard #available(iOS 15.0, *) else {
             logger.trace("iOS 15.0 is required to sign in with Passkey")
             defaultSignInFlow()
@@ -361,7 +361,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
 
     }
 
-    private func handleRegistrationError(_ controller: ASAuthorizationController, _ error: Error) {
+    @MainActor private func handleRegistrationError(_ controller: ASAuthorizationController, _ error: Error) {
         let hubViewController = getHubViewController()
 
         logger.error("Passkey registration error: \(String(describing: error))")
@@ -386,7 +386,7 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         ))
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    @MainActor func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let store = Context.currentContext.store
         let hubViewController = getHubViewController()
         if let authorizationError = error as? ASAuthorizationError {
