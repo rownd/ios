@@ -9,6 +9,7 @@ import Foundation
 import GoogleSignIn
 import UIKit
 import AnyCodable
+import JWTDecode
 
 class GoogleSignInCoordinator: NSObject {
     var parent: Rownd
@@ -19,13 +20,90 @@ class GoogleSignInCoordinator: NSObject {
         super.init()
     }
 
-    func signIn(_ intent: RowndSignInIntent?) async {
-        await signIn(intent, hint: nil)
-    }
-    
     func defaultSignInFlow() {
         logger.error("Falling back to default sign flow")
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
+    }
+    
+    /// Sign in funciton for customer-provided web views
+    func signIn(webViewId: String, intent: RowndSignInIntent?, hint: String?) -> Void {
+        let googleConfig = Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.google
+
+        guard let iosClientId = googleConfig?.iosClientId, let serverClientId = googleConfig?.serverClientId else {
+            logger.error("Google sign-in config missing required properties")
+            return
+        }
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(
+            clientID: iosClientId,
+            serverClientID: serverClientId
+        )
+
+        Task { @MainActor in
+            guard let rootViewController = parent.getRootViewController() else {
+                logger.error("Failed to retrieve root view controller")
+                return
+            }
+            
+            do {
+                let result = try await GIDSignIn.sharedInstance.signIn(
+                    withPresenting: rootViewController,
+                    hint: hint
+                )
+                
+                guard let idToken = result.user.idToken else {
+                    Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'error', 'sign_in_type': 'google' });")
+                    logger.error("Google sign-in failed. Either no ID token was present, or an error was thrown.")
+                    return
+                }
+                
+                logger.debug("Sign-in handshake with Google completed successfully.")
+                do {
+                    let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, userData: nil, intent: intent)
+                    
+                    guard let tokenResponse = tokenResponse,
+                          let accessToken = tokenResponse.accessToken,
+                          let refreshToken = tokenResponse.refreshToken else {
+                        logger.error("Token response is empty")
+                        return
+                    }
+                    
+                    // Reload the web view page with rph_init appended to the URL fragment in order
+                    // to complete the sign-in
+                    do {
+                        let jwt = try decode(jwt: accessToken)
+                        let appId = jwt.audience?.first(where: {
+                            return $0.starts(with: "app:")
+                        })?.replacingOccurrences(of: "app:", with: "")
+                        let appUserId = jwt.claim(name: "https://auth.rownd.io/app_user_id")
+                        
+                        let rphInit = RphInit(
+                            accessToken: accessToken,
+                            refreshToken: refreshToken,
+                            appId: appId,
+                            appUserId: appUserId.string
+                        )
+                        
+                        let rphInitString = try rphInit.valueForURLFragment()
+                        Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: """
+                            let url = new URL(window.location.href);
+                            let fragmentParts = url.hash?.split(',') || [];
+                            fragmentParts.push(`rph_init=\(rphInitString)`);
+                            url.hash = fragmentParts.join(',');
+                            window.location.replace(url.toString());
+                            window.location.reload(); // It would be best if we didn't have to reload, but the Hub has problems handling updated rph_ hash values without doing a full reload, today.
+                        """)
+                        return
+                    } catch {
+                        logger.error("Failed to build rph_init hash string: \(String(describing: error))")
+                        return
+                    }
+                } catch ApiError.generic(let errorInfo) {
+                    logger.error("Google sign-in failed during Rownd token exchange. Error: \(String(describing: errorInfo))")
+                }
+            } catch {
+                logger.error("Google sign-in failed during Rownd token exchange. Error: \(String(describing: error))")
+            }
+        }
     }
 
     func signIn(_ intent: RowndSignInIntent?, hint: String?) async {

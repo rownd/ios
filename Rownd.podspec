@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'LBBottomSheet'
   s.dependency 'AnyCodable'
+  s.dependency 'GzipSwift'
 
   s.subspec 'LBBottomSheet' do |ss|
     ss.source_files = 'Packages/LBBottomSheet/Sources/**/*'
@@ -38,9 +39,18 @@ Pod::Spec.new do |s|
   s.subspec 'AnyCodable' do |ss|
     ss.source_files = 'Packages/AnyCodable/Sources/**/*'
   end
-
-  s.requires_arc     = true
+  
+  s.subspec 'system-zlib' do |ss|
+    ss.source_files = 'Packages/GzipSwift/Sources/system-zlib/**/*.{c,h}'
+    ss.preserve_paths = 'Packages/GzipSwift/Sources/system-zlib/include/module.modulemap'
+    ss.libraries = 'z'
+    ss.pod_target_xcconfig = {
+      'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Packages/GzipSwift/Sources/system-zlib/include'
+    }
+  end
+  
   s.source_files     = 'Sources/**/*'
+  s.requires_arc     = true
   s.swift_versions   = [ "5.5", "5.4", "5.3", "5.2", "5.0" ]
 
 end
