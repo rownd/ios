@@ -58,6 +58,8 @@ class GoogleSignInCoordinator: NSObject {
                 
                 logger.debug("Sign-in handshake with Google completed successfully.")
                 do {
+                    Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'completing' });")
+                    
                     let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, userData: nil, intent: intent)
                     
                     guard let tokenResponse = tokenResponse,
