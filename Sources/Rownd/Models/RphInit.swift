@@ -21,7 +21,7 @@ struct RphInit: Encodable {
         case appUserId = "app_user_id"
     }
     
-    /// Computes a value suitable for appending to a URL fragment. The returne dvalue is JSON-encoded, Gzipped, and base64 encoded with a "gz." prefix
+    /// Computes a value suitable for appending to a URL fragment. The returned value is JSON-encoded, Gzipped, and base64 encoded with a "gz." prefix
     func valueForURLFragment() throws -> String {
         let encoder = JSONEncoder()
         let json = try encoder.encode(self)

@@ -236,7 +236,7 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
             if let jsFnOptions = jsFnOptions {
                 do {
-                    self.jsFunctionArgsAsJson = try jsFnOptions.toBase64JsonString()
+                    self.jsFunctionArgsAsJson = try jsFnOptions.asJsonString()
                 } catch {
                     logger.error("Failed to encode JS options to pass to function: \(String(describing: error))")
                 }

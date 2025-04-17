@@ -20,11 +20,15 @@ class GoogleSignInCoordinator: NSObject {
         super.init()
     }
 
+    func signIn(_ intent: RowndSignInIntent?) async {
+        await signIn(intent, hint: nil)
+    }
+
     func defaultSignInFlow() {
         logger.error("Falling back to default sign flow")
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
     }
-    
+
     /// Sign in funciton for customer-provided web views
     func signIn(webViewId: String, intent: RowndSignInIntent?, hint: String?) -> Void {
         let googleConfig = Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.google
@@ -92,7 +96,7 @@ class GoogleSignInCoordinator: NSObject {
                             fragmentParts.push(`rph_init=\(rphInitString)`);
                             url.hash = fragmentParts.join(',');
                             window.location.replace(url.toString());
-                            window.location.reload(); // It would be best if we didn't have to reload, but the Hub has problems handling updated rph_ hash values without doing a full reload, today.
+                            window.location.reload(); // It would be best if we didn't have to reload, but the Hub has problems handling updated rph_ hash values without doing a full reload.
                         """)
                         return
                     } catch {

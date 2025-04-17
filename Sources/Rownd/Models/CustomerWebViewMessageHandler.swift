@@ -80,12 +80,12 @@ class CustomerWebViewMessageHandler: NSObject, WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let response = message.body as? String else { return }
 
-        logger.trace("Received message from managed web view: \(Redact.redactSensitiveKeys(in: response))")
+        logger.trace("[Managed WebView (\(self.webViewId))] Received message: \(Redact.redactSensitiveKeys(in: response))")
 
         do {
             let hubMessage = try RowndCustomerInteropMessage.fromJson(message: response)
 
-            logger.debug("Message type: \(String(describing: hubMessage.type))")
+            logger.debug("[Managed WebView (\(self.webViewId))] Message type: \(String(describing: hubMessage.type))")
 
             switch hubMessage.type {
             case .unknown: break
@@ -95,11 +95,11 @@ class CustomerWebViewMessageHandler: NSObject, WKScriptMessageHandler {
                     signInWithGoogleMessage = message
                     Rownd.googleSignInCoordinator.signIn(webViewId: self.webViewId, intent: signInWithGoogleMessage.intent, hint: signInWithGoogleMessage.hint)
                 } else {
-                    logger.error("Failed to decode message payload \(String(describing: hubMessage.payload))")
+                    logger.error("[Managed WebView (\(self.webViewId))] Failed to decode message payload \(String(describing: hubMessage.payload))")
                 }
             }
         } catch {
-            logger.debug("Failed to decode message: \(String(describing: error))")
+            logger.debug("[Managed WebView (\(self.webViewId))] Failed to decode message: \(String(describing: error))")
         }
     }
 }

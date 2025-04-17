@@ -8,7 +8,7 @@
 import Foundation
 
 extension Encodable {
-    func toBase64JsonString() throws -> String {
+    func asJsonString() throws -> String {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let data = try encoder.encode(self)
