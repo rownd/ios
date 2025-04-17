@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'LBBottomSheet'
   s.dependency 'AnyCodable'
+  s.dependency 'GzipSwift'
 
   s.subspec 'LBBottomSheet' do |ss|
     ss.source_files = 'Packages/LBBottomSheet/Sources/**/*'
@@ -38,8 +39,9 @@ Pod::Spec.new do |s|
   s.subspec 'AnyCodable' do |ss|
     ss.source_files = 'Packages/AnyCodable/Sources/**/*'
   end
-
+  
   s.requires_arc     = true
+  
   s.source_files     = 'Sources/**/*'
   s.swift_versions   = [ "5.5", "5.4", "5.3", "5.2", "5.0" ]
 

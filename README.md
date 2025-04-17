@@ -433,3 +433,59 @@ Hint: use `AnyCodable.init(value)` to conform your values to the required type.
 Sets a specific user profile field to the provided value, overwriting if a value already exists. If the field is flagged as `encrypted`, it will be encrypted on-device prior to storing in Rownd's platform.
 
 Hint: use `AnyCodable.init(value)` to conform your values to the required type.
+
+## Using Rownd with WKWebView
+
+### Registering a WKWebView with Rownd
+
+The `registerWebView` method enables communication between the Rownd JavaScript SDK and native Rownd iOS SDK.
+
+#### Why Use `registerWebView`?
+
+You should call `registerWebView()` with any web view that loads content containing the Rownd JavaScript SDK. This binding is required for certain operations like signing in with Google, where Google prohibits OAuth2 sign-in from within a web view. Once registered, the web view JavaScript SDK can send messages to the Swift code to perform sign-in with Google natively.
+
+#### Method Signature
+
+```swift
+public static func registerWebView(_ webView: WKWebView) -> () -> Void
+```
+
+- **Parameter**: `webView` - The `WKWebView` instance you want to register with Rownd.
+- **Returns**: A closure that can be called to deregister the web view when it's no longer needed.
+
+#### Example Usage
+
+Here's an example of how you might use `registerWebView` in your app:
+
+```swift
+import UIKit
+import WebKit
+import Rownd
+
+class WebViewController: UIViewController {
+    var webView: WKWebView!
+    var deregisterWebView: (() -> Void)?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        webView = WKWebView(frame: self.view.bounds)
+        self.view.addSubview(webView)
+
+        // Register the web view with Rownd
+        deregisterWebView = Rownd.registerWebView(webView)
+
+        // Load a URL that uses the Rownd JavaScript SDK
+        if let url = URL(string: "https://your-web-app.com") {
+            webView.load(URLRequest(url: url))
+        }
+    }
+
+    deinit {
+        // Deregister the web view when the view controller is deallocated
+        deregisterWebView?()
+    }
+}
+```
+
+The example creates a `WKWebView` and registers it with Rownd. The web view loads a URL containing the Rownd JavaScript SDK. When the view controller deallocates, it calls the `deregisterWebView` closure to clean up the registration.

@@ -69,8 +69,12 @@ let package = Package(
             name: "Mocker",
             url: "https://github.com/WeTransfer/Mocker",
             .upToNextMajor(from: "3.0.1")
-        )
-        
+        ),
+        .package(
+            name: "Mockingbird",
+            url: "https://github.com/birdrides/mockingbird.git",
+            .upToNextMinor(from: "0.20.0")
+        ),
     ],
     
     targets: [
@@ -89,6 +93,15 @@ let package = Package(
             exclude: ["Tests"]
         ),
         .target(
+            name: "Gzip",
+            dependencies: ["system-zlib"],
+            path: "Packages/GzipSwift/Sources/Gzip"
+        ),
+        .target(
+            name: "system-zlib",
+            path: "Packages/GzipSwift/Sources/system-zlib"
+        ),
+        .target(
             name: "Rownd",
             dependencies: [
                 "AnyCodable",
@@ -96,6 +109,7 @@ let package = Package(
                 "ReSwiftThunk",
                 "JWTDecode",
                 "LBBottomSheet",
+                "Gzip",
                 "SwiftKeychainWrapper",
                 "Get",
                 "GoogleSignIn",
@@ -112,14 +126,22 @@ let package = Package(
             path: "Packages/AnyCodable/Tests/AnyCodableTests"
         ),
         .testTarget(
+            name: "GzipTests",
+            dependencies: ["Gzip"],
+            path: "Packages/GzipSwift/Tests/GzipTests",
+            resources: [.copy("test.txt.gz")]
+        ),
+        .testTarget(
             name: "RowndTests",
             dependencies: [
                 "Mocker",
+                "Mockingbird",
                 "AnyCodable",
                 "ReSwift",
                 "ReSwiftThunk",
                 "JWTDecode",
                 "LBBottomSheet",
+                "Gzip",
                 "SwiftKeychainWrapper",
                 "Get",
                 "GoogleSignIn",
