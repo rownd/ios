@@ -214,10 +214,23 @@ enum MessagePayload: Decodable {
     public struct UserDataUpdateMessage: Codable {
         var data: [String: AnyCodable]
         var meta: [String: AnyCodable]?
+        var state: UserStateVal?
+        var authLevel: UserAuthLevel?
 
         enum CodingKeys: String, CodingKey {
             case data = "data"
             case meta = "meta"
+            case state = "state"
+            case authLevel = "auth_level"
+        }
+
+        func toUserState() -> UserState {
+            return UserState(
+                data: data,
+                meta: meta,
+                state: state ?? .enabled,
+                authLevel: authLevel ?? .unknown
+            )
         }
     }
 

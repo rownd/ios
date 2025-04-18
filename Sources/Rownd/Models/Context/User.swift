@@ -17,17 +17,33 @@ private let log = Logger(subsystem: "io.rownd.sdk", category: "user")
 
 public typealias UserStateData = [String: AnyCodable]
 
+public enum UserStateVal: String, Codable, Hashable {
+    case enabled = "enabled"
+    case disabled = "disabled"
+}
+
+public enum UserAuthLevel: String, Codable, Hashable {
+    case instant = "instant"
+    case guest = "guest"
+    case unverified = "unverified"
+    case verified = "verified"
+    case unknown = "unknown"
+}
+
 public struct UserState: Hashable {
     public var isLoading: Bool = false
     public var isErrored: Bool = false
     public var errorMessage: String?
     public var data: UserStateData = [:]
     public var meta: UserStateData? = [:]
+    public var state: UserStateVal = .enabled
+    public var authLevel: UserAuthLevel = .unknown
 }
 
 extension UserState: Codable {
     public enum CodingKeys: String, CodingKey {
-        case data, meta, isLoading
+        case data, meta, state, isLoading
+        case authLevel = "auth_level"
     }
     
     public init(from decoder: Decoder) throws {
@@ -35,6 +51,8 @@ extension UserState: Codable {
         self.data = try container.decode([String: AnyCodable].self, forKey: .data)
         self.meta = try container.decodeIfPresent([String: AnyCodable].self, forKey: .meta) ?? [:]
         self.isLoading = try container.decodeIfPresent(Bool.self, forKey: .isLoading) ?? false
+        self.state = try container.decodeIfPresent(UserStateVal.self, forKey: .state) ?? .enabled
+        self.authLevel = try container.decodeIfPresent(UserAuthLevel.self, forKey: .authLevel) ?? .unknown
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -42,6 +60,8 @@ extension UserState: Codable {
         try container.encode(data, forKey: .data)
         try container.encode(meta, forKey: .meta)
         try container.encode(isLoading, forKey: .isLoading)
+        try container.encode(state, forKey: .state)
+        try container.encode(authLevel, forKey: .authLevel)
     }
 
     public func get() -> UserState {
@@ -103,10 +123,16 @@ struct SetUserError: Action {
     var errorMessage: String
 }
 
+struct SetUserState: Action {
+    var payload: UserState
+}
+
 func userReducer(action: Action, state: UserState?) -> UserState {
     var state = state ?? UserState()
 
     switch action {
+    case let action as SetUserState:
+        state = action.payload
     case let action as SetUserData:
         state.data = action.data
         state.meta = action.meta ?? [:]
@@ -138,9 +164,12 @@ struct UserMetaDataPayload: Codable {
 public struct UserStateResponse: Hashable, Codable {
     public var data: UserStateData = [:]
     public var meta: UserStateData? = [:]
+    public var state: UserStateVal = .enabled
+    public var authLevel: UserAuthLevel = .unknown
 
     public enum CodingKeys: String, CodingKey {
-        case data, meta
+        case data, meta, state
+        case authLevel = "auth_level"
     }
 }
 
@@ -152,6 +181,17 @@ public struct UserMetaDataResponse: Hashable {
 extension UserMetaDataResponse: Codable {
     public enum CodingKeys: String, CodingKey {
         case id, meta
+    }
+}
+
+extension UserStateResponse {
+    func toUserState() -> UserState {
+        return UserState(
+            data: data,
+            meta: meta ?? [:],
+            state: state,
+            authLevel: authLevel
+        )
     }
 }
 
@@ -233,17 +273,16 @@ class UserData {
                 }
 
                 do {
-                    let user = try await fetchUserData(state)
+                    let userResponse = try await fetchUserData(state)
 
-                    guard let user = user else {
+                    guard let userResponse = userResponse else {
                         return
                     }
 
-                    DispatchQueue.main.async {
-                        dispatch(SetUserData(
-                            data: user.data,
-                            meta: user.meta)
-                        )
+                    Task { @MainActor in
+                        dispatch(SetUserState(
+                            payload: userResponse.toUserState()
+                        ))
                     }
                 } catch {
                     log.error("Something went wrong while fetching the user's profile \(String(describing: error))")

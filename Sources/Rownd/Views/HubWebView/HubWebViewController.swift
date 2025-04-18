@@ -64,6 +64,7 @@ public class HubWebViewController: UIViewController, WKUIDelegate {
 
     init() {
         super.init(nibName: nil, bundle: nil)
+
         setup()
     }
 
@@ -316,7 +317,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .manageAccount else { return }
                 DispatchQueue.main.async {
-                    store.dispatch(SetUserData(data: userDataMessage.data, meta: userDataMessage.meta ?? [:] ))
+                    store
+                        .dispatch(
+                            SetUserState(payload: userDataMessage.toUserState())
+                        )
                 }
 
             case .triggerSignInWithApple:
@@ -395,21 +399,23 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .authChallengeInitiated:
                 guard case .authChallengeInitiated(let authChallengeMessage) = hubMessage.payload else { return }
                 DispatchQueue.main.async {
-                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
-                        challengeId: authChallengeMessage.challengeId,
-                        userIdentifier: authChallengeMessage.userIdentifier
-                    )))
+                    var newAuthState = Context.currentContext.store.state.auth
+                    newAuthState.challengeId = authChallengeMessage.challengeId
+                    newAuthState.userIdentifier = authChallengeMessage.userIdentifier
+                    Context.currentContext.store.dispatch(
+                        SetAuthState(payload: newAuthState)
+                    )
                 }
                 break
             case .authChallengeCleared:
                 DispatchQueue.main.async {
-                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
-                        accessToken: store.state.auth.accessToken,
-                        refreshToken: store.state.auth.refreshToken,
-                        isVerifiedUser: store.state.auth.isVerifiedUser,
-                        hasPreviouslySignedIn: store.state.auth.hasPreviouslySignedIn,
-                        userId: store.state.auth.userId
-                    )))
+                    var newAuthState = Context.currentContext.store.state.auth
+                    newAuthState.challengeId = nil
+                    newAuthState.userIdentifier = nil
+
+                    Context.currentContext.store.dispatch(
+                        SetAuthState(payload: newAuthState)
+                    )
                 }
                 break;
             }
