@@ -124,7 +124,8 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
 
                         let tokenResponse = try await Auth.fetchToken(
                             idToken: idToken,
-                            userData: userData, intent: intent
+                            userData: userData,
+                            intent: intent
                         )
 
                         Task { @MainActor in
