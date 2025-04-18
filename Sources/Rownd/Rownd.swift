@@ -65,7 +65,7 @@ public class Rownd: NSObject {
                     logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
                 }
             }
-            
+
             // Check to see if we're handling an existing auth challenge
             if store.state.auth.challengeId != nil && store.state.auth.userIdentifier != nil {
                 Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
@@ -84,6 +84,9 @@ public class Rownd: NSObject {
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
         }
+
+        InstantUsers(context: Context.currentContext)
+            .tmpForceInstantUserConversionIfRequested()
 
         return state
     }
@@ -449,11 +452,15 @@ public struct RowndSignInOptions: Encodable {
     public var hint: String?
     internal var signInType: SignInType?
 
+    public var title: String?
+    public var subtitle: String?
+
     enum CodingKeys: String, CodingKey {
         case intent
         case hint
         case postSignInRedirect = "post_login_redirect"
         case signInType = "sign_in_type"
+        case title, subtitle
     }
 }
 

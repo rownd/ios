@@ -169,6 +169,8 @@ func authReducer(action: Action, state: AuthState?) -> AuthState {
         state = action.payload
     case let action as SetUserData:
         state.userId = action.data["user_id"]?.value as? String
+    case let action as SetUserState:
+        state.userId = action.payload.data["user_id"]?.value as? String
     default:
         break
     }
@@ -211,6 +213,7 @@ struct TokenRequest: Codable {
     var intent: RowndSignInIntent?
     var intentMismatchBehavior: String?
     var userData: TokenRequestUserData?
+    var instantUserId: String?
 
     enum CodingKeys: String, CodingKey {
         case refreshToken = "refresh_token"
@@ -219,6 +222,7 @@ struct TokenRequest: Codable {
         case intentMismatchBehavior = "intent_mismatch_behavior"
         case intent
         case userData = "user_data"
+        case instantUserId = "instant_user_id"
     }
 }
 
@@ -265,6 +269,11 @@ class Auth {
     }
 
     static func fetchToken(tokenRequest: TokenRequest) async throws -> TokenResponse {
+        var tokenRequest = tokenRequest
+        if Context.currentContext.store.state.user.authLevel == .instant {
+            tokenRequest.instantUserId = Context.currentContext.store.state.user.data["user_id"]?.value as? String
+        }
+
         let tokenResp: Response<TokenResponse> = try await rowndApi.send(Request(
             path: "/hub/auth/token",
             method: .post,

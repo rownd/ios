@@ -122,7 +122,10 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                     do {
                         let userData = userAppleSignInData?.toDictionary()
 
-                        let tokenResponse = try await Auth.fetchToken(idToken: idToken, userData: userData, intent: intent)
+                        let tokenResponse = try await Auth.fetchToken(
+                            idToken: idToken,
+                            userData: userData, intent: intent
+                        )
 
                         Task { @MainActor in
                             Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
