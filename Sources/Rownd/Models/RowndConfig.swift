@@ -19,15 +19,23 @@ public struct RowndConfig: Encodable {
     public var postSignInRedirect: String? = "NATIVE_APP"
     public var googleClientId: String = ""
     public var customizations: RowndCustomizations = RowndCustomizations()
+
+    // These will not be encoded
+    public var appGroupPrefix: String?
+    public var enableSmartLinkPasteBehavior: Bool = true
     public var signInLinkPattern: String = ".*\\.rownd\\.link$"
     public var deepLinkHandler: RowndDeepLinkHandlerDelegate?
-    public var enableSmartLinkPasteBehavior: Bool = true
-
-    // These should never be encoded
-    public var appGroupPrefix: String?
+    public var forceInstantUserConversion: Bool = false
 
     private enum CodingKeys: String, CodingKey {
-        case apiUrl, baseUrl, subdomainExtension, appKey, forceDarkMode, postSignInRedirect, googleClientId, customizations
+        case apiUrl,
+             baseUrl,
+             subdomainExtension,
+             appKey,
+             forceDarkMode,
+             postSignInRedirect,
+             googleClientId,
+             customizations
     }
 
     func toJson() -> String {

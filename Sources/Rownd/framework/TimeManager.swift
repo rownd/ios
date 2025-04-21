@@ -34,14 +34,14 @@ class NetworkTimeManager {
         }
     }
 
-    let client = APIClient(baseURL: URL(string: "https://worldtimeapi.org"))
+    let client = APIClient(baseURL: URL(string: "https://time.rownd.io"))
 
     init() {
         let ntpStart = Date()
         Task {
             await fetchWorldTime()
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if Context.currentContext.store.state.clockSyncState != .synced {
                     Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .synced))
                 }
@@ -64,7 +64,7 @@ class NetworkTimeManager {
             defer { fetchTimeTask = nil }
 
             do {
-                let response: WorldTimeResponse = try await client.send(Request(path: "/api/timezone/Etc/UTC")).value
+                let response: WorldTimeResponse = try await client.send(Request(path: "/now")).value
 
                 // Custom date formatter to handle the response from world time
                 let formatter = DateFormatter()
