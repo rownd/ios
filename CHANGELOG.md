@@ -1,5 +1,9 @@
 
 
+## <small>3.13.2 (2025-04-21)</small>
+
+* fix(instant): option to force instant users to add an identity (#112) ([a74b151](https://github.com/rownd/ios/commit/a74b151)), closes [#112](https://github.com/rownd/ios/issues/112)
+
 ## <small>3.13.1 (2025-04-04)</small>
 
 * fix: error descriptions, disabling clipboard, ui controller threading (#110) ([146e1d5](https://github.com/rownd/ios/commit/146e1d5)), closes [#110](https://github.com/rownd/ios/issues/110)
