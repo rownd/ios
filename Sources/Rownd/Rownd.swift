@@ -30,6 +30,7 @@ public class Rownd: NSObject {
     internal static var apiClient = RowndApi().client
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
+    internal static var customerWebViews = CustomerWebViewManager()
 
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -212,6 +213,17 @@ public class Rownd: NSObject {
 
     public static func manageAccount() {
         inst.displayHub(.manageAccount)
+    }
+    
+    /// Registers a `WKWebView` instance with Rownd, injecting JavaScript bindings and
+    /// setting up a message handler to enable communication between the web content and native Swift code.
+    ///
+    /// This is useful when embedding Rownd's web UI inside a web view and needing native-to-web communication.
+    ///
+    /// - Parameter webView: The `WKWebView` to register and prepare for use with Rownd.
+    /// - Returns: A closure that can be called later to deregister the web view
+    public static func registerWebView(_ webView: WKWebView) -> () -> Void {
+        return customerWebViews.register(webView)
     }
 
     public class firebase {

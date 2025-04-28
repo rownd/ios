@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
         "state": {
           "branch": null,
-          "revision": "3d36a58a2b736f7bc499453e996a704929b25080",
-          "version": "1.6.0"
+          "revision": "2781038865a80e2c425a1da12cc1327bcd56501f",
+          "version": "1.7.6"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
         "state": {
           "branch": null,
-          "revision": "7932d33686c1dc4d7df7a919aae47361d1cdfda4",
-          "version": "7.0.0"
+          "revision": "a7965d134c5d3567026c523e0a8a583f73b62b0d",
+          "version": "7.1.0"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
         "state": {
           "branch": null,
-          "revision": "d4289da23e978f37c344ea6a386e5546e2466294",
-          "version": "2.1.0"
+          "revision": "a2ab612cb980066ee56d90d60d8462992c07f24b",
+          "version": "3.5.0"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/google/GTMAppAuth.git",
         "state": {
           "branch": null,
-          "revision": "6dee0cde8a1b223737a5159e55e6b4ec16bbbdd9",
-          "version": "1.3.1"
+          "revision": "5d7d66f647400952b1758b230e019b07c0b4b22a",
+          "version": "4.1.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
           "branch": null,
-          "revision": "769b88d83a42ca8d5572b020c96f47e3690b3796",
-          "version": "4.4.3"
+          "revision": "047aa81b77adcbf583a966dfef620d17650cc656",
+          "version": "4.5.1"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/WeTransfer/Mocker",
         "state": {
           "branch": null,
-          "revision": "4384e015cae4916a6828252467a4437173c7ae17",
-          "version": "3.0.1"
+          "revision": "95fa785c751f6bc40c49e112d433c3acf8417a97",
+          "version": "3.0.2"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/ReSwift/ReSwift",
         "state": {
           "branch": null,
-          "revision": "96146a29f394ae4c79be025fcec194e5b0d9c3b6",
-          "version": "6.1.0"
+          "revision": "cb5c3c02f652420ef413dea41e13ac5a76b6c0fd",
+          "version": "6.1.1"
         }
       },
       {

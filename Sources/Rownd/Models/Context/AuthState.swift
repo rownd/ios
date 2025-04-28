@@ -73,18 +73,11 @@ extension AuthState: Codable {
 
     func toRphInitHash() -> String? {
         let userId: String? = Context.currentContext.store.state.user.get(field: "user_id") as? String ?? nil
-        let rphInit = [
-            "access_token": self.accessToken,
-            "refresh_token": self.refreshToken,
-            "app_id": Context.currentContext.store.state.appConfig.id,
-            "app_user_id": userId
-        ]
 
+        let rphInit = RphInit(accessToken: self.accessToken, refreshToken: self.refreshToken, appId: Context.currentContext.store.state.appConfig.id, appUserId: userId)
+        
         do {
-            let encoder = JSONEncoder()
-            let encoded = try encoder.encode(rphInit)
-
-            return encoded.base64EncodedString()
+            return try rphInit.valueForURLFragment()
         } catch {
             logger.error("Failed to build rph_init hash string: \(String(describing: error))")
             return nil
