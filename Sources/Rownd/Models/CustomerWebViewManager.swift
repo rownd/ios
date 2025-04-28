@@ -33,7 +33,7 @@ internal class CustomerWebViewManager {
 
         let userScript = """
             var _rphConfig = (window._rphConfig = window._rphConfig || []);
-            _rphConfig.push(['setDisplayContext', 'web_view']);
+            _rphConfig.push(['setDisplayContext', 'customer_web_view']);
         """
 
         webView.configuration.userContentController.add(self.wkScriptMessageHandlerProvider(id), name: "rowndIosSDK")
