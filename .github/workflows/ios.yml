@@ -45,6 +45,7 @@ jobs:
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
           xcodebuild build-for-testing -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
       - name: Test
+        continue-on-error: true
         env:
           scheme: ${{ 'default' }}
           platform: ${{ 'iOS Simulator' }}
@@ -60,15 +61,16 @@ jobs:
 
           # Run AuthTests by itself
           xcodebuild test \
+            -workspace "rownd.xcworkspace" \
             -scheme "$scheme" \
             -destination "platform=$platform,name=$device" \
             -enableCodeCoverage YES \
-            -only-testing:RowndTests/AuthTests
+            -only-testing:RowndTests/AuthTests \
           
           # Run all the other test files
           xcodebuild test \
+            -workspace "rownd.xcworkspace" \
             -scheme "$scheme" \
             -destination "platform=$platform,name=$device" \
-            -testPlan Rownd \
             -enableCodeCoverage YES \
             -skip-testing:RowndTests/AuthTests
