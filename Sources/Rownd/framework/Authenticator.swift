@@ -10,6 +10,7 @@ import Get
 import Factory
 import ReSwift
 import OSLog
+import Combine
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "authenticator")
 
@@ -51,6 +52,9 @@ private class TokenApiClientDelegate: APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
+
+        let localRequest = request
+        log.info("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
     }
 
     // Handle refresh token non-400 response codes
@@ -122,6 +126,11 @@ internal static func createAuthenticatorMiddleware<State>() -> Middleware<State>
 actor Authenticator: AuthenticatorProtocol {
     private let tokenApi = Container.tokenApi()
     private var refreshTask: Task<AuthState, Error>?
+    private var cancellables = Set<AnyCancellable>()
+
+    private func storeCancellable(_ cancellable: AnyCancellable) {
+        self.cancellables.insert(cancellable)
+    }
 
     func getValidToken() async throws -> AuthState {
         if let handle = refreshTask {
@@ -134,6 +143,14 @@ actor Authenticator: AuthenticatorProtocol {
 
         if authState.isAccessTokenValid {
             return authState
+        }
+
+        // authState.isAccessTokenValid could return false if state.clockSyncState is .waiting
+        // even when the access token is valid. We should wait for the clock sync to complete
+        // before proceeding with a token exchange.
+        if Context.currentContext.store.state.clockSyncState == .waiting {
+            try await waitForClockSync()
+            return try await getValidToken()
         }
 
         return try await refreshToken()
@@ -209,5 +226,42 @@ actor Authenticator: AuthenticatorProtocol {
         self.refreshTask = task
 
         return try await task.value
+    }
+    
+    private func waitForClockSync() async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            let continuationID = UUID()
+            var didResume = false
+
+            // Task 1: Wait for the clock sync
+            group.addTask { [weak self] in
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                    let subscriber = Context.currentContext.store.subscribe { $0.clockSyncState }
+
+                    let cancellable = subscriber.$current.sink { clockSyncState in
+                        if clockSyncState != .waiting && !didResume {
+                            didResume = true
+                            subscriber.unsubscribe()
+                            continuation.resume()
+                        }
+                    }
+
+                    Task { [weak self] in
+                        await self?.storeCancellable(cancellable)
+                    }
+                }
+            }
+
+            // Task 2: Timeout after half a second
+            group.addTask {
+                try await Task.sleep(nanoseconds: 500_000_000)
+                if !didResume {
+                    log.warning("Authenticator timeed out waiting for clock sync. Proceeding...")
+                }
+            }
+
+            try await group.next()
+            group.cancelAll()
+        }
     }
 }
