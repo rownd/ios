@@ -256,7 +256,7 @@ actor Authenticator: AuthenticatorProtocol {
             group.addTask {
                 try await Task.sleep(nanoseconds: 500_000_000)
                 if !didResume {
-                    log.warning("Authenticator timeed out waiting for clock sync. Proceeding...")
+                    log.warning("Authenticator timed out waiting for clock sync. Proceeding...")
                 }
             }
 
