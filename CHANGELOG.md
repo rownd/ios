@@ -1,5 +1,10 @@
 
 
+## 3.14.0 (2025-05-13)
+
+* fix(auth): wait for clock sync prior to exchanging access token (#113) ([2bd86bc](https://github.com/rownd/ios/commit/2bd86bc)), closes [#113](https://github.com/rownd/ios/issues/113)
+* feat: support registering native bindings for a customer web view (#111) ([ad8e7a5](https://github.com/rownd/ios/commit/ad8e7a5)), closes [#111](https://github.com/rownd/ios/issues/111)
+
 ## <small>3.13.2 (2025-04-21)</small>
 
 * fix(instant): option to force instant users to add an identity (#112) ([a74b151](https://github.com/rownd/ios/commit/a74b151)), closes [#112](https://github.com/rownd/ios/issues/112)
