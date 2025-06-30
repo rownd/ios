@@ -149,7 +149,11 @@ actor Authenticator: AuthenticatorProtocol {
         // even when the access token is valid. We should wait for the clock sync to complete
         // before proceeding with a token exchange.
         if Context.currentContext.store.state.clockSyncState == .waiting {
-            try await waitForClockSync()
+            do {
+                try await waitForClockSync()
+            } catch {
+                logger.error("Error encountered while waiting for clock sync \(String(describing: error))")
+            }
             return try await getValidToken()
         }
 
