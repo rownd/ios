@@ -1,5 +1,9 @@
 
 
+## <small>3.14.1 (2025-06-30)</small>
+
+* fix: catch errors throw while waiting for clock sync (#114) ([47875de](https://github.com/rownd/ios/commit/47875de)), closes [#114](https://github.com/rownd/ios/issues/114)
+
 ## 3.14.0 (2025-05-13)
 
 * fix(auth): wait for clock sync prior to exchanging access token (#113) ([2bd86bc](https://github.com/rownd/ios/commit/2bd86bc)), closes [#113](https://github.com/rownd/ios/issues/113)
