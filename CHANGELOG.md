@@ -1,5 +1,9 @@
 
 
+## <small>3.14.2 (2025-06-30)</small>
+
+* fix: run waitForClockSync on main thread ([070b236](https://github.com/rownd/ios/commit/070b236))
+
 ## <small>3.14.1 (2025-06-30)</small>
 
 * fix: catch errors throw while waiting for clock sync (#114) ([47875de](https://github.com/rownd/ios/commit/47875de)), closes [#114](https://github.com/rownd/ios/issues/114)
