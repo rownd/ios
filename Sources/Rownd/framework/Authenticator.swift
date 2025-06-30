@@ -238,7 +238,7 @@ actor Authenticator: AuthenticatorProtocol {
             var didResume = false
 
             // Task 1: Wait for the clock sync
-            group.addTask { [weak self] in
+            group.addTask { @MainActor [weak self] in
                 try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                     let subscriber = Context.currentContext.store.subscribe { $0.clockSyncState }
 
