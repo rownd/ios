@@ -90,7 +90,10 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
     @MainActor func registerPasskey() {
         // Add passkey to the Rownd user
         method = PasskeyCoordinatorMethods.Register
-        let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
+        guard let anchor = getPresentationAnchor() else {
+            logger.error("Cannot present passkey UI - no valid window anchor")
+            return
+        }
         let hubViewController = getHubViewController()
         let store = Context.currentContext.store
 
@@ -155,7 +158,11 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         // Use passkey to sign in as a Rownd user
         method = PasskeyCoordinatorMethods.Authenticate
         self.intent = intent
-        let anchor: ASPresentationAnchor = (getWindowScene()?.windows.last?.rootViewController?.view.window)!
+        guard let anchor = getPresentationAnchor() else {
+            logger.error("Cannot present passkey UI - no valid window anchor")
+            defaultSignInFlow()
+            return
+        }
 
         guard let subdomain = Context.currentContext.store.state.appConfig.config?.subdomain else {
             logger.trace("Please go to the Rownd dashboard https://app.rownd.io/applications and add a subdomain in mobile sign-in")
@@ -193,7 +200,11 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
         }
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension)
 
-        let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
+        guard let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge) else {
+            logger.error("Failed to decode challenge data for authentication")
+            defaultSignInFlow()
+            return
+        }
 
         let assertionRequest = publicKeyCredentialProvider.createCredentialAssertionRequest(challenge: challenge)
 
@@ -218,7 +229,10 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
             relyingPartyIdentifier: subdomain + Rownd.config.subdomainExtension
         )
 
-        let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge)!
+        guard let challenge = Data(base64EncodedURLSafe: challengeResponse.challenge) else {
+            logger.error("Failed to decode challenge data for passkey registration")
+            return
+        }
         let userID = Data(challengeResponse.user.id.utf8)
 
         let registrationRequest = publicKeyCredentialProvider.createCredentialRegistrationRequest(
@@ -413,10 +427,22 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
     }
 
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let vc = windowScene?.windows.last?.rootViewController
-        return (vc?.view.window!)!
+        if let anchor = getPresentationAnchor() {
+            return anchor
+        }
+        // Fallback to key window if available
+        return UIApplication.shared.windows.first { $0.isKeyWindow } ?? UIWindow()
+    }
+    
+    private func getPresentationAnchor() -> ASPresentationAnchor? {
+        guard let windowScene = getWindowScene(),
+              let window = windowScene.windows.last,
+              let rootViewController = window.rootViewController,
+              let presentationWindow = rootViewController.view.window else {
+            logger.error("Unable to get presentation anchor for passkey authentication")
+            return nil
+        }
+        return presentationWindow
     }
 
 }
