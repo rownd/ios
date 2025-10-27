@@ -239,19 +239,27 @@ actor Authenticator: AuthenticatorProtocol {
 
             // Task 1: Wait for the clock sync
             group.addTask { @MainActor [weak self] in
-                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                try await withCheckedThrowingContinuation {
+                    (continuation: CheckedContinuation<Void, Error>) in
                     let subscriber = Context.currentContext.store.subscribe { $0.clockSyncState }
+                    var cancellable: AnyCancellable?
 
-                    let cancellable = subscriber.$current.sink { clockSyncState in
+                    defer {
+                        cancellable?.cancel()
+                        subscriber.unsubscribe()
+                    }
+
+                    cancellable = subscriber.$current.sink { clockSyncState in
                         if clockSyncState != .waiting && !didResume {
                             didResume = true
-                            subscriber.unsubscribe()
                             continuation.resume()
                         }
                     }
 
                     Task { [weak self] in
-                        await self?.storeCancellable(cancellable)
+                        if let cancellable = cancellable {
+                            await self?.storeCancellable(cancellable)
+                        }
                     }
                 }
             }
