@@ -1,5 +1,9 @@
 
 
+## <small>3.14.3 (2025-10-27)</small>
+
+* fix: always cancel and unsubscribe clock sync task (#115) ([38a7cd8](https://github.com/rownd/ios/commit/38a7cd8)), closes [#115](https://github.com/rownd/ios/issues/115)
+
 ## <small>3.14.2 (2025-06-30)</small>
 
 * fix: run waitForClockSync on main thread ([070b236](https://github.com/rownd/ios/commit/070b236))
