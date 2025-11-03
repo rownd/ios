@@ -65,7 +65,7 @@ jobs:
             -scheme "$scheme" \
             -destination "platform=$platform,name=$device" \
             -enableCodeCoverage YES \
-            -only-testing:RowndTests/AuthTests \
+            -only-testing:RowndTests/AuthTests
 
           # Run all the other test files
           xcodebuild test \

@@ -23,7 +23,7 @@ let package = Package(
             targets: ["Rownd"]
         )
     ],
-    
+
     dependencies: [
         .package(
             name: "ReSwift",
@@ -76,12 +76,12 @@ let package = Package(
             .upToNextMinor(from: "0.20.0")
         ),
     ],
-    
+
     targets: [
         .target(
             name: "LBBottomSheet",
             dependencies: [],
-            path: "Packages/LBBottomSheet",
+            path: "Packages/LBBottomSheet/Sources/LBBottomSheet",
             resources: [.process("Resources")],
             swiftSettings: [
                 .define("SPM")
@@ -115,9 +115,6 @@ let package = Package(
                 "GoogleSignIn",
                 "Lottie",
                 "Factory",
-            ],
-            resources: [
-                .process("Resources")
             ]
         ),
         .testTarget(
@@ -151,6 +148,6 @@ let package = Package(
             ]
         )
     ],
-    
+
     swiftLanguageVersions: [.v5]
 )
