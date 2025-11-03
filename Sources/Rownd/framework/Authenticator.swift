@@ -5,12 +5,12 @@
 //  Created by Matt Hamann on 10/16/22.
 //
 
+import Combine
+import Factory
 import Foundation
 import Get
-import Factory
-import ReSwift
 import OSLog
-import Combine
+import ReSwift
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "authenticator")
 
@@ -50,25 +50,29 @@ internal func tokenApiFactory() -> APIClient {
 
 private class TokenApiClientDelegate: APIClientDelegate {
     func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
-        request.setValue(Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
+        request.setValue(
+            Constants.TIME_META_HEADER, forHTTPHeaderField: Constants.TIME_META_HEADER_NAME)
         request.setValue(Constants.DEFAULT_API_USER_AGENT, forHTTPHeaderField: "User-Agent")
 
         let localRequest = request
-        log.info("Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))")
+        log.info(
+            "Making request to: \(String(describing: localRequest.httpMethod?.uppercased())) \(String(describing: localRequest.url))"
+        )
     }
 
     // Handle refresh token non-400 response codes
-    func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
-        if
-            case .unacceptableStatusCode(let statusCode) = error as? APIError,
+    func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int)
+        async throws -> Bool
+    {
+        if case .unacceptableStatusCode(let statusCode) = error as? APIError,
             statusCode != 400,
-            attempts <= 5 {
+            attempts <= 5
+        {
             return true
         }
 
         switch (error as? URLError)?.code {
-        case
-            .some(.timedOut),
+        case .some(.timedOut),
             .some(.cannotFindHost),
             .some(.cannotConnectToHost),
             .some(.networkConnectionLost),
@@ -97,7 +101,7 @@ class AuthenticatorSubscription: NSObject {
     /// This checks the incoming action to determine whether it contains an AuthState payload and pushes that
     /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
     /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
-internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
+    internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
         return { _, _ in
             return { next in
                 return { action in
@@ -137,7 +141,9 @@ actor Authenticator: AuthenticatorProtocol {
             return try await handle.value
         }
 
-        guard let authState = AuthenticatorSubscription.currentAuthState, let _ = authState.accessToken else {
+        guard let authState = AuthenticatorSubscription.currentAuthState,
+            authState.accessToken != nil
+        else {
             throw AuthenticationError.noAccessTokenPresent
         }
 
@@ -152,7 +158,8 @@ actor Authenticator: AuthenticatorProtocol {
             do {
                 try await waitForClockSync()
             } catch {
-                logger.error("Error encountered while waiting for clock sync \(String(describing: error))")
+                logger.error(
+                    "Error encountered while waiting for clock sync \(String(describing: error))")
             }
             return try await getValidToken()
         }
@@ -175,7 +182,8 @@ actor Authenticator: AuthenticatorProtocol {
                     Request(
                         path: "/hub/auth/token",
                         method: .post,
-                        body: TokenRequest(refreshToken: AuthenticatorSubscription.currentAuthState?.refreshToken)
+                        body: TokenRequest(
+                            refreshToken: AuthenticatorSubscription.currentAuthState?.refreshToken)
                     )
                 ).value
 
@@ -186,33 +194,37 @@ actor Authenticator: AuthenticatorProtocol {
 
                 // Update the auth state - this really should be abstracted out elsewhere
                 DispatchQueue.main.async {
-                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
-                        accessToken: newAuthState.accessToken,
-                        refreshToken: newAuthState.refreshToken,
-                        isVerifiedUser: Context.currentContext.store.state.auth.isVerifiedUser,
-                        hasPreviouslySignedIn: Context.currentContext.store.state.auth.hasPreviouslySignedIn
-                    )))
+                    Context.currentContext.store.dispatch(
+                        SetAuthState(
+                            payload: AuthState(
+                                accessToken: newAuthState.accessToken,
+                                refreshToken: newAuthState.refreshToken,
+                                isVerifiedUser: Context.currentContext.store.state.auth
+                                    .isVerifiedUser,
+                                hasPreviouslySignedIn: Context.currentContext.store.state.auth
+                                    .hasPreviouslySignedIn
+                            )))
                 }
 
                 return newAuthState
             } catch {
                 log.error("Token refresh failed: \(String(describing: error))")
 
-                if
-                    case .unacceptableStatusCode(let statusCode) = error as? APIError,
-                    statusCode != 400 {
+                if case .unacceptableStatusCode(let statusCode) = error as? APIError,
+                    statusCode != 400
+                {
                     throw AuthenticationError.serverError(details: "\(String(describing: error))")
                 }
 
                 switch (error as? URLError)?.code {
-                case
-                    .some(.notConnectedToInternet),
+                case .some(.notConnectedToInternet),
                     .some(.timedOut),
                     .some(.cannotFindHost),
                     .some(.cannotConnectToHost),
                     .some(.networkConnectionLost),
                     .some(.dnsLookupFailed):
-                    throw AuthenticationError
+                    throw
+                        AuthenticationError
                         .networkConnectionFailure(
                             details: "\(String(describing: error))"
                         )
@@ -222,7 +234,8 @@ actor Authenticator: AuthenticatorProtocol {
                 // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
                 Rownd.signOut()
 
-                throw AuthenticationError
+                throw
+                    AuthenticationError
                     .invalidRefreshToken(details: (String(describing: error)))
             }
         }
@@ -231,7 +244,7 @@ actor Authenticator: AuthenticatorProtocol {
 
         return try await task.value
     }
-    
+
     private func waitForClockSync() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             let continuationID = UUID()
@@ -244,15 +257,15 @@ actor Authenticator: AuthenticatorProtocol {
                     let subscriber = Context.currentContext.store.subscribe { $0.clockSyncState }
                     var cancellable: AnyCancellable?
 
-                    defer {
-                        cancellable?.cancel()
-                        subscriber.unsubscribe()
-                    }
-
                     cancellable = subscriber.$current.sink { clockSyncState in
                         if clockSyncState != .waiting && !didResume {
                             didResume = true
                             continuation.resume()
+                            // Defer cleanup to next runloop to avoid mutating subscriber set during notification
+                            DispatchQueue.main.async {
+                                cancellable?.cancel()
+                                subscriber.unsubscribe()
+                            }
                         }
                     }
 

@@ -5,13 +5,13 @@
 //  Created by Matt Hamann on 7/8/22.
 //
 
-import Foundation
-import UIKit
-import ReSwift
-import ReSwiftThunk
 import AnyCodable
+import Foundation
 import Get
 import OSLog
+import ReSwift
+import ReSwiftThunk
+import UIKit
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "user")
 
@@ -45,14 +45,15 @@ extension UserState: Codable {
         case data, meta, state, isLoading
         case authLevel = "auth_level"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.data = try container.decode([String: AnyCodable].self, forKey: .data)
         self.meta = try container.decodeIfPresent([String: AnyCodable].self, forKey: .meta) ?? [:]
         self.isLoading = try container.decodeIfPresent(Bool.self, forKey: .isLoading) ?? false
         self.state = try container.decodeIfPresent(UserStateVal.self, forKey: .state) ?? .enabled
-        self.authLevel = try container.decodeIfPresent(UserAuthLevel.self, forKey: .authLevel) ?? .unknown
+        self.authLevel =
+            try container.decodeIfPresent(UserAuthLevel.self, forKey: .authLevel) ?? .unknown
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -200,9 +201,10 @@ class UserData {
 
     static func onReceiveUserData(_ action: SetUserData) -> Thunk<RowndState> {
         return Thunk<RowndState> { dispatch, getState in
-            guard let _ = getState() else { return }
-
-            dispatch(action)
+            guard getState() != nil else { return }
+            DispatchQueue.main.async {
+                dispatch(action)
+            }
         }
     }
 
@@ -223,7 +225,11 @@ class UserData {
             }
 
             do {
-                let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(path: "/me/applications/\(state.appConfig.id ?? "unknown")/data", method: .get)).value
+                let user = try await Rownd.apiClient.send(
+                    Request<UserStateResponse?>(
+                        path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
+                        method: .get)
+                ).value
 
                 log.debug("Decoded user response: \(String(describing: user))")
 
@@ -236,8 +242,11 @@ class UserData {
                 log.error("Failed to retrieve user: \(String(describing: error))")
 
                 // If the user doesn't exist, sign out (user may have been deleted)
-                if case .unacceptableStatusCode(let statusCode) = error as? APIError, statusCode == 404 {
-                    log.warning("This user was not found (likely deleted), so they will be signed out.")
+                if case .unacceptableStatusCode(let statusCode) = error as? APIError,
+                    statusCode == 404
+                {
+                    log.warning(
+                        "This user was not found (likely deleted), so they will be signed out.")
                     Rownd.signOut()
                     return nil
                 }
@@ -280,12 +289,15 @@ class UserData {
                     }
 
                     Task { @MainActor in
-                        dispatch(SetUserState(
-                            payload: userResponse.toUserState()
-                        ))
+                        dispatch(
+                            SetUserState(
+                                payload: userResponse.toUserState()
+                            ))
                     }
                 } catch {
-                    log.error("Something went wrong while fetching the user's profile \(String(describing: error))")
+                    log.error(
+                        "Something went wrong while fetching the user's profile \(String(describing: error))"
+                    )
                 }
             }
         }
@@ -326,11 +338,13 @@ class UserData {
                 let userDataPayload = UserDataPayload(data: data)
 
                 do {
-                    let user = try await Rownd.apiClient.send(Request<UserStateResponse?>(
-                        path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
-                        method: .put,
-                        body: userDataPayload
-                    )).value
+                    let user = try await Rownd.apiClient.send(
+                        Request<UserStateResponse?>(
+                            path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
+                            method: .put,
+                            body: userDataPayload
+                        )
+                    ).value
 
                     logger.debug("Decoded user response: \(String(describing: user))")
 
@@ -340,7 +354,11 @@ class UserData {
                 } catch {
                     logger.error("Failed to save user profile: \(String(describing: error))")
                     DispatchQueue.main.async {
-                        dispatch(SetUserError(errorMessage: "The user profile could not be saved: \(String(describing: error))"))
+                        dispatch(
+                            SetUserError(
+                                errorMessage:
+                                    "The user profile could not be saved: \(String(describing: error))"
+                            ))
                     }
                 }
             }
@@ -362,11 +380,13 @@ class UserData {
                 }
 
                 do {
-                    let response = try await Rownd.apiClient.send(Request<UserMetaDataResponse?>(
-                        path: "/me/meta",
-                        method: .put,
-                        body: UserMetaDataPayload(meta: meta)
-                    )).value
+                    let response = try await Rownd.apiClient.send(
+                        Request<UserMetaDataResponse?>(
+                            path: "/me/meta",
+                            method: .put,
+                            body: UserMetaDataPayload(meta: meta)
+                        )
+                    ).value
 
                     logger.debug("Saved Rownd meta data: \(String(describing: response))")
                 } catch {
