@@ -1,4 +1,5 @@
 import Combine
+import Foundation
 import ReSwift
 import Testing
 
