@@ -1,5 +1,9 @@
 
 
+## <small>3.14.4 (2025-11-04)</small>
+
+* fix(state): ensure subscribers exist before unsubscribing (#117) ([b35987b](https://github.com/rownd/ios/commit/b35987b)), closes [#117](https://github.com/rownd/ios/issues/117)
+
 ## <small>3.14.3 (2025-10-27)</small>
 
 * fix: always cancel and unsubscribe clock sync task (#115) ([38a7cd8](https://github.com/rownd/ios/commit/38a7cd8)), closes [#115](https://github.com/rownd/ios/issues/115)
