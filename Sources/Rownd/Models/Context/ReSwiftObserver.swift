@@ -5,13 +5,13 @@
 //  Created by Matt Hamann on 6/27/22.
 //
 
+import Combine
 import Foundation
-
 import ReSwift
 import SwiftUI
-import Combine
 
-public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription {
+public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription
+{
 
     @Published fileprivate(set) public var current: T
     let selector: (RowndState) -> T
@@ -21,7 +21,8 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
 
     // MARK: Lifecycle
 
-    public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil) {
+    public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil)
+    {
         self.current = selector(Context.currentContext.store.state)
         self.selector = selector
         self.animation = animation
@@ -30,14 +31,23 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
 
     public func subscribe() {
         guard !isSubscribed else { return }
-        Context.currentContext.store.subscribe(self, transform: { [self] in $0.select(selector) })
-        isSubscribed = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard !self.isSubscribed else { return }
+            Context.currentContext.store.subscribe(
+                self, transform: { [self] in $0.select(self.selector) })
+            self.isSubscribed = true
+        }
     }
 
     func unsubscribe() {
         guard isSubscribed else { return }
-        Context.currentContext.store.unsubscribe(self)
-        isSubscribed = false
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard self.isSubscribed else { return }
+            Context.currentContext.store.unsubscribe(self)
+            self.isSubscribed = false
+        }
     }
 
     deinit {
@@ -71,7 +81,10 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
 
     // MARK: Lifecycle
 
-    public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil, throttleInMs: Int) {
+    public init(
+        select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil,
+        throttleInMs: Int
+    ) {
         super.init(select: selector, animation: animation)
 
         objectThrottled
@@ -98,7 +111,9 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
     private let objectThrottled = PassthroughSubject<T, Never>()
 }
 
-public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription {
+public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: ObservableObject,
+    StoreSubscriber, ObservableSubscription
+{
     @Published public var current: Derived
 
     let selector: (RowndState) -> Original
@@ -109,7 +124,10 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
 
     // MARK: Lifecycle
 
-    public init(select selector: @escaping (RowndState) -> Original, transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil) {
+    public init(
+        select selector: @escaping (RowndState) -> Original,
+        transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
+    ) {
         self.current = transform(selector(Context.currentContext.store.state))
         self.selector = selector
         self.transform = transform
@@ -119,14 +137,23 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
 
     func subscribe() {
         guard !isSubscribed else { return }
-        Context.currentContext.store.subscribe(self, transform: { [self] in $0.select(selector) })
-        isSubscribed = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard !self.isSubscribed else { return }
+            Context.currentContext.store.subscribe(
+                self, transform: { [self] in $0.select(self.selector) })
+            self.isSubscribed = true
+        }
     }
 
     func unsubscribe() {
         guard isSubscribed else { return }
-        Context.currentContext.store.unsubscribe(self)
-        isSubscribed = false
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard self.isSubscribed else { return }
+            Context.currentContext.store.unsubscribe(self)
+            self.isSubscribed = false
+        }
     }
 
     deinit {
@@ -158,11 +185,17 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     }
 }
 
-public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashable>: ObservableDerivedState<Original, Derived> {
+public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashable>:
+    ObservableDerivedState<Original, Derived>
+{
 
     // MARK: Lifecycle
 
-    public init(select selector: @escaping (RowndState) -> Original, transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil, throttleInMs: Int) {
+    public init(
+        select selector: @escaping (RowndState) -> Original,
+        transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil,
+        throttleInMs: Int
+    ) {
         super.init(select: selector, transform: transform, animation: animation)
 
         objectThrottled
@@ -183,28 +216,44 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
             objectThrottled.send(original)
         }
 
-        DispatchQueue.main.async { self.objectDidChange.send(ChangeSubject(old: old, new: self.current)) }
+        DispatchQueue.main.async {
+            self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
+        }
     }
 
     private let objectThrottled = PassthroughSubject<Original, Never>()
 }
 
-public extension Store where State == RowndState {
+extension Store where State == RowndState {
 
-    func subscribe<T>(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil) -> ObservableState<T> {
+    public func subscribe<T>(
+        select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil
+    ) -> ObservableState<T> {
         ObservableState(select: selector, animation: animation)
     }
 
-    func subscribe<Original, Derived>(select selector: @escaping (RowndState) -> (Original), transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil) -> ObservableDerivedState<Original, Derived> {
+    public func subscribe<Original, Derived>(
+        select selector: @escaping (RowndState) -> (Original),
+        transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
+    ) -> ObservableDerivedState<Original, Derived> {
         ObservableDerivedState(select: selector, transform: transform, animation: animation)
     }
 
-    func subscribeThrottled<T>(select selector: @escaping (RowndState) -> (T), throttleInMs: Int = 350, animation: SwiftUI.Animation? = nil) -> ObservableThrottledState<T> {
+    public func subscribeThrottled<T>(
+        select selector: @escaping (RowndState) -> (T), throttleInMs: Int = 350,
+        animation: SwiftUI.Animation? = nil
+    ) -> ObservableThrottledState<T> {
         ObservableThrottledState(select: selector, animation: animation, throttleInMs: throttleInMs)
     }
 
-    func subscribeThrottled<Original, Derived>(select selector: @escaping (RowndState) -> (Original), transform: @escaping (Original) -> Derived, throttleInMs: Int = 350, animation: SwiftUI.Animation? = nil) -> ObservableDerivedThrottledState<Original, Derived> {
-        ObservableDerivedThrottledState(select: selector, transform: transform, animation: animation, throttleInMs: throttleInMs)
+    public func subscribeThrottled<Original, Derived>(
+        select selector: @escaping (RowndState) -> (Original),
+        transform: @escaping (Original) -> Derived, throttleInMs: Int = 350,
+        animation: SwiftUI.Animation? = nil
+    ) -> ObservableDerivedThrottledState<Original, Derived> {
+        ObservableDerivedThrottledState(
+            select: selector, transform: transform, animation: animation, throttleInMs: throttleInMs
+        )
     }
 }
 
