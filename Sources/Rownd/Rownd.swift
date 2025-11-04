@@ -53,6 +53,9 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
+        // Start automations after initial app setup
+        Rownd.automationsCoordinator.start()
+
         let store = Context.currentContext.store
         if store.state.isStateLoaded &&
             !store.state.auth.isAuthenticated {
@@ -75,7 +78,7 @@ public class Rownd: NSObject {
                     userIdentifier: store.state.auth.userIdentifier
                 ))
             }
-            
+
         }
 
         // Fetch user if authenticated and app is in foreground
@@ -195,9 +198,9 @@ public class Rownd: NSObject {
                 }
             }
         }
-       
+
     }
-    
+
     public static func signOut() {
         Task { @MainActor in
             let store = Context.currentContext.store
@@ -214,7 +217,7 @@ public class Rownd: NSObject {
     public static func manageAccount() {
         inst.displayHub(.manageAccount)
     }
-    
+
     /// Registers a `WKWebView` instance with Rownd, injecting JavaScript bindings and
     /// setting up a message handler to enable communication between the web content and native Swift code.
     ///
