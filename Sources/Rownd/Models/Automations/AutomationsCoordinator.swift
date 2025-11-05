@@ -44,28 +44,33 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         super.init()
     }
 
+    @MainActor
     public func start() {
         guard !isStarted else { return }
         isStarted = true
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            Context.currentContext.store.subscribe(self) {
-                $0.select {
-                    AutomationStoreState(
-                        user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth,
-                        passkeys: $0.passkeys)
-                }
+        Context.currentContext.store.subscribe(self) {
+            $0.select {
+                AutomationStoreState(
+                    user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth,
+                    passkeys: $0.passkeys)
             }
         }
+    }
+
+    @MainActor
+    public func stop() {
+        guard isStarted else { return }
+        Context.currentContext.store.unsubscribe(self)
+        isStarted = false
+    }
+
+    deinit {
+        DispatchQueue.main.sync { [weak self] in self?.stop() }
     }
 
     public func newState(state: AutomationStoreState) {
         self.state = state
         self.processAutomations()
-    }
-
-    deinit {
-        Context.currentContext.store.unsubscribe(self)
     }
 
     private func processAutomations(_ state: AutomationStoreState) {
