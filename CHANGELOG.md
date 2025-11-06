@@ -1,5 +1,10 @@
 
 
+## <small>3.14.5 (2025-11-06)</small>
+
+* chore: add automations coordinator tests ([3e74bfb](https://github.com/rownd/ios/commit/3e74bfb))
+* fix(automations): process may crash during init (#118) ([78dc6cc](https://github.com/rownd/ios/commit/78dc6cc)), closes [#118](https://github.com/rownd/ios/issues/118)
+
 ## <small>3.14.4 (2025-11-04)</small>
 
 * fix(state): ensure subscribers exist before unsubscribing (#117) ([b35987b](https://github.com/rownd/ios/commit/b35987b)), closes [#117](https://github.com/rownd/ios/issues/117)
