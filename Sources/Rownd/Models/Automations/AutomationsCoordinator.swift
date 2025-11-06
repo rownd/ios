@@ -5,9 +5,9 @@
 //  Created by Michael Murray on 5/22/23.
 //
 
+import AnyCodable
 import Foundation
 import ReSwift
-import AnyCodable
 
 public struct AutomationStoreState {
     var user: UserState
@@ -37,24 +37,40 @@ func computeLastRunTimestamp(automation: RowndAutomation, meta: [String: AnyCoda
 public class AutomationsCoordinator: NSObject, StoreSubscriber {
     private var state: AutomationStoreState?
     public typealias StoreSubscriberStateType = AutomationStoreState
-    let debouncer = Debouncer(delay: 0.5) // 500ms
+    let debouncer = Debouncer(delay: 0.5)  // 500ms
+    private var isStarted = false
 
     override init() {
         super.init()
+    }
+
+    @MainActor
+    public func start() {
+        guard !isStarted else { return }
+        isStarted = true
         Context.currentContext.store.subscribe(self) {
             $0.select {
-                AutomationStoreState(user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth, passkeys: $0.passkeys)
+                AutomationStoreState(
+                    user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth,
+                    passkeys: $0.passkeys)
             }
         }
+    }
+
+    @MainActor
+    public func stop() {
+        guard isStarted else { return }
+        Context.currentContext.store.unsubscribe(self)
+        isStarted = false
+    }
+
+    deinit {
+        DispatchQueue.main.sync { [weak self] in self?.stop() }
     }
 
     public func newState(state: AutomationStoreState) {
         self.state = state
         self.processAutomations()
-    }
-
-    deinit {
-        Context.currentContext.store.unsubscribe(self)
     }
 
     private func processAutomations(_ state: AutomationStoreState) {
@@ -103,7 +119,9 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
 
     }
 
-    public func invokeAction(type: RowndAutomationActionType, args: [String: AnyCodable]?, automation: RowndAutomation) {
+    public func invokeAction(
+        type: RowndAutomationActionType, args: [String: AnyCodable]?, automation: RowndAutomation
+    ) {
         guard let actionFn = AutomationActors[type] else {
             logger.log("Automation action function not found for action type \(type.rawValue)")
             return
@@ -134,8 +152,9 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             "is_authenticated": AnyCodable(state.auth.isAccessTokenValid),
             "is_verified": AnyCodable(state.auth.isVerifiedUser ?? false),
             "are_passkeys_initialized": AnyCodable(state.passkeys.isInitialized),
-            "has_prompted_for_passkey": AnyCodable(state.user.meta?["last_passkey_registration_prompt"] != nil),
-            "has_passkeys": AnyCodable(hasPasskeys)
+            "has_prompted_for_passkey": AnyCodable(
+                state.user.meta?["last_passkey_registration_prompt"] != nil),
+            "has_passkeys": AnyCodable(hasPasskeys),
         ]
 
         additionalAutomationMeta.forEach { (k, v) in automationMeta[k] = v }
@@ -145,12 +164,16 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         return automationMeta
     }
 
-    private func processRule(rule: RowndAutomationRuleUnknown, metaData: [String: AnyCodable]?) -> Bool {
+    private func processRule(rule: RowndAutomationRuleUnknown, metaData: [String: AnyCodable]?)
+        -> Bool
+    {
         switch rule {
         case .rule(let _rule):
             switch _rule.entityType {
             case .metadata, .userData:
-                let userData = _rule.entityType == RowndAutomationRuleEntityRule.metadata ? metaData : state?.user.data
+                let userData =
+                    _rule.entityType == RowndAutomationRuleEntityRule.metadata
+                    ? metaData : state?.user.data
                 return evaluateRule(userData: userData, rule: _rule)
             case .scope:
                 return false
@@ -167,7 +190,10 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         case and, or
     }
 
-    private func processRuleSet(rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and, metaData: [String: AnyCodable]?) -> Bool {
+    private func processRuleSet(
+        rules: [RowndAutomationRuleUnknown], op: RuleSetEvalOperator = .and,
+        metaData: [String: AnyCodable]?
+    ) -> Bool {
         switch op {
         case .and:
             return rules.allSatisfy { rule in processRule(rule: rule, metaData: metaData) }
@@ -176,13 +202,19 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
         }
     }
 
-    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState) -> Bool {
+    public func shouldAutomationRun(automation: RowndAutomation, state: AutomationStoreState)
+        -> Bool
+    {
         let automationMetaData = determineAutomationMetaData(state)
-        let ruleResult = processRuleSet(rules: automation.rules, op: .and, metaData: automationMetaData)
+        let ruleResult = processRuleSet(
+            rules: automation.rules, op: .and, metaData: automationMetaData)
 
         var triggerResult = true
-        if let timeTrigger = automation.triggers.first(where: { $0.type == RowndAutomationTriggerType.time }) {
-            let lastRunTimestamp = computeLastRunTimestamp(automation: automation, meta: state.user.meta)
+        if let timeTrigger = automation.triggers.first(where: {
+            $0.type == RowndAutomationTriggerType.time
+        }) {
+            let lastRunTimestamp = computeLastRunTimestamp(
+                automation: automation, meta: state.user.meta)
             triggerResult = shouldTrigger(trigger: timeTrigger, lastRunTimestamp: lastRunTimestamp)
 
             let finalResult = ruleResult && triggerResult
@@ -190,25 +222,25 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
             return finalResult
         }
 
-        return false // Currently only working with time triggers
+        return false  // Currently only working with time triggers
     }
 
     public func shouldTrigger(trigger: RowndAutomationTrigger, lastRunTimestamp: Date?) -> Bool {
         switch trigger.type {
-            case RowndAutomationTriggerType.time:
-                guard let lastRunTimestamp = lastRunTimestamp else {
-                    return true
-                }
+        case RowndAutomationTriggerType.time:
+            guard let lastRunTimestamp = lastRunTimestamp else {
+                return true
+            }
 
-                guard let triggerFrequency = stringToSeconds(trigger.value) else {
-                    return false
-                }
-
-                let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
-                let currentDate = NetworkTimeManager.shared.currentTime ?? Date()
-                return currentDate > dateOfNextPrompt
-            default:
+            guard let triggerFrequency = stringToSeconds(trigger.value) else {
                 return false
+            }
+
+            let dateOfNextPrompt = lastRunTimestamp.addingTimeInterval(Double(triggerFrequency))
+            let currentDate = NetworkTimeManager.shared.currentTime ?? Date()
+            return currentDate > dateOfNextPrompt
+        default:
+            return false
         }
     }
 }

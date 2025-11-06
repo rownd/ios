@@ -5,17 +5,17 @@
 //  Created by Matt Hamann on 6/23/22.
 //
 
-import Foundation
-import SwiftUI
-import UIKit
-import ReSwift
-import WebKit
 import AnyCodable
 import AuthenticationServices
-import LBBottomSheet
-import GoogleSignIn
-import LocalAuthentication
+import Foundation
 import Get
+import GoogleSignIn
+import LBBottomSheet
+import LocalAuthentication
+import ReSwift
+import SwiftUI
+import UIKit
+import WebKit
 
 public class Rownd: NSObject {
     private static let inst: Rownd = Rownd()
@@ -24,8 +24,10 @@ public class Rownd: NSObject {
 
     public static let user = UserPropAccess()
     private static var appleSignUpCoordinator: AppleSignUpCoordinator = AppleSignUpCoordinator(inst)
-    internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(inst)
-    @MainActor internal var bottomSheetController: BottomSheetViewController = BottomSheetViewController()
+    internal static var googleSignInCoordinator: GoogleSignInCoordinator = GoogleSignInCoordinator(
+        inst)
+    @MainActor internal var bottomSheetController: BottomSheetViewController =
+        BottomSheetViewController()
     internal static var passkeyCoordinator: PasskeyCoordinator = PasskeyCoordinator()
     internal static var apiClient = RowndApi().client
     internal static let automationsCoordinator = AutomationsCoordinator()
@@ -38,7 +40,9 @@ public class Rownd: NSObject {
     }
 
     @discardableResult
-    public static func configure(launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, appKey: String?) async -> RowndState {
+    public static func configure(
+        launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, appKey: String?
+    ) async -> RowndState {
         if let _appKey = appKey {
             config.appKey = _appKey
         }
@@ -53,9 +57,13 @@ public class Rownd: NSObject {
         await inst.loadAppConfig()
         inst.loadAppleSignIn()
 
+        // Start automations after initial app setup on the main actor
+        await MainActor.run {
+            Rownd.automationsCoordinator.start()
+        }
+
         let store = Context.currentContext.store
-        if store.state.isStateLoaded &&
-            !store.state.auth.isAuthenticated {
+        if store.state.isStateLoaded && !store.state.auth.isAuthenticated {
             SmartLinks.handleSmartLinkLaunchBehavior(launchOptions: launchOptions)
 
             if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
@@ -63,24 +71,27 @@ public class Rownd: NSObject {
                     _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
                     logger.debug("Successfully restored previous Google Sign-in")
                 } catch {
-                    logger.warning("Failed to restore previous Google Sign-in: \(String(describing: error))")
+                    logger.warning(
+                        "Failed to restore previous Google Sign-in: \(String(describing: error))")
                 }
             }
 
             // Check to see if we're handling an existing auth challenge
             if store.state.auth.challengeId != nil && store.state.auth.userIdentifier != nil {
-                Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
-                    loginStep: .completing,
-                    challengeId: store.state.auth.challengeId,
-                    userIdentifier: store.state.auth.userIdentifier
-                ))
+                Rownd.requestSignIn(
+                    jsFnOptions: RowndSignInJsOptions(
+                        loginStep: .completing,
+                        challengeId: store.state.auth.challengeId,
+                        userIdentifier: store.state.auth.userIdentifier
+                    ))
             }
-            
+
         }
 
         // Fetch user if authenticated and app is in foreground
         await MainActor.run {
-            if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active {
+            if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active
+            {
                 store.dispatch(UserData.fetch())
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
@@ -106,7 +117,11 @@ public class Rownd: NSObject {
     public class auth {
         public class passkeys {
             public static func register() {
-                inst.displayHub(.connectPasskey, jsFnOptions: RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary())
+                inst.displayHub(
+                    .connectPasskey,
+                    jsFnOptions: RowndConnectPasskeySignInOptions(
+                        biometricType: LAContext().biometricType.rawValue
+                    ).dictionary())
             }
             public static func authenticate() {
                 passkeyCoordinator.authenticate(nil)
@@ -126,7 +141,9 @@ public class Rownd: NSObject {
         requestSignIn(with: with, signInOptions: RowndSignInOptions(), completion: completion)
     }
 
-    public static func requestSignIn(with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil) {
+    public static func requestSignIn(
+        with: RowndSignInHint, signInOptions: RowndSignInOptions?, completion: (() -> Void)? = nil
+    ) {
         let signInOptions = determineSignInOptions(signInOptions)
         switch with {
         case .phone:
@@ -153,7 +170,7 @@ public class Rownd: NSObject {
 
     public static func requestSignIn(_ signInOptions: RowndSignInOptions?) {
         let signInOptions = determineSignInOptions(signInOptions)
-        inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions() )
+        inst.displayHub(.signIn, jsFnOptions: signInOptions ?? RowndSignInOptions())
     }
 
     internal static func requestSignIn(jsFnOptions: Encodable?) {
@@ -161,16 +178,22 @@ public class Rownd: NSObject {
     }
 
     @MainActor
-    public static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil) {
+    public static func connectAuthenticator(
+        with: RowndConnectSignInHint, completion: (() -> Void)? = nil
+    ) {
         connectAuthenticator(with: with, completion: completion, args: nil)
     }
 
-    internal static func connectAuthenticator(with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: [String: AnyCodable]?) {
+    internal static func connectAuthenticator(
+        with: RowndConnectSignInHint, completion: (() -> Void)? = nil, args: [String: AnyCodable]?
+    ) {
         switch with {
         case .passkey:
             let store = Context.currentContext.store
             if store.state.auth.accessToken != nil {
-                var passkeySignInOptions = RowndConnectPasskeySignInOptions(biometricType: LAContext().biometricType.rawValue).dictionary()
+                var passkeySignInOptions = RowndConnectPasskeySignInOptions(
+                    biometricType: LAContext().biometricType.rawValue
+                ).dictionary()
                 args?.forEach { (k, v) in passkeySignInOptions[k] = v }
                 inst.displayHub(.connectPasskey, jsFnOptions: passkeySignInOptions)
             } else {
@@ -190,23 +213,26 @@ public class Rownd: NSObject {
                     // sign out of current session
                     signOut()
                 } catch {
-                    logger.error("Failed to sign out user from all sessions: \(String(describing: error))")
-                    throw RowndError("Failed to sign out user from all sessions: \(error.localizedDescription)")
+                    logger.error(
+                        "Failed to sign out user from all sessions: \(String(describing: error))")
+                    throw RowndError(
+                        "Failed to sign out user from all sessions: \(error.localizedDescription)")
                 }
             }
         }
-       
+
     }
-    
+
     public static func signOut() {
         Task { @MainActor in
             let store = Context.currentContext.store
             store.dispatch(SetAuthState(payload: AuthState()))
 
             Task {
-                RowndEventEmitter.emit(RowndEvent(
-                    event: .signOut
-                ))
+                RowndEventEmitter.emit(
+                    RowndEvent(
+                        event: .signOut
+                    ))
             }
         }
     }
@@ -214,7 +240,7 @@ public class Rownd: NSObject {
     public static func manageAccount() {
         inst.displayHub(.manageAccount)
     }
-    
+
     /// Registers a `WKWebView` instance with Rownd, injecting JavaScript bindings and
     /// setting up a message handler to enable communication between the web content and native Swift code.
     ///
@@ -232,7 +258,9 @@ public class Rownd: NSObject {
         }
     }
 
-    @discardableResult public static func getAccessToken(throwIfMissing: Bool = false) async throws -> String? {
+    @discardableResult public static func getAccessToken(throwIfMissing: Bool = false) async throws
+        -> String?
+    {
         let store = Context.currentContext.store
         return try await store.state.auth.getAccessToken(throwIfMissing: throwIfMissing)
     }
@@ -242,7 +270,11 @@ public class Rownd: NSObject {
 
         Task { @MainActor in
             let store = Context.currentContext.store
-            store.dispatch(SetAuthState(payload: AuthState(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)))
+            store.dispatch(
+                SetAuthState(
+                    payload: AuthState(
+                        accessToken: tokenResponse.accessToken,
+                        refreshToken: tokenResponse.refreshToken)))
             store.dispatch(UserData.fetch())
         }
 
@@ -261,7 +293,10 @@ public class Rownd: NSObject {
     // This is an internal test function used only to manually test
     // ensuring refresh tokens are only used once when attempting
     // to fetch new access tokens
-    @available(*, deprecated, message: "Internal test use only. This method may change any time without warning.")
+    @available(
+        *, deprecated,
+        message: "Internal test use only. This method may change any time without warning."
+    )
     public static func _refreshToken() {
         Task {
             do {
@@ -291,21 +326,29 @@ public class Rownd: NSObject {
         }
     }
 
-    internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?) -> RowndSignInOptions? {
+    internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?)
+        -> RowndSignInOptions?
+    {
         return determineSignInOptions(signInOptions, signInType: nil)
     }
 
-    internal static func determineSignInOptions(_ signInOptions: RowndSignInOptions?, signInType: SignInType?) -> RowndSignInOptions? {
+    internal static func determineSignInOptions(
+        _ signInOptions: RowndSignInOptions?, signInType: SignInType?
+    ) -> RowndSignInOptions? {
         let store = Context.currentContext.store
         var signInOptions = signInOptions
-        if signInOptions?.intent == RowndSignInIntent.signUp || signInOptions?.intent == RowndSignInIntent.signIn {
+        if signInOptions?.intent == RowndSignInIntent.signUp
+            || signInOptions?.intent == RowndSignInIntent.signIn
+        {
             if store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true {
                 signInOptions?.intent = nil
-                logger.error("Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform")
+                logger.error(
+                    "Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform"
+                )
             }
         }
 
-        if (signInType != nil) {
+        if signInType != nil {
             signInOptions?.signInType = signInType
         }
 
@@ -365,10 +408,10 @@ public class Rownd: NSObject {
 
     internal func getRootViewController() -> UIViewController? {
         return UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
+            .filter({ $0.activationState == .foregroundActive })
+            .compactMap({ $0 as? UIWindowScene })
             .first?.windows
-            .filter({$0.isKeyWindow}).first?.rootViewController
+            .filter({ $0.isKeyWindow }).first?.rootViewController
     }
 
     private func displayViewControllerOnTop(_ viewController: UIViewController) {
@@ -390,16 +433,15 @@ public class Rownd: NSObject {
     }
 
     @MainActor internal static func isDisplayingHub() -> Bool {
-        return inst.bottomSheetController.controller != nil && inst.bottomSheetController.presentingViewController != nil
+        return inst.bottomSheetController.controller != nil
+            && inst.bottomSheetController.presentingViewController != nil
     }
 
 }
 
 public class UserPropAccess {
     private var store: Store<RowndState> {
-        get {
-            return Context.currentContext.store
-        }
+        return Context.currentContext.store
     }
     public func get() -> UserState {
         return store.state.user.get()
@@ -423,15 +465,21 @@ public class UserPropAccess {
     }
 
     public func isEncryptionPossible() throws {
-        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
+        throw RowndError(
+            "Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io"
+        )
     }
 
     public func encrypt(plaintext: String) throws {
-        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
+        throw RowndError(
+            "Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io"
+        )
     }
 
     public func decrypt(ciphertext: String) throws {
-        throw RowndError("Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io")
+        throw RowndError(
+            "Encryption is currently not enabled with this SDK. If you like to enable it, please reach out to support@rownd.io"
+        )
     }
 }
 
@@ -445,7 +493,7 @@ public enum UserFieldAccessType {
 
 public enum RowndSignInHint {
     case appleId, googleId, passkey, email, phone,
-         guest, anonymous // these two do the same thing
+        guest, anonymous  // these two do the same thing
 }
 
 public enum RowndConnectSignInHint {
@@ -453,7 +501,10 @@ public enum RowndConnectSignInHint {
 }
 
 public struct RowndSignInOptions: Encodable {
-    public init(postSignInRedirect: String? = Rownd.config.postSignInRedirect, intent: RowndSignInIntent? = nil, hint: String? = nil) {
+    public init(
+        postSignInRedirect: String? = Rownd.config.postSignInRedirect,
+        intent: RowndSignInIntent? = nil, hint: String? = nil
+    ) {
         self.postSignInRedirect = postSignInRedirect
         self.intent = intent
         self.hint = hint
@@ -525,10 +576,11 @@ public struct RowndConnectPasskeySignInOptions: Encodable {
     public var type: String = "passkey"
     public var error: String?
     internal func dictionary() -> [String: AnyCodable] {
-        return ["status": AnyCodable(status),
-                "biometric_type": AnyCodable(biometricType),
-                "type": AnyCodable(type),
-                "error": AnyCodable(error)
+        return [
+            "status": AnyCodable(status),
+            "biometric_type": AnyCodable(biometricType),
+            "type": AnyCodable(type),
+            "error": AnyCodable(error),
         ]
     }
 
