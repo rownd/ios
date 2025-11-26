@@ -94,8 +94,9 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
     }
 
     override public func newState(state: T) {
-        guard self.current != state else { return }
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard self.current != state else { return }
             let old = self.current
             if let animation = self.animation {
                 withAnimation(animation) {
@@ -161,7 +162,8 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     }
 
     public func newState(state original: Original) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             let old = self.current
             self.objectWillChange.send(ChangeSubject(old: old, new: self.current))
 
@@ -207,16 +209,16 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
     }
 
     override public func newState(state original: Original) {
-        let old = current
-        if let animation = animation {
-            withAnimation(animation) {
-                objectThrottled.send(original)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let old = self.current
+            if let animation = self.animation {
+                withAnimation(animation) {
+                    self.objectThrottled.send(original)
+                }
+            } else {
+                self.objectThrottled.send(original)
             }
-        } else {
-            objectThrottled.send(original)
-        }
-
-        DispatchQueue.main.async {
             self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
         }
     }
