@@ -2,7 +2,7 @@
   "object": {
     "pins": [
       {
-        "package": "AppAuth-iOS",
+        "package": "AppAuth",
         "repositoryURL": "https://github.com/openid/AppAuth-iOS.git",
         "state": {
           "branch": null,
@@ -20,7 +20,7 @@
         }
       },
       {
-        "package": "get",
+        "package": "Get",
         "repositoryURL": "https://github.com/rownd/get",
         "state": {
           "branch": null,
@@ -29,7 +29,7 @@
         }
       },
       {
-        "package": "GoogleSignIn-iOS",
+        "package": "GoogleSignIn",
         "repositoryURL": "https://github.com/google/GoogleSignIn-iOS.git",
         "state": {
           "branch": null,
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "gtm-session-fetcher",
+        "package": "GTMSessionFetcher",
         "repositoryURL": "https://github.com/google/gtm-session-fetcher.git",
         "state": {
           "branch": null,
@@ -56,7 +56,7 @@
         }
       },
       {
-        "package": "JWTDecode.swift",
+        "package": "JWTDecode",
         "repositoryURL": "https://github.com/auth0/JWTDecode.swift",
         "state": {
           "branch": null,
@@ -65,7 +65,7 @@
         }
       },
       {
-        "package": "lottie-ios",
+        "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
           "branch": null,
@@ -83,6 +83,15 @@
         }
       },
       {
+        "package": "Mockingbird",
+        "repositoryURL": "https://github.com/birdrides/mockingbird.git",
+        "state": {
+          "branch": null,
+          "revision": "6e0d473df6b975719e145f6aebf90990c634700e",
+          "version": "0.20.0"
+        }
+      },
+      {
         "package": "ReSwift",
         "repositoryURL": "https://github.com/ReSwift/ReSwift",
         "state": {
@@ -92,7 +101,7 @@
         }
       },
       {
-        "package": "ReSwift-Thunk",
+        "package": "ReSwiftThunk",
         "repositoryURL": "https://github.com/ReSwift/ReSwift-Thunk.git",
         "state": {
           "branch": null,
