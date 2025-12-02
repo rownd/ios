@@ -112,30 +112,29 @@ class SmartLinks {
                 ]
             )).value
 
-            Task { @MainActor in
-                if let accessToken = authResp.accessToken, let refreshToken = authResp.refreshToken {
-                    Context.currentContext.store.dispatch(SetAuthState(payload: AuthState(
-                        accessToken: accessToken,
-                        refreshToken: refreshToken
-                    )))
+            if let accessToken = authResp.accessToken, let refreshToken = authResp.refreshToken {
+                await Context.currentContext.store.setAuth(AuthState(
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                ))
 
-                    Context.currentContext.store.dispatch(UserData.fetch())
+                await UserData.fetch()
+                await PasskeyData.fetchPasskeyRegistration()
 
-                    Context.currentContext.store.dispatch(PasskeyData.fetchPasskeyRegistration())
-
+                Task { @MainActor in
                     if Rownd.isDisplayingHub() {
                         Rownd.requestSignIn(jsFnOptions: RowndSignInJsOptions(
                             loginStep: .success
                         ))
                     }
                 }
-
-                guard let strRedirectUrl = authResp.redirectUrl, let redirectUrl = URL(string: strRedirectUrl) else {
-                    return
-                }
-
-                Rownd.config.deepLinkHandler?.handle(linkUrl: redirectUrl)
             }
+
+            guard let strRedirectUrl = authResp.redirectUrl, let redirectUrl = URL(string: strRedirectUrl) else {
+                return
+            }
+
+            Rownd.config.deepLinkHandler?.handle(linkUrl: redirectUrl)
         } catch {
             Task { @MainActor in
                 if Rownd.isDisplayingHub() {

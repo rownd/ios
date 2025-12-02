@@ -1,9 +1,9 @@
-import AuthenticationServices
 import AnyCodable
+import AuthenticationServices
 import Foundation
-import os
 import Get
 import LocalAuthentication
+import os
 
 extension Data {
     init?(base64EncodedURLSafe string: String, options: Base64DecodingOptions = []) {
@@ -310,15 +310,12 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
                         )
                     ).value
 
-                    DispatchQueue.main.async {
-                        Context.currentContext.store.dispatch(SetAuthState(
-                            payload: AuthState(
-                                accessToken: challengeAuthenticationCompleteResponse.access_token,
-                                refreshToken: challengeAuthenticationCompleteResponse.refresh_token
-                            )
-                        ))
-                        Context.currentContext.store.dispatch(UserData.fetch())
-                    }
+                    // Update auth state
+                    await Context.currentContext.store.setAuth(AuthState(
+                        accessToken: challengeAuthenticationCompleteResponse.access_token,
+                        refreshToken: challengeAuthenticationCompleteResponse.refresh_token
+                    ))
+                    await UserData.fetch()
 
                     await hubViewController?.loadNewPage(
                         targetPage: .signIn,
@@ -387,7 +384,6 @@ internal class PasskeyCoordinator: NSObject, ASAuthorizationControllerPresentati
     }
 
     @MainActor func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        let store = Context.currentContext.store
         let hubViewController = getHubViewController()
         if let authorizationError = error as? ASAuthorizationError {
             switch authorizationError.code {

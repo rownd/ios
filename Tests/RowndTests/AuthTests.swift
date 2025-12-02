@@ -5,14 +5,13 @@
 //  Created by Matt Hamann on 9/21/22.
 //
 
-import Foundation
-import Mocker
+import Combine
 import CryptoKit
 import Factory
+import Foundation
 import Get
-import ReSwiftThunk
-import Combine
 import JWTDecode
+import Mocker
 import Testing
 
 @testable import Rownd
@@ -26,27 +25,23 @@ import Testing
             }
         }
         let store = Context.currentContext.store
-        await MainActor.run {
-            store.dispatch(SetClockSync(clockSyncState: .synced))
-        }
+        await store.setClockSync(.synced)
         Mocker.removeAll()
     }
-    
+
     @Test func testRefreshToken() async throws {
         let store = Context.currentContext.store
 
-        Task { @MainActor in
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: NSDate().timeIntervalSince1970), // this will be expired
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: NSDate().timeIntervalSince1970), // this will be expired
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
         let responseData = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
-        
+
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
@@ -56,11 +51,11 @@ import Testing
                 .post : try JSONEncoder().encode(responseData)
             ]
         )
-        
+
         mock.onRequestHandler = OnRequestHandler(httpBodyType: [String:String].self) { request, postBodyArguments in
             print("Refresh called")
         }
-        
+
         mock.register()
 
         let authState = try? await Context.currentContext.authenticator.refreshToken()
@@ -69,23 +64,21 @@ import Testing
         #expect(authState?.accessToken != nil, "Access token should be present")
         #expect(authState?.accessToken == responseData.accessToken, "Access token should be updated")
     }
-    
+
     @Test func testMultipleAuthenticatedReqeustsWithExpiredAccessToken() async throws {
         let store = Context.currentContext.store
 
-        Task { @MainActor in
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
         let responseData = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
         print("Response data will be: \(String(describing: responseData))")
-        
+
         var numTimesRefreshCalled = 0
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
@@ -96,14 +89,14 @@ import Testing
                 .post : try JSONEncoder().encode(responseData)
             ]
         )
-        
+
         mock.onRequestHandler = OnRequestHandler(httpBodyType: [String:String].self) { request, postBodyArguments in
             numTimesRefreshCalled += 1
             print("Refresh called: \(numTimesRefreshCalled) times")
         }
-        
+
         mock.delay = DispatchTimeInterval.seconds(2)
-        
+
         mock.register()
 
         async let task1 = Rownd.getAccessToken()
@@ -120,23 +113,21 @@ import Testing
 
         #expect(numTimesRefreshCalled == 1)
     }
-    
+
     @Test func testRefreshTokenRetryWithHttpErrors() async throws {
         let store = Context.currentContext.store
 
-        Task { @MainActor in
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
         let responseData = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
         print("Response data will be: \(String(describing: responseData))")
-        
+
         var numTimesRefreshCalled = 0
         var mock = Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
@@ -147,7 +138,7 @@ import Testing
                 .post : try JSONEncoder().encode(["error": "Something went wrong"])
             ]
         )
-        
+
         mock.onRequestHandler = OnRequestHandler(httpBodyType: [String:String].self) { request, postBodyArguments in
             // After a couple of errors, make the mock return normal status
             if numTimesRefreshCalled == 2 {
@@ -164,34 +155,32 @@ import Testing
                     Issue.record("Failed to register updated mock")
                 }
             }
-            
+
             numTimesRefreshCalled += 1
             print("Refresh called: \(numTimesRefreshCalled) times")
         }
-        
+
         mock.delay = DispatchTimeInterval.seconds(2)
-        
+
         mock.register()
 
         let token1 = try await Rownd.getAccessToken()
         #expect(token1 == responseData.accessToken)
     }
-    
+
     @Test func testRefreshTokenThrowsWhenOfflineShouldNotSignOut() async throws {
         let store = Context.currentContext.store
 
-        Task { @MainActor in
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
         let responseData = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
-        
+
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
@@ -210,7 +199,7 @@ import Testing
             #expect(store.state.auth.isAuthenticated == true)
         }
     }
-    
+
     @Test func testSignOutWhenRefreshTokenIsAlreadyConsumed() async throws {
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
@@ -225,47 +214,50 @@ import Testing
                 ])
             ]
         ).register()
-        
+
         let accessToken = generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970) // this will be expired
         let store = Context.currentContext.store
-        
-        let authSubscriber = TestFilteredSubscriber<AuthState?>()
-        store.subscribe(authSubscriber) {
-            $0.select { $0.auth }
-        }
 
-        await MainActor.run {
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: accessToken,
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        var authStateValues: [AuthState] = []
+        var cancellable: AnyCancellable?
 
-        await Task { @MainActor in
-            #expect((authSubscriber.receivedValue as? AuthState)?.isAuthenticated == true, "User should be authenticated initially")
+        cancellable = store.publisher(for: \.auth)
+            .sink { auth in
+                authStateValues.append(auth)
+            }
 
-            let accessToken2 = try? await Rownd.getAccessToken()
-            #expect(accessToken2 == nil, "Returned token should be nil")
+        await store.setAuth(AuthState(
+            accessToken: accessToken,
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
-            #expect((authSubscriber.receivedValue as? AuthState)?.isAuthenticated == false, "User should no longer be authenticated")
-        }.value
+        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+        #expect(authStateValues.last?.isAuthenticated == true, "User should be authenticated initially")
+
+        let accessToken2 = try? await Rownd.getAccessToken()
+        #expect(accessToken2 == nil, "Returned token should be nil")
+
+        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+        #expect(store.state.auth.isAuthenticated == false, "User should no longer be authenticated")
+
+        cancellable?.cancel()
     }
-    
+
     @Test func testRefreshTokenThrowsWhenHttpServerErrorsOccur() async throws {
         let store = Context.currentContext.store
 
-        Task { @MainActor in
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
-                refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -1000).timeIntervalSince1970), // this will be expired
+            refreshToken: "eyJhbGciOiJFZERTQSIsImtpZCI6InNpZy0xNjQ0OTM3MzYwIn0.eyJqdGkiOiJiNzY4NmUxNC0zYjk2LTQzMTItOWM3ZS1iODdmOTlmYTAxMzIiLCJhdWQiOlsiYXBwOjMzNzA4MDg0OTIyMTU1MDY3MSJdLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNDg5NTEyMjc5NTQ1MjEyNzI3NiIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9hcHBfdXNlcl9pZCI6ImM5YTgxMDM5LTBjYmMtNDFkNy05YTlkLWVhOWI1YTE5Y2JmMCIsImh0dHBzOi8vYXV0aC5yb3duZC5pby9pc192ZXJpZmllZF91c2VyIjp0cnVlLCJpc3MiOiJodHRwczovL2FwaS5yb3duZC5pbyIsImlhdCI6MTY2NTk3MTk0MiwiaHR0cHM6Ly9hdXRoLnJvd25kLmlvL2p3dF90eXBlIjoicmVmcmVzaF90b2tlbiIsImV4cCI6MTY2ODU2Mzk0Mn0.Yn35j83bfFNgNk26gTvd4a2a2NAGXp7eknvOaFAtd3lWCdvtw6gKRso6Uzd7uydy2MWJFRWC38AkV6lMMfnrDw"
+        ))
 
         let responseData = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 1000).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
         )
-        
+
         Mock(
             url: URL(string: "https://api.rownd.io/hub/auth/token")!,
             ignoreQuery: true,
@@ -285,6 +277,9 @@ import Testing
     }
 
     @Test func testAccessTokenValidWithMargin() async throws {
+        let store = Context.currentContext.store
+        await store.setClockSync(.synced)
+
         let accessTokenNew = AuthState(
             accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: 3600).timeIntervalSince1970),
             refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
@@ -315,12 +310,10 @@ import Testing
     @Test func alwaysThrowWhenAccessTokenCannotBeRetrieved() async throws {
         let store = Context.currentContext.store
 
-        await MainActor.run {
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -3600).timeIntervalSince1970),
-                refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        ))
 
         let authenticator = TestAuthenticator()
         Context.currentContext.authenticator = authenticator
@@ -346,12 +339,10 @@ import Testing
     @Test func onlyThrowWhenAccessTokenCannotBeRetrievedForNetworkReasons() async throws {
         let store = Context.currentContext.store
 
-        await MainActor.run {
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -3600).timeIntervalSince1970),
-                refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: Date.init(timeIntervalSinceNow: -3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date.init().timeIntervalSince1970)
+        ))
 
         let authenticator = TestAuthenticator()
         Context.currentContext.authenticator = authenticator
@@ -387,20 +378,20 @@ struct Payload: Encodable {
 internal func generateJwt(expires: TimeInterval) -> String {
     let secret = "your-256-bit-secret"
     let privateKey = SymmetricKey(data: Data(secret.utf8))
-    
+
     let headerJSONData = try! JSONEncoder().encode(Header())
     let headerBase64String = headerJSONData.urlSafeBase64EncodedString()
-    
+
     var payload = Payload()
     payload.exp = Int(expires)
     let payloadJSONData = try! JSONEncoder().encode(payload)
     let payloadBase64String = payloadJSONData.urlSafeBase64EncodedString()
-    
+
     let toSign = Data((headerBase64String + "." + payloadBase64String).utf8)
-    
+
     let signature = HMAC<SHA256>.authenticationCode(for: toSign, using: privateKey)
     let signatureBase64String = Data(signature).urlSafeBase64EncodedString()
-    
+
     let token = [headerBase64String, payloadBase64String, signatureBase64String].joined(separator: ".")
     return token
 }

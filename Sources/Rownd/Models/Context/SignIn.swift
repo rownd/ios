@@ -1,5 +1,5 @@
 //
-//  Auth.swift
+//  SignIn.swift
 //  framework
 //
 //  Created by Matt Hamann on 6/25/22.
@@ -7,8 +7,6 @@
 
 import Foundation
 import UIKit
-import ReSwift
-import ReSwiftThunk
 
 extension Date {
     static func ISOStringFromDate(date: Date) -> String {
@@ -21,11 +19,11 @@ extension Date {
     }
 }
 
-public enum SignInMethodTypes: String, Codable {
+public enum SignInMethodTypes: String, Codable, Sendable {
     case apple, google
 }
 
-public struct SignInState: Hashable, Codable {
+public struct SignInState: Hashable, Codable, Sendable {
     public var lastSignIn: SignInMethodTypes?
     public var lastSignInDate: String?
 
@@ -51,25 +49,14 @@ public struct SignInState: Hashable, Codable {
     }
 }
 
-// MARK: Reducers
-struct SetLastSignInMethod: Action {
-    var payload: SignInMethodTypes
-}
+// MARK: - Sign In Actions
 
-struct ResetSignInState: Action {}
-
-func signInReducer(action: Action, state: SignInState?) -> SignInState {
-    var state = state ?? SignInState()
-
-    switch action {
-    case _ as ResetSignInState:
-        state = SignInState()
-    case let action as SetLastSignInMethod:
-        state.lastSignIn = action.payload
-        state.lastSignInDate = Date.ISOStringFromDate(date: NetworkTimeManager.shared.currentTime ?? Date())
-    default:
-        break
+extension StateStore {
+    /// Set the last sign in method.
+    func setLastSignInMethod(_ method: SignInMethodTypes) async {
+        await mutate { state in
+            state.signIn.lastSignIn = method
+            state.signIn.lastSignInDate = Date.ISOStringFromDate(date: NetworkTimeManager.shared.currentTime ?? Date())
+        }
     }
-
-    return state
 }

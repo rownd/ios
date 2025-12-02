@@ -5,15 +5,13 @@
 //  Created by Matt Hamann on 6/25/22.
 //
 
-import Foundation
-import UIKit
-import ReSwift
-import ReSwiftThunk
-import JWTDecode
-import Get
 import AnyCodable
+import Foundation
+import Get
+import JWTDecode
+import UIKit
 
-public struct AuthState: Hashable, CustomStringConvertible {
+public struct AuthState: Hashable, CustomStringConvertible, Sendable {
     public var isLoading: Bool = false
     public var accessToken: String?
     public var refreshToken: String?
@@ -34,7 +32,7 @@ extension AuthState: Codable {
     }
 
     public var isAuthenticatedWithUserData: Bool {
-        if (!isAuthenticated) {
+        if !isAuthenticated {
             return false
         }
 
@@ -75,7 +73,7 @@ extension AuthState: Codable {
         let userId: String? = Context.currentContext.store.state.user.get(field: "user_id") as? String ?? nil
 
         let rphInit = RphInit(accessToken: self.accessToken, refreshToken: self.refreshToken, appId: Context.currentContext.store.state.appConfig.id, appUserId: userId)
-        
+
         do {
             return try rphInit.valueForURLFragment()
         } catch {
@@ -108,76 +106,27 @@ extension AuthState: Codable {
         }
     }
 
-func onReceiveAuthTokens(_ newAuthState: AuthState) -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let _ = getState() else { return }
-
-            Task {
-                // This is a special case to get the new auth state over
-                // to the authenticator as quickly as possible without
-                // waiting for the store update flow to complete
-
-                DispatchQueue.main.async {
-                    dispatch(SetAuthState(payload: newAuthState))
-                    dispatch(UserData.fetch())
-                    dispatch(PasskeyData.fetchPasskeyRegistration())
-                }
-            }
-
+    /// Handle receiving new auth tokens and update state.
+    func onReceiveAuthTokens(_ newAuthState: AuthState) {
+        Task {
+            await Context.currentContext.store.setAuth(newAuthState)
+            await UserData.fetch()
+            await PasskeyData.fetchPasskeyRegistration()
         }
     }
 
-    func onReceiveAppleAuthTokens(_ newAuthState: AuthState) -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let _ = getState() else { return }
-
-            Task {
-                // This is a special case to get the new auth state over
-                // to the authenticator as quickly as possible without
-                // waiting for the store update flow to complete
-
-                DispatchQueue.main.async {
-                    dispatch(SetAuthState(payload: newAuthState))
-                    dispatch(PasskeyData.fetchPasskeyRegistration())
-                }
-            }
-
+    /// Handle receiving Apple auth tokens (doesn't fetch user data).
+    func onReceiveAppleAuthTokens(_ newAuthState: AuthState) {
+        Task {
+            await Context.currentContext.store.setAuth(newAuthState)
+            await PasskeyData.fetchPasskeyRegistration()
         }
     }
-}
-
-// MARK: Reducers
-
-struct SetAuthState: Action {
-    var payload = AuthState()
-}
-
-func authReducer(action: Action, state: AuthState?) -> AuthState {
-    var state = state ?? AuthState()
-
-    let hasPreviouslySignedIn = state.hasPreviouslySignedIn
-
-    switch action {
-    case let action as SetAuthState:
-        state = action.payload
-    case let action as SetUserData:
-        state.userId = action.data["user_id"]?.value as? String
-    case let action as SetUserState:
-        state.userId = action.payload.data["user_id"]?.value as? String
-    default:
-        break
-    }
-
-    if hasPreviouslySignedIn ?? false || state.isAuthenticated {
-        state.hasPreviouslySignedIn = true
-    }
-
-    return state
 }
 
 // MARK: Token / auth API calls
 
-public enum UserType: String, Codable {
+public enum UserType: String, Codable, Sendable {
     case NewUser = "new_user"
     case ExistingUser = "existing_user"
     case Unknown = "unknown"
@@ -275,17 +224,17 @@ class Auth {
 
         return tokenResp.value
     }
-    
+
     static func signOutUser(signOutRequest: SignOutRequest) async throws {
 
-        guard let appId = Context.currentContext.store.state.appConfig.id else {  throw RowndError("AppId not found") }
-        
+        guard let appId = Context.currentContext.store.state.appConfig.id else { throw RowndError("AppId not found") }
+
         try await Rownd.apiClient.send(Request(
             path: "/me/applications/\(appId)/signout",
             method: .post,
             body: signOutRequest
         ))
-        
+
     }
 }
 

@@ -41,10 +41,8 @@ class NetworkTimeManager {
         Task {
             await fetchWorldTime()
 
-            Task { @MainActor in
-                if Context.currentContext.store.state.clockSyncState != .synced {
-                    Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .synced))
-                }
+            Task {
+                await Context.currentContext.store.setClockSync(.synced)
             }
         }
 
@@ -52,7 +50,9 @@ class NetworkTimeManager {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if Context.currentContext.store.state.clockSyncState == .waiting {
                     self.log.warning("TimeManager clock not synced after \(ntpStart.distance(to: Date())) seconds.")
-                    Context.currentContext.store.dispatch(SetClockSync(clockSyncState: .unknown))
+                    Task {
+                        await Context.currentContext.store.setClockSync(.unknown)
+                    }
                 }
             }
         }

@@ -26,16 +26,6 @@ let package = Package(
 
     dependencies: [
         .package(
-            name: "ReSwift",
-            url: "https://github.com/ReSwift/ReSwift",
-            .upToNextMajor(from: "6.1.0")
-        ),
-        .package(
-            name: "ReSwiftThunk",
-            url: "https://github.com/ReSwift/ReSwift-Thunk",
-            .upToNextMajor(from: "2.0.0")
-        ),
-        .package(
             name: "JWTDecode",
             url: "https://github.com/auth0/JWTDecode.swift",
             .upToNextMajor(from: "2.6.3")
@@ -105,8 +95,6 @@ let package = Package(
             name: "Rownd",
             dependencies: [
                 "AnyCodable",
-                "ReSwift",
-                "ReSwiftThunk",
                 "JWTDecode",
                 "LBBottomSheet",
                 "Gzip",
@@ -134,8 +122,6 @@ let package = Package(
                 "Mocker",
                 "Mockingbird",
                 "AnyCodable",
-                "ReSwift",
-                "ReSwiftThunk",
                 "JWTDecode",
                 "LBBottomSheet",
                 "Gzip",

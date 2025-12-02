@@ -5,9 +5,9 @@
 //  Created by Matt Hamann on 7/15/22.
 //
 
+import Foundation
 import Testing
 @testable import Rownd
-import Foundation
 
 struct RowndTests {
 
@@ -18,20 +18,18 @@ struct RowndTests {
     @Test func signOut() async throws {
         let store = Context.currentContext.store
 
-        await MainActor.run {
-            store.dispatch(SetAuthState(payload: AuthState(
-                accessToken: generateJwt(expires: NSDate().timeIntervalSince1970),
-                refreshToken: generateJwt(expires: NSDate().timeIntervalSince1970)
-            )))
-        }
+        await store.setAuth(AuthState(
+            accessToken: generateJwt(expires: NSDate().timeIntervalSince1970),
+            refreshToken: generateJwt(expires: NSDate().timeIntervalSince1970)
+        ))
 
-        #expect(store.state?.auth.isAuthenticated == true)
+        #expect(store.state.auth.isAuthenticated == true)
 
         Rownd.signOut()
 
-        await MainActor.run {
-            #expect(store.state?.auth.isAuthenticated == false)
-        }
+        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+        #expect(store.state.auth.isAuthenticated == false)
     }
 
 }

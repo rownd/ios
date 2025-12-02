@@ -5,11 +5,11 @@
 //  Created by Matt Hamann on 4/4/23.
 //
 
+import AnyCodable
 import Foundation
 import GoogleSignIn
-import UIKit
-import AnyCodable
 import JWTDecode
+import UIKit
 
 class GoogleSignInCoordinator: NSObject {
     var parent: Rownd
@@ -29,7 +29,7 @@ class GoogleSignInCoordinator: NSObject {
         Rownd.requestSignIn(RowndSignInOptions(intent: intent))
     }
 
-    /// Sign in funciton for customer-provided web views
+    /// Sign in function for customer-provided web views
     func signIn(webViewId: String, intent: RowndSignInIntent?, hint: String?) -> Void {
         let googleConfig = Context.currentContext.store.state.appConfig.config?.hub?.auth?.signInMethods?.google
 
@@ -47,32 +47,32 @@ class GoogleSignInCoordinator: NSObject {
                 logger.error("Failed to retrieve root view controller")
                 return
             }
-            
+
             do {
                 let result = try await GIDSignIn.sharedInstance.signIn(
                     withPresenting: rootViewController,
                     hint: hint
                 )
-                
+
                 guard let idToken = result.user.idToken else {
                     Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'error', 'sign_in_type': 'google' });")
                     logger.error("Google sign-in failed. Either no ID token was present, or an error was thrown.")
                     return
                 }
-                
+
                 logger.debug("Sign-in handshake with Google completed successfully.")
                 do {
                     Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: "window.rownd.requestSignIn({ 'login_step': 'completing' });")
-                    
+
                     let tokenResponse = try await Auth.fetchToken(idToken: idToken.tokenString, userData: nil, intent: intent)
-                    
+
                     guard let tokenResponse = tokenResponse,
                           let accessToken = tokenResponse.accessToken,
                           let refreshToken = tokenResponse.refreshToken else {
                         logger.error("Token response is empty")
                         return
                     }
-                    
+
                     // Reload the web view page with rph_init appended to the URL fragment in order
                     // to complete the sign-in
                     do {
@@ -81,14 +81,14 @@ class GoogleSignInCoordinator: NSObject {
                             return $0.starts(with: "app:")
                         })?.replacingOccurrences(of: "app:", with: "")
                         let appUserId = jwt.claim(name: "https://auth.rownd.io/app_user_id")
-                        
+
                         let rphInit = RphInit(
                             accessToken: accessToken,
                             refreshToken: refreshToken,
                             appId: appId,
                             appUserId: appUserId.string
                         )
-                        
+
                         let rphInitString = try rphInit.valueForURLFragment()
                         Rownd.customerWebViews.evaluateJavaScript(webViewId: webViewId, code: """
                             let url = new URL(window.location.href);
@@ -177,34 +177,33 @@ class GoogleSignInCoordinator: NSObject {
                         intent: intent
                     )
 
-                    Task { @MainActor in
-                        Context.currentContext.store.dispatch(SetAuthState(
-                            payload: AuthState(
-                                accessToken: tokenResponse?.accessToken,
-                                refreshToken: tokenResponse?.refreshToken
-                            )
-                        ))
-                        Context.currentContext.store.dispatch(UserData.fetch())
-                        Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.google))
+                    // Update auth state
+                    await Context.currentContext.store.setAuth(AuthState(
+                        accessToken: tokenResponse?.accessToken,
+                        refreshToken: tokenResponse?.refreshToken
+                    ))
 
-                        Rownd.requestSignIn(
-                            jsFnOptions: RowndSignInJsOptions(
-                                loginStep: .success,
-                                intent: intent,
-                                userType: tokenResponse?.userType,
-                                appVariantUserType: tokenResponse?.appVariantUserType
-                            )
+                    await UserData.fetch()
+                    await Context.currentContext.store.setLastSignInMethod(.google)
+
+                    Rownd.requestSignIn(
+                        jsFnOptions: RowndSignInJsOptions(
+                            loginStep: .success,
+                            intent: intent,
+                            userType: tokenResponse?.userType,
+                            appVariantUserType: tokenResponse?.appVariantUserType
                         )
-                        
-                        RowndEventEmitter.emit(RowndEvent(
-                            event: .signInCompleted,
-                            data: [
-                                "method": AnyCodable(SignInType.google.rawValue),
-                                "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
-                                "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
-                            ]
-                        ))
-                    }
+                    )
+
+                    RowndEventEmitter.emit(RowndEvent(
+                        event: .signInCompleted,
+                        data: [
+                            "method": AnyCodable(SignInType.google.rawValue),
+                            "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
+                            "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
+                        ]
+                    ))
+
                     return
                 } catch ApiError.generic(let errorInfo) {
                     if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {

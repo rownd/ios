@@ -10,7 +10,6 @@ import Factory
 import Foundation
 import Get
 import OSLog
-import ReSwift
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "authenticator")
 
@@ -89,41 +88,30 @@ private class TokenApiClientDelegate: APIClientDelegate {
     }
 }
 
-// This class exists for the sole purpose of subscribing the Authenticator to the
-// global state. Data races can occur when using subscribers within the actor itself,
-// which leads to memmory corruption and weird app crashes.
+// This class exists for the sole purpose of maintaining a synchronized copy
+// of the auth state for immediate access by the Authenticator actor.
+// Data races can occur when accessing the store directly within the actor.
 class AuthenticatorSubscription: NSObject {
     private static let inst: AuthenticatorSubscription = AuthenticatorSubscription()
     internal static var currentAuthState: AuthState? = Context.currentContext.store.state.auth
+    private var cancellable: AnyCancellable?
 
-    private override init() {}
+    private override init() {
+        super.init()
+        startObserving()
+    }
 
-    /// This checks the incoming action to determine whether it contains an AuthState payload and pushes that
-    /// to the Authenticator if present. This prevents race conditions between the internal Rownd state and any
-    /// external subscribers. The Authenticator MUST always reflect the correct state in order to prevent race conditions.
-    internal static func createAuthenticatorMiddleware<State>() -> Middleware<State> {
-        return { _, _ in
-            return { next in
-                return { action in
-                    var authState: AuthState?
-
-                    switch action {
-                    case let action as SetAuthState:
-                        authState = action.payload
-                    case let action as InitializeRowndState:
-                        authState = action.payload.auth
-                    default:
-                        break
-                    }
-
-                    guard let authState = authState else {
-                        return next(action)
-                    }
-                    AuthenticatorSubscription.currentAuthState = authState
-                    next(action)
-                }
+    /// Start observing auth state changes from the store.
+    private func startObserving() {
+        cancellable = Context.currentContext.store.publisher(for: \.auth)
+            .sink { [weak self] authState in
+                AuthenticatorSubscription.currentAuthState = authState
             }
-        }
+    }
+
+    /// Update the current auth state directly (for immediate access before store update propagates).
+    internal static func updateAuthState(_ authState: AuthState) {
+        currentAuthState = authState
     }
 }
 
@@ -190,20 +178,17 @@ actor Authenticator: AuthenticatorProtocol {
                 log.debug("Successfully refreshed auth tokens.")
 
                 // Store the new token response here for immediate use outside of the state lifecycle
-                AuthenticatorSubscription.currentAuthState = newAuthState
+                AuthenticatorSubscription.updateAuthState(newAuthState)
 
-                // Update the auth state - this really should be abstracted out elsewhere
-                DispatchQueue.main.async {
-                    Context.currentContext.store.dispatch(
-                        SetAuthState(
-                            payload: AuthState(
-                                accessToken: newAuthState.accessToken,
-                                refreshToken: newAuthState.refreshToken,
-                                isVerifiedUser: Context.currentContext.store.state.auth
-                                    .isVerifiedUser,
-                                hasPreviouslySignedIn: Context.currentContext.store.state.auth
-                                    .hasPreviouslySignedIn
-                            )))
+                // Update the auth state
+                Task {
+                    await Context.currentContext.store.mutate { state in
+                        state.auth.accessToken = newAuthState.accessToken
+                        state.auth.refreshToken = newAuthState.refreshToken
+                        // Preserve existing values
+                        state.auth.isVerifiedUser = state.auth.isVerifiedUser
+                        state.auth.hasPreviouslySignedIn = state.auth.hasPreviouslySignedIn
+                    }
                 }
 
                 return newAuthState
@@ -231,7 +216,7 @@ actor Authenticator: AuthenticatorProtocol {
                 default: break
                 }
 
-                // Sign the user out b/c they need to get a new refresh token - this really should be abstracted out elsewhere
+                // Sign the user out b/c they need to get a new refresh token
                 Rownd.signOut()
 
                 throw
@@ -247,27 +232,22 @@ actor Authenticator: AuthenticatorProtocol {
 
     private func waitForClockSync() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
-            let continuationID = UUID()
             var didResume = false
 
             // Task 1: Wait for the clock sync
             group.addTask { @MainActor [weak self] in
                 try await withCheckedThrowingContinuation {
                     (continuation: CheckedContinuation<Void, Error>) in
-                    let subscriber = Context.currentContext.store.subscribe { $0.clockSyncState }
                     var cancellable: AnyCancellable?
 
-                    cancellable = subscriber.$current.sink { clockSyncState in
-                        if clockSyncState != .waiting && !didResume {
-                            didResume = true
-                            continuation.resume()
-                            // Defer cleanup to next runloop to avoid mutating subscriber set during notification
-                            DispatchQueue.main.async {
+                    cancellable = Context.currentContext.store.publisher(for: \.clockSyncState)
+                        .sink { clockSyncState in
+                            if clockSyncState != .waiting && !didResume {
+                                didResume = true
+                                continuation.resume()
                                 cancellable?.cancel()
-                                subscriber.unsubscribe()
                             }
                         }
-                    }
 
                     Task { [weak self] in
                         if let cancellable = cancellable {

@@ -1,13 +1,13 @@
 //
-//  File.swift
-//  
+//  RowndEvent.swift
+//
 //
 //  Created by Matt Hamann on 3/20/24.
 //
 
-import Foundation
 import AnyCodable
 import Combine
+import Foundation
 
 public enum RowndEventType: String, Codable {
     case signInStarted = "sign_in_started"
@@ -32,17 +32,20 @@ public protocol RowndEventHandlerDelegate: AnyObject {
 
 class RowndEventEmitter {
     static private var cancellables = Set<AnyCancellable>()
+
     static func emit(_ event: RowndEvent) {
         if event.event == .signInCompleted {
-            let subscription = Context.currentContext.store.subscribe { $0.auth.isAccessTokenValid }
-            subscription.$current.sink { isAccessTokenValid in
-                if isAccessTokenValid {
-                    subscription.unsubscribe()
+            // Wait for access token to be valid before emitting sign-in completed
+            Context.currentContext.store.publisher(for: \.auth.isAccessTokenValid)
+                .filter { $0 }
+                .first()
+                .receive(on: DispatchQueue.main)
+                .sink { _ in
                     Context.currentContext.eventListeners.forEach { listener in
                         listener.handleRowndEvent(event)
                     }
                 }
-            }.store(in: &Self.cancellables)
+                .store(in: &Self.cancellables)
         } else {
             Context.currentContext.eventListeners.forEach { listener in
                 listener.handleRowndEvent(event)

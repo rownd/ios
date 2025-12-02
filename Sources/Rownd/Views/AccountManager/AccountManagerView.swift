@@ -5,14 +5,14 @@
 //  Created by Matt Hamann on 7/13/22.
 //
 
-import SwiftUI
 import AnyCodable
+import SwiftUI
 
 struct AccountManager: View {
 
-    @StateObject var appConfig = Rownd.getInstance().state().subscribe { $0.appConfig }
-    @StateObject var userData = Rownd.getInstance().state().subscribe { $0.user.data }
-    @State var userIsLoading = Rownd.getInstance().state().subscribe { $0.user.isLoading }
+    @StateObject var appConfig = Rownd.getInstance().state().subscribe(select: { $0.appConfig })
+    @StateObject var userData = Rownd.getInstance().state().subscribe(select: { $0.user.data })
+    @State var userIsLoading = Rownd.getInstance().state().subscribe(select: { $0.user.isLoading })
 
     @State private var editingUser: [String: AnyCodable] = [:]
 
@@ -41,7 +41,9 @@ struct AccountManager: View {
             }
             Button(action: {
                 let mergedData = editingUser.merging(userData.current) { (current, _) in current }
-                Context.currentContext.store.dispatch(UserData.save(mergedData))
+                Task {
+                    await UserData.save(mergedData)
+                }
             }) {
                 Text(userIsLoading.current ? "Saving..." : "Save")
             }

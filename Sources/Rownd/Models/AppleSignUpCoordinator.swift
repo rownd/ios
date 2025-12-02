@@ -5,12 +5,11 @@
 //  Created by Michael Murray on 7/17/22.
 //
 
-import SwiftUI
-import AuthenticationServices
-import UIKit
 import AnyCodable
-import ReSwiftThunk
+import AuthenticationServices
 import Combine
+import SwiftUI
+import UIKit
 
 private let appleSignInDataKey = "userAppleSignInData"
 
@@ -140,33 +139,34 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
                         // Prevent fast auth handshakes from feeling jarring to the user
                         try await Task.sleep(nanoseconds: UInt64(2 * Double(NSEC_PER_SEC)))
 
-                        DispatchQueue.main.async {
-                            Context.currentContext.store.dispatch(Context.currentContext.store.state.auth.onReceiveAppleAuthTokens(
-                                AuthState(
-                                    accessToken: tokenResponse?.accessToken,
-                                    refreshToken: tokenResponse?.refreshToken
-                                )
-                            ))
+                        // Handle auth tokens
+                        let newAuthState = AuthState(
+                            accessToken: tokenResponse?.accessToken,
+                            refreshToken: tokenResponse?.refreshToken
+                        )
+                        newAuthState.onReceiveAppleAuthTokens(newAuthState)
 
-                            Context.currentContext.store.dispatch(SetLastSignInMethod(payload: SignInMethodTypes.apple))
+                        await Context.currentContext.store.setLastSignInMethod(.apple)
 
-                            let subscriber = Context.currentContext.store.subscribe { $0.auth.isAccessTokenValid }
-                            subscriber.$current.sink { isAccessTokenValid in
-                                if isAccessTokenValid {
-                                    subscriber.unsubscribe()
-                                    self.updateUserDataWithAppleData(fullName: fullName, email: email)
-                                    
-                                    RowndEventEmitter.emit(RowndEvent(
-                                        event: .signInCompleted,
-                                        data: [
-                                            "method": AnyCodable(SignInType.apple.rawValue),
-                                            "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
-                                            "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
-                                        ]
-                                    ))
-                                }
-                            }.store(in: &self.cancellables)
-                        }
+                        // Subscribe to auth state to update user data when valid
+                        Context.currentContext.store.publisher(for: \.auth.isAccessTokenValid)
+                            .filter { $0 }
+                            .first()
+                            .receive(on: DispatchQueue.main)
+                            .sink { [weak self] _ in
+                                self?.updateUserDataWithAppleData(fullName: fullName, email: email)
+
+                                RowndEventEmitter.emit(RowndEvent(
+                                    event: .signInCompleted,
+                                    data: [
+                                        "method": AnyCodable(SignInType.apple.rawValue),
+                                        "user_type": AnyCodable(tokenResponse?.userType?.rawValue),
+                                        "app_variant_user_type": AnyCodable(tokenResponse?.appVariantUserType?.rawValue)
+                                    ]
+                                ))
+                            }
+                            .store(in: &self.cancellables)
+
                     } catch ApiError.generic(let errorInfo) {
                         if errorInfo.code == "E_SIGN_IN_USER_NOT_FOUND" {
                             Task { @MainActor in
@@ -212,50 +212,47 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
     }
 
     func updateUserDataWithAppleData(fullName: PersonNameComponents?, email: String?) {
-        Context.currentContext.store.dispatch(Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
-            Task {
-                do {
-                    if let userStateResponse = try await UserData.fetchUserData(state) {
-                        var userData = state.user.data
-                        userData.merge(userStateResponse.data) { (current, _) in current }
+        Task {
+            do {
+                if let userStateResponse = try await UserData.fetchUserData() {
+                    var userData = Context.currentContext.store.state.user.data
+                    userData.merge(userStateResponse.data) { (current, _) in current }
 
-                        let defaults = UserDefaults.standard
-                        // use UserDefault values for Email and fullName if available
-                        if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
-                            let decoder = JSONDecoder()
-                            if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
-                                userData["email"] = AnyCodable(loadedAppleSignInData.email)
-                                userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
-                                userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
-                                userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
-                            }
-                            
-                            // Remove the data since we no longer need it for subsequent signins.
-                            defaults.removeObject(forKey: appleSignInDataKey)
-                        } else {
-                            if let email = email {
-                                userData["email"] = AnyCodable(email)
-                                userData["first_name"] = AnyCodable(fullName?.givenName)
-                                userData["last_name"] = AnyCodable(fullName?.familyName)
-                                userData["full_name"] = AnyCodable(String("\(fullName?.givenName) \(fullName?.familyName)"))
-                            }
+                    let defaults = UserDefaults.standard
+                    // use UserDefault values for Email and fullName if available
+                    if let userAppleSignInData = defaults.object(forKey: appleSignInDataKey) as? Data {
+                        let decoder = JSONDecoder()
+                        if let loadedAppleSignInData = try? decoder.decode(AppleSignInData.self, from: userAppleSignInData) {
+                            userData["email"] = AnyCodable(loadedAppleSignInData.email)
+                            userData["first_name"] = AnyCodable(loadedAppleSignInData.firstName)
+                            userData["last_name"] = AnyCodable(loadedAppleSignInData.lastName)
+                            userData["full_name"] = AnyCodable(loadedAppleSignInData.fullName)
                         }
 
-                        if !userData.isEmpty {
-                            dispatch(UserData.save(userData))
-                            logger.debug("UserData to save after signin: \(String(describing: userData))")
-                        }
+                        // Remove the data since we no longer need it for subsequent signins.
+                        defaults.removeObject(forKey: appleSignInDataKey)
                     } else {
-                        // Handle the case where userStateResponse is nil
-                        logger.error("Failed to fetch user state response")
+                        if let email = email {
+                            userData["email"] = AnyCodable(email)
+                            userData["first_name"] = AnyCodable(fullName?.givenName)
+                            userData["last_name"] = AnyCodable(fullName?.familyName)
+                            userData["full_name"] = AnyCodable(String("\(fullName?.givenName ?? "") \(fullName?.familyName ?? "")"))
+                        }
                     }
-                } catch {
-                    // Handle any errors that occurred during fetch
-                    logger.error("Error fetching user data: \(error)")
+
+                    if !userData.isEmpty {
+                        await UserData.save(userData)
+                        logger.debug("UserData to save after signin: \(String(describing: userData))")
+                    }
+                } else {
+                    // Handle the case where userStateResponse is nil
+                    logger.error("Failed to fetch user state response")
                 }
+            } catch {
+                // Handle any errors that occurred during fetch
+                logger.error("Error fetching user data: \(error)")
             }
-        })
+        }
     }
 
     // If authorization faced any issue then this method will get triggered
@@ -263,7 +260,7 @@ class AppleSignUpCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAut
 
         // If there is any error will get it here
         logger.error("An error occurred while signing in with Apple. Error: \(String(describing: error))")
-        
+
         func defaultSignInFlow() {
             logger.error("Falling back to default sign flow")
             Rownd.requestSignIn(RowndSignInOptions(intent: intent))

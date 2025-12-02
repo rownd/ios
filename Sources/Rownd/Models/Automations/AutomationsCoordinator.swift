@@ -6,10 +6,10 @@
 //
 
 import AnyCodable
+import Combine
 import Foundation
-import ReSwift
 
-public struct AutomationStoreState {
+public struct AutomationStoreState: Sendable {
     var user: UserState
     var automations: [RowndAutomation]?
     var auth: AuthState
@@ -34,11 +34,11 @@ func computeLastRunTimestamp(automation: RowndAutomation, meta: [String: AnyCoda
     return nil
 }
 
-public class AutomationsCoordinator: NSObject, StoreSubscriber {
+public class AutomationsCoordinator: NSObject {
     private var state: AutomationStoreState?
-    public typealias StoreSubscriberStateType = AutomationStoreState
     let debouncer = Debouncer(delay: 0.5)  // 500ms
     private var isStarted = false
+    private var cancellable: AnyCancellable?
 
     override init() {
         super.init()
@@ -48,29 +48,34 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
     public func start() {
         guard !isStarted else { return }
         isStarted = true
-        Context.currentContext.store.subscribe(self) {
-            $0.select {
+
+        // Subscribe to state changes using Combine
+        cancellable = Context.currentContext.store.publisher()
+            .map { state in
                 AutomationStoreState(
-                    user: $0.user, automations: $0.appConfig.config?.automations, auth: $0.auth,
-                    passkeys: $0.passkeys)
+                    user: state.user,
+                    automations: state.appConfig.config?.automations,
+                    auth: state.auth,
+                    passkeys: state.passkeys
+                )
             }
-        }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newState in
+                self?.state = newState
+                self?.processAutomations()
+            }
     }
 
     @MainActor
     public func stop() {
         guard isStarted else { return }
-        Context.currentContext.store.unsubscribe(self)
+        cancellable?.cancel()
+        cancellable = nil
         isStarted = false
     }
 
     deinit {
-        DispatchQueue.main.sync { [weak self] in self?.stop() }
-    }
-
-    public func newState(state: AutomationStoreState) {
-        self.state = state
-        self.processAutomations()
+        cancellable?.cancel()
     }
 
     private func processAutomations(_ state: AutomationStoreState) {
@@ -129,7 +134,7 @@ public class AutomationsCoordinator: NSObject, StoreSubscriber {
 
         actionFn(args)
 
-        // Save automatino action in meta data
+        // Save automation action in meta data
         let lastRunId = computeLastRunId(automation)
         Task { @MainActor in
             let date = NetworkTimeManager.shared.currentTime ?? Date()

@@ -1,5 +1,5 @@
 //
-//  Auth.swift
+//  User.swift
 //  framework
 //
 //  Created by Matt Hamann on 7/8/22.
@@ -9,20 +9,18 @@ import AnyCodable
 import Foundation
 import Get
 import OSLog
-import ReSwift
-import ReSwiftThunk
 import UIKit
 
 private let log = Logger(subsystem: "io.rownd.sdk", category: "user")
 
 public typealias UserStateData = [String: AnyCodable]
 
-public enum UserStateVal: String, Codable, Hashable {
+public enum UserStateVal: String, Codable, Hashable, Sendable {
     case enabled = "enabled"
     case disabled = "disabled"
 }
 
-public enum UserAuthLevel: String, Codable, Hashable {
+public enum UserAuthLevel: String, Codable, Hashable, Sendable {
     case instant = "instant"
     case guest = "guest"
     case unverified = "unverified"
@@ -30,7 +28,7 @@ public enum UserAuthLevel: String, Codable, Hashable {
     case unknown = "unknown"
 }
 
-public struct UserState: Hashable {
+public struct UserState: Hashable, Sendable {
     public var isLoading: Bool = false
     public var isErrored: Bool = false
     public var errorMessage: String?
@@ -82,76 +80,35 @@ extension UserState: Codable {
     }
 
     public func set(data: [String: AnyCodable]) {
-        DispatchQueue.main.async {
-            Context.currentContext.store.dispatch(UserData.save(data))
+        Task {
+            await UserData.save(data)
         }
     }
 
     public func set(field: String, value: AnyCodable) {
         var userData = self.data
         userData[field] = value
-        DispatchQueue.main.async {
-            Context.currentContext.store.dispatch(UserData.save(userData))
+        Task {
+            await UserData.save(userData)
         }
     }
 
     internal func setMetaData(_ meta: [String: AnyCodable]) {
-        DispatchQueue.main.async {
-            Context.currentContext.store.dispatch(UserData.saveMetaData(meta))
+        Task {
+            await UserData.saveMetaData(meta)
         }
     }
 
     internal func setMetaData(field: String, value: AnyCodable) {
         var meta = self.meta ?? [:]
         meta[field] = value
-        DispatchQueue.main.async {
-            Context.currentContext.store.dispatch(UserData.saveMetaData(meta))
+        Task {
+            await UserData.saveMetaData(meta)
         }
     }
 }
 
-struct SetUserLoading: Action {
-    var isLoading: Bool
-}
-
-struct SetUserData: Action {
-    var data: [String: AnyCodable] = [:]
-    var meta: [String: AnyCodable]? = [:]
-}
-
-struct SetUserError: Action {
-    var isErrored: Bool = true
-    var errorMessage: String
-}
-
-struct SetUserState: Action {
-    var payload: UserState
-}
-
-func userReducer(action: Action, state: UserState?) -> UserState {
-    var state = state ?? UserState()
-
-    switch action {
-    case let action as SetUserState:
-        state = action.payload
-    case let action as SetUserData:
-        state.data = action.data
-        state.meta = action.meta ?? [:]
-        state.isLoading = false
-    case let action as SetUserLoading:
-        state.isLoading = action.isLoading
-    case let action as SetAuthState:
-        if !action.payload.isAuthenticated {
-            state = UserState()
-        }
-    default:
-        break
-    }
-
-    return state
-}
-
-/* API / side-effecty things */
+// MARK: - API / side-effect actions
 
 // Easily unwrap the main payload from the `app` key
 struct UserDataPayload: Codable {
@@ -162,7 +119,7 @@ struct UserMetaDataPayload: Codable {
     var meta: [String: AnyCodable]
 }
 
-public struct UserStateResponse: Hashable, Codable {
+public struct UserStateResponse: Hashable, Codable, Sendable {
     public var data: UserStateData = [:]
     public var meta: UserStateData? = [:]
     public var state: UserStateVal = .enabled
@@ -174,7 +131,7 @@ public struct UserStateResponse: Hashable, Codable {
     }
 }
 
-public struct UserMetaDataResponse: Hashable {
+public struct UserMetaDataResponse: Hashable, Sendable {
     public var id: String = ""
     public var meta: [String: AnyCodable] = [:]
 }
@@ -199,22 +156,23 @@ extension UserStateResponse {
 class UserData {
     private static var fetchTask: Task<UserStateResponse?, Error>?
 
-    static func onReceiveUserData(_ action: SetUserData) -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard getState() != nil else { return }
-            DispatchQueue.main.async {
-                dispatch(action)
-            }
+    /// Handle receiving user data from external source.
+    static func onReceiveUserData(data: [String: AnyCodable], meta: [String: AnyCodable]? = nil) async {
+        await Context.currentContext.store.mutate { state in
+            state.user.data = data
+            state.user.meta = meta ?? state.user.meta
+            state.user.isLoading = false
         }
     }
 
-    internal static func fetchUserData(_ state: RowndState) async throws -> UserStateResponse? {
+    internal static func fetchUserData() async throws -> UserStateResponse? {
         if let handle = fetchTask {
             log.debug("User data fetch is already in progress")
             return try await handle.value
         }
 
         let task = Task.retrying { () throws -> UserStateResponse? in
+            let state = Context.currentContext.store.state
 
             guard state.auth.isAuthenticated else {
                 throw RowndError("User must be authenticated before fetching profile")
@@ -252,7 +210,7 @@ class UserData {
                 }
 
                 throw RowndError(
-                    "Failed to retireve user: \(error.localizedDescription)"
+                    "Failed to retrieve user: \(error.localizedDescription)"
                 )
             }
         }
@@ -262,137 +220,112 @@ class UserData {
         return try await task.value
     }
 
-    static func fetch() -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
+    static func fetch() async {
+        let state = Context.currentContext.store.state
 
+        guard state.auth.isAuthenticated else {
+            return
+        }
+
+        await Context.currentContext.store.setUserLoading(true)
+
+        defer {
             Task {
-                guard state.auth.isAuthenticated else {
-                    return
-                }
+                await Context.currentContext.store.setUserLoading(false)
+            }
+        }
 
-                DispatchQueue.main.async {
-                    dispatch(SetUserLoading(isLoading: true))
-                }
+        do {
+            let userResponse = try await fetchUserData()
 
-                defer {
-                    DispatchQueue.main.async {
-                        dispatch(SetUserLoading(isLoading: false))
-                    }
-                }
+            guard let userResponse = userResponse else {
+                return
+            }
 
-                do {
-                    let userResponse = try await fetchUserData(state)
+            await Context.currentContext.store.setUser(userResponse.toUserState())
+        } catch {
+            log.error(
+                "Something went wrong while fetching the user's profile \(String(describing: error))"
+            )
+        }
+    }
 
-                    guard let userResponse = userResponse else {
-                        return
-                    }
+    static func save() async {
+        await save(Context.currentContext.store.state.user.data)
+    }
 
-                    Task { @MainActor in
-                        dispatch(
-                            SetUserState(
-                                payload: userResponse.toUserState()
-                            ))
-                    }
-                } catch {
-                    log.error(
-                        "Something went wrong while fetching the user's profile \(String(describing: error))"
-                    )
-                }
+    static func save(_ data: [String: AnyCodable]) async {
+        let state = Context.currentContext.store.state
+        guard !state.user.isLoading else { return }
+
+        // Update local state immediately
+        await Context.currentContext.store.mutate { state in
+            state.user.data = data
+        }
+
+        guard state.auth.isAuthenticated else {
+            return
+        }
+
+        await Context.currentContext.store.setUserLoading(true)
+
+        defer {
+            Task {
+                await Context.currentContext.store.setUserLoading(false)
+            }
+        }
+
+        let userDataPayload = UserDataPayload(data: data)
+
+        do {
+            let user = try await Rownd.apiClient.send(
+                Request<UserStateResponse?>(
+                    path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
+                    method: .put,
+                    body: userDataPayload
+                )
+            ).value
+
+            logger.debug("Decoded user response: \(String(describing: user))")
+
+            await Context.currentContext.store.mutate { state in
+                state.user.data = user?.data ?? [:]
+                state.user.isLoading = false
+            }
+        } catch {
+            logger.error("Failed to save user profile: \(String(describing: error))")
+            await Context.currentContext.store.mutate { state in
+                state.user.isErrored = true
+                state.user.errorMessage = "The user profile could not be saved: \(String(describing: error))"
             }
         }
     }
 
-    static func save() -> Thunk<RowndState> {
-        return save(Context.currentContext.store.state.user.data)
-    }
+    static func saveMetaData(_ meta: [String: AnyCodable]) async {
+        let state = Context.currentContext.store.state
+        guard !state.user.isLoading else { return }
 
-    static func save(_ data: [String: AnyCodable]) -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
-            guard !state.user.isLoading else { return }
-
-            DispatchQueue.main.async {
-                dispatch(SetUserData(data: data, meta: state.user.meta))
-            }
-
-            Task {
-                guard state.auth.isAuthenticated else {
-                    return
-                }
-
-                DispatchQueue.main.async {
-                    dispatch(SetUserLoading(isLoading: true))
-                }
-
-                defer {
-                    DispatchQueue.main.async {
-                        dispatch(SetUserLoading(isLoading: false))
-                    }
-                }
-
-                // Handle data that should be encrypted
-                var updatedUserState = UserState()
-                updatedUserState.data = data
-
-                let userDataPayload = UserDataPayload(data: data)
-
-                do {
-                    let user = try await Rownd.apiClient.send(
-                        Request<UserStateResponse?>(
-                            path: "/me/applications/\(state.appConfig.id ?? "unknown")/data",
-                            method: .put,
-                            body: userDataPayload
-                        )
-                    ).value
-
-                    logger.debug("Decoded user response: \(String(describing: user))")
-
-                    DispatchQueue.main.async {
-                        dispatch(SetUserData(data: user?.data ?? [:], meta: state.user.meta))
-                    }
-                } catch {
-                    logger.error("Failed to save user profile: \(String(describing: error))")
-                    DispatchQueue.main.async {
-                        dispatch(
-                            SetUserError(
-                                errorMessage:
-                                    "The user profile could not be saved: \(String(describing: error))"
-                            ))
-                    }
-                }
-            }
+        // Update local state immediately
+        await Context.currentContext.store.mutate { state in
+            state.user.meta = meta
         }
-    }
 
-    static func saveMetaData(_ meta: [String: AnyCodable]) -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
-            guard !state.user.isLoading else { return }
+        guard state.auth.isAuthenticated else {
+            return
+        }
 
-            DispatchQueue.main.async {
-                dispatch(SetUserData(data: state.user.data, meta: meta))
-            }
+        do {
+            let response = try await Rownd.apiClient.send(
+                Request<UserMetaDataResponse?>(
+                    path: "/me/meta",
+                    method: .put,
+                    body: UserMetaDataPayload(meta: meta)
+                )
+            ).value
 
-            Task {
-                guard state.auth.isAuthenticated else {
-                    return
-                }
-
-                do {
-                    let response = try await Rownd.apiClient.send(
-                        Request<UserMetaDataResponse?>(
-                            path: "/me/meta",
-                            method: .put,
-                            body: UserMetaDataPayload(meta: meta)
-                        )
-                    ).value
-
-                    logger.debug("Saved Rownd meta data: \(String(describing: response))")
-                } catch {
-                    logger.error("Failed to save meta data: \(String(describing: error))")
-                }
-            }
+            logger.debug("Saved Rownd meta data: \(String(describing: response))")
+        } catch {
+            logger.error("Failed to save meta data: \(String(describing: error))")
         }
     }
 }
