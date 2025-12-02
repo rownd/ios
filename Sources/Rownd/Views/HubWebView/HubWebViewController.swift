@@ -6,11 +6,10 @@
 //
 
 import Foundation
+import LocalAuthentication
+import SwiftUI
 import UIKit
 import WebKit
-import SwiftUI
-import LocalAuthentication
-import ReSwiftThunk
 
 public enum HubPageSelector {
     case signIn
@@ -292,18 +291,18 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             switch hubMessage.type {
             case .authentication:
                 guard case .authentication(let authMessage) = hubMessage.payload else { return }
-                guard hubViewController?.targetPage == .signIn  else { return }
+                guard hubViewController?.targetPage == .signIn else { return }
                 let initialJsFunctionArgsAsJson = self.jsFunctionArgsAsJson
-                DispatchQueue.main.async {
-                    // Ensure user.isLoading = false so that the data is fetched properly
-                    store.dispatch(SetUserLoading(isLoading: false))
-                    // Then set our tokens
-                    store.dispatch(store.state.auth.onReceiveAuthTokens(
-                        AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
-                    ))
-                    store.dispatch(ResetSignInState())
+
+                // Handle auth tokens
+                Task {
+                    await store.setUserLoading(false)
+                    let newAuthState = AuthState(accessToken: authMessage.accessToken, refreshToken: authMessage.refreshToken)
+                    newAuthState.onReceiveAuthTokens(newAuthState)
+                    await store.resetSignIn()
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in // .now() + num_seconds
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
                     // Close the hub as long as no other rownd api was called
                     if initialJsFunctionArgsAsJson == self?.jsFunctionArgsAsJson {
                         self?.hubViewController?.hide()
@@ -316,11 +315,8 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
             case .userDataUpdate:
                 guard case .userDataUpdate(let userDataMessage) = hubMessage.payload else { return }
                 guard hubViewController?.targetPage == .manageAccount else { return }
-                DispatchQueue.main.async {
-                    store
-                        .dispatch(
-                            SetUserState(payload: userDataMessage.toUserState())
-                        )
+                Task {
+                    await store.setUser(userDataMessage.toUserState())
                 }
 
             case .triggerSignInWithApple:
@@ -328,7 +324,6 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 if case .triggerSignInWithApple(let message) = hubMessage.payload {
                     signInWithAppleMessage = message
                 }
-                //                self.hubViewController?.hide()
                 Rownd.requestSignIn(
                     with: .appleId,
                     signInOptions: RowndSignInOptions(
@@ -361,10 +356,10 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
 
                 if hubViewController?.targetPage != .signOut &&
                     signOutMessage?.wasUserInitiated != true {
-                    return;
+                    return
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in // .now() + num_seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     self?.hubViewController?.hide()
                 }
                 Rownd.signOut()
@@ -398,26 +393,21 @@ extension HubWebViewController: WKScriptMessageHandler, WKNavigationDelegate {
                 break
             case .authChallengeInitiated:
                 guard case .authChallengeInitiated(let authChallengeMessage) = hubMessage.payload else { return }
-                DispatchQueue.main.async {
-                    var newAuthState = Context.currentContext.store.state.auth
-                    newAuthState.challengeId = authChallengeMessage.challengeId
-                    newAuthState.userIdentifier = authChallengeMessage.userIdentifier
-                    Context.currentContext.store.dispatch(
-                        SetAuthState(payload: newAuthState)
-                    )
+                Task {
+                    await store.mutate { state in
+                        state.auth.challengeId = authChallengeMessage.challengeId
+                        state.auth.userIdentifier = authChallengeMessage.userIdentifier
+                    }
                 }
                 break
             case .authChallengeCleared:
-                DispatchQueue.main.async {
-                    var newAuthState = Context.currentContext.store.state.auth
-                    newAuthState.challengeId = nil
-                    newAuthState.userIdentifier = nil
-
-                    Context.currentContext.store.dispatch(
-                        SetAuthState(payload: newAuthState)
-                    )
+                Task {
+                    await store.mutate { state in
+                        state.auth.challengeId = nil
+                        state.auth.userIdentifier = nil
+                    }
                 }
-                break;
+                break
             }
         } catch {
             logger.debug("Failed to decode incoming interop message: \(String(describing: error))")

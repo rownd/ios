@@ -5,14 +5,12 @@
 //  Created by Matt Hamann on 6/23/22.
 //
 
-import Foundation
-import UIKit
-import ReSwift
-import ReSwiftThunk
-import Get
 import AnyCodable
+import Foundation
+import Get
+import UIKit
 
-public struct AppConfigState: Hashable {
+public struct AppConfigState: Hashable, Sendable {
     public var isLoading: Bool = false
     public var id: String?
     public var icon: String?
@@ -29,7 +27,7 @@ extension AppConfigState: Codable {
     }
 }
 
-public struct AppConfigConfig: Hashable {
+public struct AppConfigConfig: Hashable, Sendable {
     public var automations: [RowndAutomation]?
     public var hub: AppHubConfigState?
     public var customizations: AppCustomizationsConfigState?
@@ -52,7 +50,7 @@ extension AppConfigConfig: Codable {
                 if let automation = try? nestedContainer.decode(RowndAutomation.self) {
                     tempAutomations.append(automation)
                 } else {
-                    _ = try? nestedContainer.decode(AnyCodable.self) // This line skips over the bad entry
+                    _ = try? nestedContainer.decode(AnyCodable.self)  // This line skips over the bad entry
                 }
             }
 
@@ -76,7 +74,7 @@ extension AppConfigConfig: Codable {
                 do {
                     try nestedContainer.encode(automation)
                 } catch {
-                    continue // Skip the automation if encoding fails
+                    continue  // Skip the automation if encoding fails
                 }
             }
         }
@@ -93,7 +91,7 @@ extension AppConfigConfig: Codable {
     }
 }
 
-public struct AppSchemaField: Hashable {
+public struct AppSchemaField: Hashable, Sendable {
     public var displayName: String?
     public var type: String?
     public var required: Bool?
@@ -109,15 +107,15 @@ extension AppSchemaField: Codable {
     }
 }
 
-public struct AppSchemaFieldEncryption: Hashable, Codable {
+public struct AppSchemaFieldEncryption: Hashable, Codable, Sendable {
     public var state: AppSchemaEncryptionState?
 }
 
-public enum AppSchemaEncryptionState: String, Codable {
+public enum AppSchemaEncryptionState: String, Codable, Sendable {
     case enabled, disabled
 }
 
-public struct AppHubConfigState: Hashable {
+public struct AppHubConfigState: Hashable, Sendable {
     public var auth: AppHubAuthConfigState?
     public var customizations: AppHubCustomizationsConfigState?
     public var customStyles: [AppHubCustomStylesConfigState]?
@@ -130,7 +128,7 @@ extension AppHubConfigState: Codable {
     }
 }
 
-public struct AppHubAuthConfigState: Hashable {
+public struct AppHubAuthConfigState: Hashable, Sendable {
     public var signInMethods: SignInMethods?
     public var useExplicitSignUpFlow: Bool?
 }
@@ -142,7 +140,7 @@ extension AppHubAuthConfigState: Codable {
     }
 }
 
-public struct AppCustomizationsConfigState: Hashable {
+public struct AppCustomizationsConfigState: Hashable, Sendable {
     public var primaryColor: String?
 }
 
@@ -152,7 +150,7 @@ extension AppCustomizationsConfigState: Codable {
     }
 }
 
-public struct AppHubCustomizationsConfigState: Hashable {
+public struct AppHubCustomizationsConfigState: Hashable, Sendable {
     public var fontFamily: String?
     public var darkMode: String?
     public var primaryColor: String?
@@ -168,7 +166,7 @@ extension AppHubCustomizationsConfigState: Codable {
     }
 }
 
-public struct AppHubCustomStylesConfigState: Hashable {
+public struct AppHubCustomStylesConfigState: Hashable, Sendable {
     public var content: String
 }
 
@@ -178,7 +176,7 @@ extension AppHubCustomStylesConfigState: Codable {
     }
 }
 
-public struct SignInMethods: Hashable {
+public struct SignInMethods: Hashable, Sendable {
     public var google: GoogleSignInMethodConfig?
     public var passkeys: PasskeysSignInMethodConfig?
 }
@@ -189,7 +187,7 @@ extension SignInMethods: Codable {
     }
 }
 
-public struct GoogleSignInMethodConfig: Hashable {
+public struct GoogleSignInMethodConfig: Hashable, Sendable {
     public var enabled: Bool?
     public var serverClientId: String?
     public var iosClientId: String?
@@ -203,7 +201,7 @@ extension GoogleSignInMethodConfig: Codable {
     }
 }
 
-public struct PasskeysSignInMethodConfig: Hashable {
+public struct PasskeysSignInMethodConfig: Hashable, Sendable {
     public var enabled: Bool?
     public var domains: [String]?
 }
@@ -214,31 +212,7 @@ extension PasskeysSignInMethodConfig: Codable {
     }
 }
 
-struct SetAppConfig: Action {
-    var payload: AppConfigState
-}
-
-struct SetAppLoading: Action {
-    var isLoading: Bool
-}
-
-func appConfigReducer(action: Action, state: AppConfigState?) -> AppConfigState {
-    var state = state ?? AppConfigState()
-
-    switch action {
-    case let action as SetAppConfig:
-        state = action.payload
-        state.isLoading = false
-    case let action as SetAppLoading:
-        state.isLoading = action.isLoading
-    default:
-        break
-    }
-
-    return state
-}
-
-// MARK: API / side-effecty things
+// MARK: - API / side-effect actions
 
 // Easily unwrap the main payload from the `app` key
 struct AppConfigResponse: Decodable {
@@ -246,22 +220,21 @@ struct AppConfigResponse: Decodable {
 }
 
 class AppConfig {
-    static func requestAppState() -> Thunk<RowndState> {
-        return Thunk<RowndState> { dispatch, getState in
-            guard let state = getState() else { return }
-            guard !state.appConfig.isLoading else { return }
-            dispatch(SetAppLoading(isLoading: true))
+    static func requestAppState() async {
+        let state = Context.currentContext.store.state
+        guard !state.appConfig.isLoading else { return }
 
-            Task {
-                let appConfig = await AppConfig.fetch()
+        await Context.currentContext.store.mutate { state in
+            state.appConfig.isLoading = true
+        }
 
-                DispatchQueue.main.async {
-                    if let appConfig = appConfig {
-                        dispatch(SetAppConfig(payload: appConfig.app))
-                    }
-                    dispatch(SetAppLoading(isLoading: false))
-                }
+        let appConfig = await AppConfig.fetch()
+
+        await Context.currentContext.store.mutate { state in
+            if let appConfig = appConfig {
+                state.appConfig = appConfig.app
             }
+            state.appConfig.isLoading = false
         }
     }
 

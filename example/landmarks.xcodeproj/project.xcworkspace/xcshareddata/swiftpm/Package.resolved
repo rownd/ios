@@ -92,24 +92,6 @@
         }
       },
       {
-        "package": "ReSwift",
-        "repositoryURL": "https://github.com/ReSwift/ReSwift",
-        "state": {
-          "branch": null,
-          "revision": "cb5c3c02f652420ef413dea41e13ac5a76b6c0fd",
-          "version": "6.1.1"
-        }
-      },
-      {
-        "package": "ReSwiftThunk",
-        "repositoryURL": "https://github.com/ReSwift/ReSwift-Thunk.git",
-        "state": {
-          "branch": null,
-          "revision": "5ee9816158a2115863b1458c66cf1be9e9143b39",
-          "version": "2.0.1"
-        }
-      },
-      {
         "package": "SwiftKeychainWrapper",
         "repositoryURL": "https://github.com/jrendel/SwiftKeychainWrapper",
         "state": {

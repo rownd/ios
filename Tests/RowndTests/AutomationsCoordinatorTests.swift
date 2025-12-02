@@ -1,5 +1,4 @@
 import Foundation
-import ReSwift
 import Testing
 
 @testable import Rownd
@@ -14,12 +13,12 @@ struct AutomationsCoordinatorTests {
         let coordinator = AutomationsCoordinator()
         let iterations = 50
 
-        // Dispatch a flurry of actions while starting the coordinator
-        let dispatchTask = Task { @MainActor in
+        // Dispatch a flurry of state updates while starting the coordinator
+        let dispatchTask = Task {
             for i in 0..<iterations {
                 let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                store.dispatch(SetClockSync(clockSyncState: state))
-                store.dispatch(SetUserLoading(isLoading: i % 3 == 0))
+                await store.setClockSync(state)
+                await store.setUserLoading(i % 3 == 0)
             }
         }
 

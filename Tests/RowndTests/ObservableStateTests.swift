@@ -9,33 +9,29 @@
 
 import Combine
 import Foundation
-import ReSwift
 import Testing
 
 @testable import Rownd
 
 struct ObservableStateTests {
 
-    /// Tests that ObservableState can handle newState being called from background threads.
-    /// Pre-fix, this would crash in swift_retain when accessing the @Published property
-    /// from a non-main thread.
+    /// Tests that ObservableState can handle state updates from concurrent tasks.
     @Test
     func observableStateHandlesBackgroundThreadStateUpdates() async throws {
         let store = createStore()
         _ = Context(store)
 
         // Create an observable state
-        let observer = store.subscribe { $0.clockSyncState }
+        let observer = store.subscribe(select: { $0.clockSyncState })
 
         let iterations = 100
 
-        // Dispatch state changes from background threads - this is what ReSwift might do
+        // Dispatch state changes from concurrent tasks
         await withTaskGroup(of: Void.self) { group in
             for i in 0..<iterations {
                 group.addTask {
                     let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                    // Simulate ReSwift calling newState from a background thread
-                    observer.newState(state: state)
+                    await store.setClockSync(state)
                 }
             }
         }
@@ -44,8 +40,7 @@ struct ObservableStateTests {
         _ = observer
     }
 
-    /// Tests that ObservableThrottledState can handle newState from background threads.
-    /// Pre-fix, this crashed because it accessed self.current outside the main queue dispatch.
+    /// Tests that ObservableThrottledState can handle state updates from concurrent tasks.
     @Test
     func observableThrottledStateHandlesBackgroundThreadStateUpdates() async throws {
         let store = createStore()
@@ -56,13 +51,12 @@ struct ObservableStateTests {
 
         let iterations = 100
 
-        // Dispatch state changes from background threads
+        // Dispatch state changes from concurrent tasks
         await withTaskGroup(of: Void.self) { group in
             for i in 0..<iterations {
                 group.addTask {
                     let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                    // Simulate ReSwift calling newState from a background thread
-                    observer.newState(state: state)
+                    await store.setClockSync(state)
                 }
             }
         }
@@ -71,8 +65,7 @@ struct ObservableStateTests {
         _ = observer
     }
 
-    /// Tests that ObservableDerivedState can handle newState from background threads.
-    /// Pre-fix, this crashed due to missing [weak self] in the async block.
+    /// Tests that ObservableDerivedState can handle state updates from concurrent tasks.
     @Test
     func observableDerivedStateHandlesBackgroundThreadStateUpdates() async throws {
         let store = createStore()
@@ -93,13 +86,12 @@ struct ObservableStateTests {
 
         let iterations = 100
 
-        // Dispatch state changes from background threads
+        // Dispatch state changes from concurrent tasks
         await withTaskGroup(of: Void.self) { group in
             for i in 0..<iterations {
                 group.addTask {
                     let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                    // Simulate ReSwift calling newState from a background thread
-                    observer.newState(state: state)
+                    await store.setClockSync(state)
                 }
             }
         }
@@ -108,8 +100,7 @@ struct ObservableStateTests {
         _ = observer
     }
 
-    /// Tests that ObservableDerivedThrottledState can handle newState from background threads.
-    /// Pre-fix, this crashed because it accessed current outside main dispatch and lacked [weak self].
+    /// Tests that ObservableDerivedThrottledState can handle state updates from concurrent tasks.
     @Test
     func observableDerivedThrottledStateHandlesBackgroundThreadStateUpdates() async throws {
         let store = createStore()
@@ -132,13 +123,12 @@ struct ObservableStateTests {
 
         let iterations = 100
 
-        // Dispatch state changes from background threads
+        // Dispatch state changes from concurrent tasks
         await withTaskGroup(of: Void.self) { group in
             for i in 0..<iterations {
                 group.addTask {
                     let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                    // Simulate ReSwift calling newState from a background thread
-                    observer.newState(state: state)
+                    await store.setClockSync(state)
                 }
             }
         }
@@ -148,8 +138,7 @@ struct ObservableStateTests {
     }
 
     /// Tests that rapidly creating and destroying observers while dispatching state
-    /// does not crash. Pre-fix, missing [weak self] could cause crashes when the
-    /// async block executed after the observer was deallocated.
+    /// does not crash.
     @Test
     func rapidObserverCreationAndDestructionDoesNotCrash() async throws {
         let store = createStore()
@@ -157,20 +146,18 @@ struct ObservableStateTests {
 
         let iterations = 50
 
-        // Dispatch state changes on main thread
-        let dispatchTask = Task { @MainActor in
+        // Dispatch state changes
+        let dispatchTask = Task {
             for i in 0..<iterations {
                 let state: ClockSyncState = (i % 2 == 0) ? .waiting : .synced
-                store.dispatch(SetClockSync(clockSyncState: state))
+                await store.setClockSync(state)
             }
         }
 
         // Rapidly create and destroy observers
-        // The [weak self] fix ensures we don't crash when the async block runs
-        // after the observer is deallocated
         for _ in 0..<iterations {
             autoreleasepool {
-                let obs1 = store.subscribe { $0.clockSyncState }
+                let obs1 = store.subscribe(select: { $0.clockSyncState })
                 let obs2 = store.subscribeThrottled(select: { $0.clockSyncState }, throttleInMs: 10)
                 let obs3 = store.subscribe(
                     select: { $0.clockSyncState },
@@ -189,9 +176,7 @@ struct ObservableStateTests {
         // If we reach here without crashing, the test passes
     }
 
-    /// Tests concurrent newState calls from multiple background threads while
-    /// the observer is being deallocated. This is the most aggressive test case
-    /// that reproduces the exact crash scenario from the bug reports.
+    /// Tests concurrent state updates during observer deallocation does not crash.
     @Test
     func concurrentNewStateCallsDuringDeallocationDoesNotCrash() async throws {
         let store = createStore()
@@ -205,20 +190,19 @@ struct ObservableStateTests {
                 autoreleasepool {
                     let observer = store.subscribeThrottled(select: { $0.clockSyncState }, throttleInMs: 5)
 
-                    // Fire off background thread state updates
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        observer.newState(state: .waiting)
+                    // Fire off concurrent state updates
+                    Task {
+                        await store.setClockSync(.waiting)
                     }
-                    DispatchQueue.global(qos: .default).async {
-                        observer.newState(state: .synced)
+                    Task {
+                        await store.setClockSync(.synced)
                     }
-                    DispatchQueue.global(qos: .utility).async {
-                        observer.newState(state: .waiting)
+                    Task {
+                        await store.setClockSync(.waiting)
                     }
 
                     // Observer will be deallocated when autoreleasepool exits
-                    // Pre-fix, the async blocks in newState could crash when they execute
-                    // because they didn't use [weak self]
+                    _ = observer
                 }
 
                 // Small delay to let async blocks execute

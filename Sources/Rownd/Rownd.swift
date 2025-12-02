@@ -12,7 +12,6 @@ import Get
 import GoogleSignIn
 import LBBottomSheet
 import LocalAuthentication
-import ReSwift
 import SwiftUI
 import UIKit
 import WebKit
@@ -39,6 +38,11 @@ public class Rownd: NSObject {
         Rownd.automationsCoordinator.processAutomations()
     }
 
+    /// Access the state store for subscriptions.
+    public static var state: StateStore {
+        return Context.currentContext.store
+    }
+
     @discardableResult
     public static func configure(
         launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, appKey: String?
@@ -47,11 +51,11 @@ public class Rownd: NSObject {
             config.appKey = _appKey
         }
 
-        let state = await inst.inflateStoreCache()
+        let loadedState = await inst.inflateStoreCache()
 
         // Skip the rest within app extensions
         if Bundle.main.bundlePath.hasSuffix(".appex") {
-            return state
+            return loadedState
         }
 
         await inst.loadAppConfig()
@@ -62,11 +66,11 @@ public class Rownd: NSObject {
             Rownd.automationsCoordinator.start()
         }
 
-        let store = Context.currentContext.store
-        if store.state.isStateLoaded && !store.state.auth.isAuthenticated {
+        let currentState = Context.currentContext.store.state
+        if currentState.isStateLoaded && !currentState.auth.isAuthenticated {
             SmartLinks.handleSmartLinkLaunchBehavior(launchOptions: launchOptions)
 
-            if store.state.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
+            if currentState.appConfig.config?.hub?.auth?.signInMethods?.google?.enabled == true {
                 do {
                     _ = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
                     logger.debug("Successfully restored previous Google Sign-in")
@@ -77,12 +81,12 @@ public class Rownd: NSObject {
             }
 
             // Check to see if we're handling an existing auth challenge
-            if store.state.auth.challengeId != nil && store.state.auth.userIdentifier != nil {
+            if currentState.auth.challengeId != nil && currentState.auth.userIdentifier != nil {
                 Rownd.requestSignIn(
                     jsFnOptions: RowndSignInJsOptions(
                         loginStep: .completing,
-                        challengeId: store.state.auth.challengeId,
-                        userIdentifier: store.state.auth.userIdentifier
+                        challengeId: currentState.auth.challengeId,
+                        userIdentifier: currentState.auth.userIdentifier
                     ))
             }
 
@@ -90,17 +94,19 @@ public class Rownd: NSObject {
 
         // Fetch user if authenticated and app is in foreground
         await MainActor.run {
-            if store.state.auth.isAuthenticated && UIApplication.shared.applicationState == .active
+            if currentState.auth.isAuthenticated && UIApplication.shared.applicationState == .active
             {
-                store.dispatch(UserData.fetch())
-                store.dispatch(PasskeyData.fetchPasskeyRegistration())
+                Task {
+                    await UserData.fetch()
+                    await PasskeyData.fetchPasskeyRegistration()
+                }
             }
         }
 
         InstantUsers(context: Context.currentContext)
             .tmpForceInstantUserConversionIfRequested()
 
-        return state
+        return currentState
     }
 
     @available(*, deprecated, renamed: "handleSmartLink")
@@ -189,8 +195,8 @@ public class Rownd: NSObject {
     ) {
         switch with {
         case .passkey:
-            let store = Context.currentContext.store
-            if store.state.auth.accessToken != nil {
+            let currentState = Context.currentContext.store.state
+            if currentState.auth.accessToken != nil {
                 var passkeySignInOptions = RowndConnectPasskeySignInOptions(
                     biometricType: LAContext().biometricType.rawValue
                 ).dictionary()
@@ -224,16 +230,13 @@ public class Rownd: NSObject {
     }
 
     public static func signOut() {
-        Task { @MainActor in
-            let store = Context.currentContext.store
-            store.dispatch(SetAuthState(payload: AuthState()))
+        Task {
+            await Context.currentContext.store.clearAuth()
 
-            Task {
-                RowndEventEmitter.emit(
-                    RowndEvent(
-                        event: .signOut
-                    ))
-            }
+            RowndEventEmitter.emit(
+                RowndEvent(
+                    event: .signOut
+                ))
         }
     }
 
@@ -261,28 +264,27 @@ public class Rownd: NSObject {
     @discardableResult public static func getAccessToken(throwIfMissing: Bool = false) async throws
         -> String?
     {
-        let store = Context.currentContext.store
-        return try await store.state.auth.getAccessToken(throwIfMissing: throwIfMissing)
+        let currentState = Context.currentContext.store.state
+        return try await currentState.auth.getAccessToken(throwIfMissing: throwIfMissing)
     }
 
     @discardableResult public static func getAccessToken(token: String) async -> String? {
         guard let tokenResponse = try? await Auth.fetchToken(token) else { return nil }
 
-        Task { @MainActor in
-            let store = Context.currentContext.store
-            store.dispatch(
-                SetAuthState(
-                    payload: AuthState(
-                        accessToken: tokenResponse.accessToken,
-                        refreshToken: tokenResponse.refreshToken)))
-            store.dispatch(UserData.fetch())
+        Task {
+            await Context.currentContext.store.mutate { state in
+                state.auth.accessToken = tokenResponse.accessToken
+                state.auth.refreshToken = tokenResponse.refreshToken
+            }
+            await UserData.fetch()
         }
 
         return tokenResponse.accessToken
 
     }
 
-    public func state() -> Store<RowndState> {
+    /// Returns the state store for subscriptions (backward compatible).
+    public func state() -> StateStore {
         return Context.currentContext.store
     }
 
@@ -335,12 +337,12 @@ public class Rownd: NSObject {
     internal static func determineSignInOptions(
         _ signInOptions: RowndSignInOptions?, signInType: SignInType?
     ) -> RowndSignInOptions? {
-        let store = Context.currentContext.store
+        let currentState = Context.currentContext.store.state
         var signInOptions = signInOptions
         if signInOptions?.intent == RowndSignInIntent.signUp
             || signInOptions?.intent == RowndSignInIntent.signIn
         {
-            if store.state.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true {
+            if currentState.appConfig.config?.hub?.auth?.useExplicitSignUpFlow != true {
                 signInOptions?.intent = nil
                 logger.error(
                     "Sign in with intent: SignIn/SignUp is not enabled. Turn it on in the Rownd platform"
@@ -361,20 +363,18 @@ public class Rownd: NSObject {
     }
 
     private func loadAppConfig() async {
-        let store = Context.currentContext.store
-        if store.state.appConfig.id == nil {
+        let currentState = Context.currentContext.store.state
+        if currentState.appConfig.id == nil {
             // Await the config if it wasn't already cached
             guard let appConfig = await AppConfig.fetch() else {
                 return
             }
 
-            Task { @MainActor in
-                store.dispatch(SetAppConfig(payload: appConfig.app))
-            }
+            await Context.currentContext.store.setAppConfig(appConfig.app)
         } else {
-            Task { @MainActor in
-                // Refresh in background if already present
-                store.dispatch(AppConfig.requestAppState())
+            // Refresh in background if already present
+            Task {
+                await AppConfig.requestAppState()
             }
         }
 
@@ -382,8 +382,7 @@ public class Rownd: NSObject {
 
     @discardableResult
     private func inflateStoreCache() async -> RowndState {
-        let store = Context.currentContext.store
-        return await store.state.load()
+        return await Context.currentContext.store.load()
     }
 
     private func displayHub(_ page: HubPageSelector) {
@@ -440,7 +439,7 @@ public class Rownd: NSObject {
 }
 
 public class UserPropAccess {
-    private var store: Store<RowndState> {
+    private var store: StateStore {
         return Context.currentContext.store
     }
     public func get() -> UserState {

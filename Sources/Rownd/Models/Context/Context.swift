@@ -6,23 +6,30 @@
 //
 
 import Foundation
-import ReSwift
 
 class Context {
     public internal(set) static var currentContext: Context = Context()
 
-    let store: Store<RowndState>
+    /// The state store - replaces the old ReSwift Store.
+    let store: StateStore
 
     var eventListeners: [RowndEventHandlerDelegate] = []
 
     var authenticator: AuthenticatorProtocol = Authenticator()
 
     init() {
-        store = createStore()
+        store = StateStore()
     }
 
-    init(_ store: Store<RowndState>) {
+    init(_ store: StateStore) {
         self.store = store
         Context.currentContext = self
     }
+}
+
+// MARK: - Test Helpers
+
+/// Creates a new StateStore for testing purposes.
+func createStore() -> StateStore {
+    return StateStore()
 }
