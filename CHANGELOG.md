@@ -1,5 +1,9 @@
 
 
+## <small>3.14.6 (2025-12-02)</small>
+
+* fix(store): prevent stale state listeners from crashing apps (#119) ([3eff869](https://github.com/rownd/ios/commit/3eff869)), closes [#119](https://github.com/rownd/ios/issues/119)
+
 ## <small>3.14.5 (2025-11-06)</small>
 
 * chore: add automations coordinator tests ([3e74bfb](https://github.com/rownd/ios/commit/3e74bfb))
