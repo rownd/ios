@@ -14,6 +14,7 @@ import Testing
 
 @testable import Rownd
 
+@MainActor
 struct ObservableStateTests {
 
     /// Tests that ObservableState can handle newState being called from background threads.
