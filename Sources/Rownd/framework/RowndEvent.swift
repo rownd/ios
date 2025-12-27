@@ -30,6 +30,7 @@ public protocol RowndEventHandlerDelegate: AnyObject {
     func handleRowndEvent(_ event: RowndEvent)
 }
 
+@MainActor
 class RowndEventEmitter {
     static private var cancellables = Set<AnyCancellable>()
     static func emit(_ event: RowndEvent) {

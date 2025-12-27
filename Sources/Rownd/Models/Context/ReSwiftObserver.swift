@@ -10,17 +10,11 @@ import Foundation
 import ReSwift
 import SwiftUI
 
-// MARK: - Main Thread Dispatch Helper
+// MARK: - ObservableState
 
-/// Helper to centralize main-thread dispatch with weak self handling.
-/// Reduces duplication and ensures consistent patterns across observable state types.
-private func dispatchOnMain<T: AnyObject>(_ instance: T, execute work: @escaping (T) -> Void) {
-    DispatchQueue.main.async { [weak instance] in
-        guard let instance = instance else { return }
-        work(instance)
-    }
-}
-
+/// Observable wrapper for ReSwift state slices that publishes changes to SwiftUI.
+/// Uses @MainActor to ensure all @Published property access is thread-safe.
+@MainActor
 public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription
 {
 
@@ -42,42 +36,39 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
 
     public func subscribe() {
         guard !isSubscribed else { return }
-        // Capture selector directly to avoid retaining self in the transform closure
         let selector = self.selector
-        dispatchOnMain(self) { instance in
-            guard !instance.isSubscribed else { return }
-            Context.currentContext.store.subscribe(
-                instance, transform: { $0.select(selector) })
-            instance.isSubscribed = true
-        }
+        Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
+        isSubscribed = true
     }
 
     func unsubscribe() {
         guard isSubscribed else { return }
-        dispatchOnMain(self) { instance in
-            guard instance.isSubscribed else { return }
-            Context.currentContext.store.unsubscribe(instance)
-            instance.isSubscribed = false
-        }
+        Context.currentContext.store.unsubscribe(self)
+        isSubscribed = false
     }
 
     deinit {
-        unsubscribe()
+        // Note: deinit is nonisolated even for @MainActor classes.
+        // ReSwift's SubscriptionBox holds a weak reference to subscribers,
+        // so cleanup happens automatically when this object is deallocated.
     }
 
-    public func newState(state: T) {
-        // All @Published property access must happen on main thread
-        dispatchOnMain(self) { instance in
-            guard instance.current != state else { return }
-            let old = instance.current
-            if let animation = instance.animation {
+    /// Called by ReSwift when state changes. This method is nonisolated because
+    /// ReSwift may call it from any thread. We dispatch to MainActor to safely
+    /// access @Published properties.
+    nonisolated public func newState(state: T) {
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            guard self.current != state else { return }
+            let old = self.current
+            if let animation = self.animation {
                 withAnimation(animation) {
-                    instance.current = state
+                    self.current = state
                 }
             } else {
-                instance.current = state
+                self.current = state
             }
-            instance.objectDidChange.send(DidChangeSubject(old: old, new: instance.current))
+            self.objectDidChange.send(DidChangeSubject(old: old, new: self.current))
         }
     }
 
@@ -105,26 +96,26 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
             .store(in: &cancellables)
     }
 
-    override public func newState(state: T) {
-        // All @Published property access must happen on main thread to avoid crashes
-        // in swift_retain when accessing Combine's Published wrapper from background threads
-        dispatchOnMain(self) { instance in
-            guard instance.current != state else { return }
-            let old = instance.current
-            if let animation = instance.animation {
+    nonisolated override public func newState(state: T) {
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            guard self.current != state else { return }
+            let old = self.current
+            if let animation = self.animation {
                 withAnimation(animation) {
-                    instance.objectThrottled.send(state)
+                    self.objectThrottled.send(state)
                 }
             } else {
-                instance.objectThrottled.send(state)
+                self.objectThrottled.send(state)
             }
-            instance.objectDidChange.send(DidChangeSubject(old: old, new: instance.current))
+            self.objectDidChange.send(DidChangeSubject(old: old, new: self.current))
         }
     }
 
     private let objectThrottled = PassthroughSubject<T, Never>()
 }
 
+@MainActor
 public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: ObservableObject,
     StoreSubscriber, ObservableSubscription
 {
@@ -151,42 +142,37 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
 
     func subscribe() {
         guard !isSubscribed else { return }
-        // Capture selector directly to avoid retaining self in the transform closure
         let selector = self.selector
-        dispatchOnMain(self) { instance in
-            guard !instance.isSubscribed else { return }
-            Context.currentContext.store.subscribe(
-                instance, transform: { $0.select(selector) })
-            instance.isSubscribed = true
-        }
+        Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
+        isSubscribed = true
     }
 
     func unsubscribe() {
         guard isSubscribed else { return }
-        dispatchOnMain(self) { instance in
-            guard instance.isSubscribed else { return }
-            Context.currentContext.store.unsubscribe(instance)
-            instance.isSubscribed = false
-        }
+        Context.currentContext.store.unsubscribe(self)
+        isSubscribed = false
     }
 
     deinit {
-        unsubscribe()
+        // Note: deinit is nonisolated even for @MainActor classes.
+        // ReSwift's SubscriptionBox holds a weak reference to subscribers,
+        // so cleanup happens automatically when this object is deallocated.
     }
 
-    public func newState(state original: Original) {
-        dispatchOnMain(self) { instance in
-            let old = instance.current
-            instance.objectWillChange.send(ChangeSubject(old: old, new: instance.current))
+    nonisolated public func newState(state original: Original) {
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            let old = self.current
+            self.objectWillChange.send(ChangeSubject(old: old, new: self.current))
 
-            if let animation = instance.animation {
+            if let animation = self.animation {
                 withAnimation(animation) {
-                    instance.current = instance.transform(original)
+                    self.current = self.transform(original)
                 }
             } else {
-                instance.current = instance.transform(original)
+                self.current = self.transform(original)
             }
-            instance.objectDidChange.send(ChangeSubject(old: old, new: instance.current))
+            self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
         }
     }
 
@@ -220,17 +206,18 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
             .store(in: &cancellables)
     }
 
-    override public func newState(state original: Original) {
-        dispatchOnMain(self) { instance in
-            let old = instance.current
-            if let animation = instance.animation {
+    nonisolated override public func newState(state original: Original) {
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            let old = self.current
+            if let animation = self.animation {
                 withAnimation(animation) {
-                    instance.objectThrottled.send(original)
+                    self.objectThrottled.send(original)
                 }
             } else {
-                instance.objectThrottled.send(original)
+                self.objectThrottled.send(original)
             }
-            instance.objectDidChange.send(ChangeSubject(old: old, new: instance.current))
+            self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
         }
     }
 
@@ -239,12 +226,14 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
 
 extension Store where State == RowndState {
 
+    @MainActor
     public func subscribe<T>(
         select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil
     ) -> ObservableState<T> {
         ObservableState(select: selector, animation: animation)
     }
 
+    @MainActor
     public func subscribe<Original, Derived>(
         select selector: @escaping (RowndState) -> (Original),
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
@@ -252,6 +241,7 @@ extension Store where State == RowndState {
         ObservableDerivedState(select: selector, transform: transform, animation: animation)
     }
 
+    @MainActor
     public func subscribeThrottled<T>(
         select selector: @escaping (RowndState) -> (T), throttleInMs: Int = 350,
         animation: SwiftUI.Animation? = nil
@@ -259,6 +249,7 @@ extension Store where State == RowndState {
         ObservableThrottledState(select: selector, animation: animation, throttleInMs: throttleInMs)
     }
 
+    @MainActor
     public func subscribeThrottled<Original, Derived>(
         select selector: @escaping (RowndState) -> (Original),
         transform: @escaping (Original) -> Derived, throttleInMs: Int = 350,
