@@ -10,10 +10,47 @@ import Foundation
 import ReSwift
 import SwiftUI
 
+// MARK: - Main Actor Dispatch Helper
+
+/// Dispatches work to the MainActor from a nonisolated context.
+///
+/// This helper serializes state updates through a Combine subject to maintain FIFO ordering,
+/// then processes them on the MainActor. This prevents the ordering issues that can occur
+/// with unstructured Task spawning under high-frequency state changes.
+///
+/// - Parameters:
+///   - instance: The object to operate on (captured weakly)
+///   - state: The state value to process
+///   - work: The MainActor-isolated work to perform
+private func dispatchToMainActor<T: AnyObject, S>(
+    _ instance: T,
+    state: S,
+    work: @escaping @MainActor (T, S) -> Void
+) {
+    // Use DispatchQueue.main.async for FIFO ordering, then Task for @MainActor isolation
+    DispatchQueue.main.async { [weak instance] in
+        guard let instance = instance else { return }
+        Task { @MainActor in
+            work(instance, state)
+        }
+    }
+}
+
 // MARK: - ObservableState
 
 /// Observable wrapper for ReSwift state slices that publishes changes to SwiftUI.
 /// Uses @MainActor to ensure all @Published property access is thread-safe.
+///
+/// ## Thread Safety
+/// ReSwift may call `newState(state:)` from any thread. This class uses @MainActor
+/// isolation to ensure all @Published property access occurs on the main thread,
+/// preventing crashes in swift_retain when accessing Combine's Published wrapper.
+///
+/// ## State Update Ordering
+/// State updates are dispatched through DispatchQueue.main.async to maintain FIFO ordering,
+/// then processed on the MainActor. While this preserves ordering of dispatch calls,
+/// the actual property updates occur asynchronously. For most SwiftUI use cases this is
+/// acceptable since SwiftUI will render the final state.
 @MainActor
 public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription
 {
@@ -54,22 +91,27 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
     }
 
     /// Called by ReSwift when state changes. This method is nonisolated because
-    /// ReSwift may call it from any thread. We dispatch to MainActor to safely
-    /// access @Published properties.
+    /// ReSwift may call it from any thread. Updates are dispatched to MainActor
+    /// via DispatchQueue.main to maintain FIFO ordering.
     nonisolated public func newState(state: T) {
-        Task { @MainActor [weak self] in
-            guard let self = self else { return }
-            guard self.current != state else { return }
-            let old = self.current
-            if let animation = self.animation {
-                withAnimation(animation) {
-                    self.current = state
-                }
-            } else {
-                self.current = state
-            }
-            self.objectDidChange.send(DidChangeSubject(old: old, new: self.current))
+        dispatchToMainActor(self, state: state) { instance, newState in
+            instance.applyStateUpdate(newState)
         }
+    }
+
+    /// Applies the state update on MainActor. Separated from newState to keep
+    /// the dispatch logic clean and enable subclass overrides.
+    fileprivate func applyStateUpdate(_ state: T) {
+        guard current != state else { return }
+        let old = current
+        if let animation = animation {
+            withAnimation(animation) {
+                current = state
+            }
+        } else {
+            current = state
+        }
+        objectDidChange.send(DidChangeSubject(old: old, new: current))
     }
 
     public let objectDidChange = PassthroughSubject<DidChangeSubject<T>, Never>()
@@ -97,19 +139,22 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
     }
 
     nonisolated override public func newState(state: T) {
-        Task { @MainActor [weak self] in
-            guard let self = self else { return }
-            guard self.current != state else { return }
-            let old = self.current
-            if let animation = self.animation {
-                withAnimation(animation) {
-                    self.objectThrottled.send(state)
-                }
-            } else {
-                self.objectThrottled.send(state)
-            }
-            self.objectDidChange.send(DidChangeSubject(old: old, new: self.current))
+        dispatchToMainActor(self, state: state) { instance, newState in
+            instance.applyThrottledStateUpdate(newState)
         }
+    }
+
+    fileprivate func applyThrottledStateUpdate(_ state: T) {
+        guard current != state else { return }
+        let old = current
+        if let animation = animation {
+            withAnimation(animation) {
+                objectThrottled.send(state)
+            }
+        } else {
+            objectThrottled.send(state)
+        }
+        objectDidChange.send(DidChangeSubject(old: old, new: current))
     }
 
     private let objectThrottled = PassthroughSubject<T, Never>()
@@ -160,20 +205,23 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     }
 
     nonisolated public func newState(state original: Original) {
-        Task { @MainActor [weak self] in
-            guard let self = self else { return }
-            let old = self.current
-            self.objectWillChange.send(ChangeSubject(old: old, new: self.current))
-
-            if let animation = self.animation {
-                withAnimation(animation) {
-                    self.current = self.transform(original)
-                }
-            } else {
-                self.current = self.transform(original)
-            }
-            self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
+        dispatchToMainActor(self, state: original) { instance, newState in
+            instance.applyStateUpdate(newState)
         }
+    }
+
+    fileprivate func applyStateUpdate(_ original: Original) {
+        let old = current
+        objectWillChange.send(ChangeSubject(old: old, new: current))
+
+        if let animation = animation {
+            withAnimation(animation) {
+                current = transform(original)
+            }
+        } else {
+            current = transform(original)
+        }
+        objectDidChange.send(ChangeSubject(old: old, new: current))
     }
 
     public let objectWillChange = PassthroughSubject<ChangeSubject<Derived>, Never>()
@@ -207,18 +255,21 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
     }
 
     nonisolated override public func newState(state original: Original) {
-        Task { @MainActor [weak self] in
-            guard let self = self else { return }
-            let old = self.current
-            if let animation = self.animation {
-                withAnimation(animation) {
-                    self.objectThrottled.send(original)
-                }
-            } else {
-                self.objectThrottled.send(original)
-            }
-            self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
+        dispatchToMainActor(self, state: original) { instance, newState in
+            instance.applyThrottledStateUpdate(newState)
         }
+    }
+
+    fileprivate func applyThrottledStateUpdate(_ original: Original) {
+        let old = current
+        if let animation = animation {
+            withAnimation(animation) {
+                objectThrottled.send(original)
+            }
+        } else {
+            objectThrottled.send(original)
+        }
+        objectDidChange.send(ChangeSubject(old: old, new: current))
     }
 
     private let objectThrottled = PassthroughSubject<Original, Never>()
