@@ -58,7 +58,7 @@ let package = Package(
         .package(
             name: "Lottie",
             url: "https://github.com/airbnb/lottie-ios",
-            .upToNextMajor(from: "4.3.3")
+            .upToNextMajor(from: "4.5.0")
         ),
         .package(
             name: "Factory",
