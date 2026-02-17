@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   s.dependency 'SwiftKeychainWrapper', '~> 4.0.1'
   s.dependency 'Get', '~> 2.2.0'
   s.dependency 'GoogleSignIn', '~> 7.0.0'
-  s.dependency 'lottie-ios', '~> 4.3.3'
+  s.dependency 'lottie-ios', '~> 4.5.0'
   s.dependency 'Factory', '~> 1.2.8'
 
   s.dependency 'LBBottomSheet'
