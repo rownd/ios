@@ -1,5 +1,9 @@
 
 
+## <small>3.14.7 (2026-02-17)</small>
+
+* chore: upgrade lottie-ios dependency to ~> 4.5.0 ([2f19487](https://github.com/rownd/ios/commit/2f19487))
+
 ## <small>3.14.6 (2025-12-02)</small>
 
 * fix(store): prevent stale state listeners from crashing apps (#119) ([3eff869](https://github.com/rownd/ios/commit/3eff869)), closes [#119](https://github.com/rownd/ios/issues/119)
