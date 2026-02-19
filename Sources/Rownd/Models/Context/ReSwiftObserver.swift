@@ -14,9 +14,10 @@ import SwiftUI
 
 /// Dispatches work to the MainActor from a nonisolated context.
 ///
-/// This helper serializes state updates through a Combine subject to maintain FIFO ordering,
-/// then processes them on the MainActor. This prevents the ordering issues that can occur
-/// with unstructured Task spawning under high-frequency state changes.
+/// Uses `DispatchQueue.main.async` to preserve FIFO ordering of state updates,
+/// then hops into a `@MainActor` Task for proper isolation. This prevents the
+/// ordering issues that can occur with unstructured Task spawning under
+/// high-frequency state changes.
 ///
 /// - Parameters:
 ///   - instance: The object to operate on (captured weakly)
@@ -134,7 +135,12 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
 
         objectThrottled
             .throttle(for: .milliseconds(throttleInMs), scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] in self?.current = $0 }
+            .sink { [weak self] in
+                guard let self = self else { return }
+                let old = self.current
+                self.current = $0
+                self.objectDidChange.send(DidChangeSubject(old: old, new: self.current))
+            }
             .store(in: &cancellables)
     }
 
@@ -146,7 +152,6 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
 
     fileprivate func applyThrottledStateUpdate(_ state: T) {
         guard current != state else { return }
-        let old = current
         if let animation = animation {
             withAnimation(animation) {
                 objectThrottled.send(state)
@@ -154,7 +159,6 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
         } else {
             objectThrottled.send(state)
         }
-        objectDidChange.send(DidChangeSubject(old: old, new: current))
     }
 
     private let objectThrottled = PassthroughSubject<T, Never>()
@@ -249,7 +253,10 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
         objectThrottled
             .throttle(for: .milliseconds(throttleInMs), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] in
-                self?.current = transform($0)
+                guard let self = self else { return }
+                let old = self.current
+                self.current = transform($0)
+                self.objectDidChange.send(ChangeSubject(old: old, new: self.current))
             }
             .store(in: &cancellables)
     }
@@ -261,7 +268,6 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
     }
 
     fileprivate func applyThrottledStateUpdate(_ original: Original) {
-        let old = current
         if let animation = animation {
             withAnimation(animation) {
                 objectThrottled.send(original)
@@ -269,7 +275,6 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
         } else {
             objectThrottled.send(original)
         }
-        objectDidChange.send(ChangeSubject(old: old, new: current))
     }
 
     private let objectThrottled = PassthroughSubject<Original, Never>()
