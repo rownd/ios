@@ -7,6 +7,7 @@
 
 import Combine
 
+@MainActor
 class InstantUsers {
     private let context: Context
     private var cancellables = Set<AnyCancellable>()

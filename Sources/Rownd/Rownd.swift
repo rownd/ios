@@ -95,10 +95,10 @@ public class Rownd: NSObject {
                 store.dispatch(UserData.fetch())
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
-        }
 
-        InstantUsers(context: Context.currentContext)
-            .tmpForceInstantUserConversionIfRequested()
+            InstantUsers(context: Context.currentContext)
+                .tmpForceInstantUserConversionIfRequested()
+        }
 
         return state
     }

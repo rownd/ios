@@ -5,6 +5,7 @@ import Testing
 
 @testable import Rownd
 
+@MainActor
 struct SubscriberMutationTests {
     @Test
     func rapidClockSyncAndObserverChurnDoesNotCrash() async throws {
