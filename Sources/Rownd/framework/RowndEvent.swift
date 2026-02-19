@@ -35,19 +35,31 @@ class RowndEventEmitter {
     static private var cancellables = Set<AnyCancellable>()
     static func emit(_ event: RowndEvent) {
         if event.event == .signInCompleted {
+            // Check if the access token is already valid — if so, fire immediately
+            // to avoid a race where the Combine subscription misses a value that's
+            // already settled before the sink is attached.
+            let authState = Context.currentContext.store.state.auth
+            if authState.isAccessTokenValid {
+                Self.notifyListeners(event)
+                return
+            }
+
+            // Token not yet valid — subscribe and wait for it
             let subscription = Context.currentContext.store.subscribe { $0.auth.isAccessTokenValid }
             subscription.$current.sink { isAccessTokenValid in
                 if isAccessTokenValid {
                     subscription.unsubscribe()
-                    Context.currentContext.eventListeners.forEach { listener in
-                        listener.handleRowndEvent(event)
-                    }
+                    Self.notifyListeners(event)
                 }
             }.store(in: &Self.cancellables)
         } else {
-            Context.currentContext.eventListeners.forEach { listener in
-                listener.handleRowndEvent(event)
-            }
+            Self.notifyListeners(event)
+        }
+    }
+
+    private static func notifyListeners(_ event: RowndEvent) {
+        Context.currentContext.eventListeners.forEach { listener in
+            listener.handleRowndEvent(event)
         }
     }
 }
