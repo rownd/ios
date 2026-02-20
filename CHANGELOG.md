@@ -1,5 +1,9 @@
 
 
+## <small>3.14.8 (2026-02-20)</small>
+
+* fix(state): stale pointer access could cause app crashes (#121) ([7fe6b4a](https://github.com/rownd/ios/commit/7fe6b4a))
+
 ## <small>3.14.7 (2026-02-17)</small>
 
 * chore: upgrade lottie-ios dependency to ~> 4.5.0 ([2f19487](https://github.com/rownd/ios/commit/2f19487))
