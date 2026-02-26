@@ -64,7 +64,7 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
 
     // MARK: Lifecycle
 
-    public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil)
+    nonisolated public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil)
     {
         self.current = selector(Context.currentContext.store.state)
         self.selector = selector
@@ -72,7 +72,7 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
         self.subscribe()
     }
 
-    public func subscribe() {
+    nonisolated public func subscribe() {
         guard !isSubscribed else { return }
         let selector = self.selector
         Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
@@ -127,7 +127,7 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
 
     // MARK: Lifecycle
 
-    public init(
+    nonisolated public init(
         select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil,
         throttleInMs: Int
     ) {
@@ -178,7 +178,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
 
     // MARK: Lifecycle
 
-    public init(
+    nonisolated public init(
         select selector: @escaping (RowndState) -> Original,
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
     ) {
@@ -189,7 +189,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
         self.subscribe()
     }
 
-    func subscribe() {
+    nonisolated func subscribe() {
         guard !isSubscribed else { return }
         let selector = self.selector
         Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
@@ -243,7 +243,7 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
 
     // MARK: Lifecycle
 
-    public init(
+    nonisolated public init(
         select selector: @escaping (RowndState) -> Original,
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil,
         throttleInMs: Int
