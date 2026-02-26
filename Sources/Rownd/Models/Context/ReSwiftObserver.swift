@@ -282,14 +282,13 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
 
 extension Store where State == RowndState {
 
-    @MainActor
+    // BACKWARD COMPATIBLE: Removed @MainActor requirement to restore API compatibility
     public func subscribe<T>(
         select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil
     ) -> ObservableState<T> {
         ObservableState(select: selector, animation: animation)
     }
 
-    @MainActor
     public func subscribe<Original, Derived>(
         select selector: @escaping (RowndState) -> (Original),
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
@@ -297,7 +296,6 @@ extension Store where State == RowndState {
         ObservableDerivedState(select: selector, transform: transform, animation: animation)
     }
 
-    @MainActor
     public func subscribeThrottled<T>(
         select selector: @escaping (RowndState) -> (T), throttleInMs: Int = 350,
         animation: SwiftUI.Animation? = nil
@@ -305,7 +303,6 @@ extension Store where State == RowndState {
         ObservableThrottledState(select: selector, animation: animation, throttleInMs: throttleInMs)
     }
 
-    @MainActor
     public func subscribeThrottled<Original, Derived>(
         select selector: @escaping (RowndState) -> (Original),
         transform: @escaping (Original) -> Derived, throttleInMs: Int = 350,
