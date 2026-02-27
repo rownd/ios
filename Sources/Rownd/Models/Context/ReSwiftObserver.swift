@@ -28,7 +28,6 @@ private func dispatchToMainActor<T: AnyObject, S>(
     state: S,
     work: @escaping @MainActor (T, S) -> Void
 ) {
-    // Use DispatchQueue.main.async for FIFO ordering, then Task for @MainActor isolation
     DispatchQueue.main.async { [weak instance] in
         guard let instance = instance else { return }
         Task { @MainActor in
@@ -40,19 +39,17 @@ private func dispatchToMainActor<T: AnyObject, S>(
 // MARK: - ObservableState
 
 /// Observable wrapper for ReSwift state slices that publishes changes to SwiftUI.
-/// Uses @MainActor to ensure all @Published property access is thread-safe.
 ///
 /// ## Thread Safety
-/// ReSwift may call `newState(state:)` from any thread. This class uses @MainActor
-/// isolation to ensure all @Published property access occurs on the main thread,
-/// preventing crashes in swift_retain when accessing Combine's Published wrapper.
+/// ReSwift may call `newState(state:)` from any thread. State mutations are dispatched
+/// through `dispatchToMainActor` to ensure all `@Published` property access occurs on the
+/// main thread, preventing crashes from concurrent access to Combine's Published wrapper.
 ///
 /// ## State Update Ordering
 /// State updates are dispatched through DispatchQueue.main.async to maintain FIFO ordering,
 /// then processed on the MainActor. While this preserves ordering of dispatch calls,
 /// the actual property updates occur asynchronously. For most SwiftUI use cases this is
 /// acceptable since SwiftUI will render the final state.
-@MainActor
 public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, ObservableSubscription
 {
 
@@ -64,7 +61,7 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
 
     // MARK: Lifecycle
 
-    nonisolated public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil)
+    public init(select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil)
     {
         self.current = selector(Context.currentContext.store.state)
         self.selector = selector
@@ -72,7 +69,7 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
         self.subscribe()
     }
 
-    nonisolated public func subscribe() {
+    public func subscribe() {
         guard !isSubscribed else { return }
         let selector = self.selector
         Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
@@ -86,23 +83,21 @@ public class ObservableState<T: Hashable>: ObservableObject, StoreSubscriber, Ob
     }
 
     deinit {
-        // Note: deinit is nonisolated even for @MainActor classes.
         // ReSwift's SubscriptionBox holds a weak reference to subscribers,
         // so cleanup happens automatically when this object is deallocated.
     }
 
-    /// Called by ReSwift when state changes. This method is nonisolated because
-    /// ReSwift may call it from any thread. Updates are dispatched to MainActor
-    /// via DispatchQueue.main to maintain FIFO ordering.
+    /// Called by ReSwift when state changes. ReSwift may call this from any thread.
+    /// Updates are dispatched to MainActor via DispatchQueue.main to maintain FIFO ordering
+    /// and ensure @Published property access is thread-safe.
     nonisolated public func newState(state: T) {
         dispatchToMainActor(self, state: state) { instance, newState in
             instance.applyStateUpdate(newState)
         }
     }
 
-    /// Applies the state update on MainActor. Separated from newState to keep
-    /// the dispatch logic clean and enable subclass overrides.
-    fileprivate func applyStateUpdate(_ state: T) {
+    /// Applies the state update. Must be called on MainActor (enforced by dispatchToMainActor).
+    @MainActor fileprivate func applyStateUpdate(_ state: T) {
         guard current != state else { return }
         let old = current
         if let animation = animation {
@@ -127,7 +122,7 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
 
     // MARK: Lifecycle
 
-    nonisolated public init(
+    public init(
         select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil,
         throttleInMs: Int
     ) {
@@ -150,7 +145,7 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
         }
     }
 
-    fileprivate func applyThrottledStateUpdate(_ state: T) {
+    @MainActor fileprivate func applyThrottledStateUpdate(_ state: T) {
         guard current != state else { return }
         if let animation = animation {
             withAnimation(animation) {
@@ -164,7 +159,6 @@ public class ObservableThrottledState<T: Hashable>: ObservableState<T> {
     private let objectThrottled = PassthroughSubject<T, Never>()
 }
 
-@MainActor
 public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: ObservableObject,
     StoreSubscriber, ObservableSubscription
 {
@@ -178,7 +172,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
 
     // MARK: Lifecycle
 
-    nonisolated public init(
+    public init(
         select selector: @escaping (RowndState) -> Original,
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil
     ) {
@@ -189,7 +183,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
         self.subscribe()
     }
 
-    nonisolated func subscribe() {
+    func subscribe() {
         guard !isSubscribed else { return }
         let selector = self.selector
         Context.currentContext.store.subscribe(self, transform: { $0.select(selector) })
@@ -203,7 +197,6 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
     }
 
     deinit {
-        // Note: deinit is nonisolated even for @MainActor classes.
         // ReSwift's SubscriptionBox holds a weak reference to subscribers,
         // so cleanup happens automatically when this object is deallocated.
     }
@@ -214,7 +207,7 @@ public class ObservableDerivedState<Original: Hashable, Derived: Hashable>: Obse
         }
     }
 
-    fileprivate func applyStateUpdate(_ original: Original) {
+    @MainActor fileprivate func applyStateUpdate(_ original: Original) {
         let old = current
         objectWillChange.send(ChangeSubject(old: old, new: current))
 
@@ -243,7 +236,7 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
 
     // MARK: Lifecycle
 
-    nonisolated public init(
+    public init(
         select selector: @escaping (RowndState) -> Original,
         transform: @escaping (Original) -> Derived, animation: SwiftUI.Animation? = nil,
         throttleInMs: Int
@@ -267,7 +260,7 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
         }
     }
 
-    fileprivate func applyThrottledStateUpdate(_ original: Original) {
+    @MainActor fileprivate func applyThrottledStateUpdate(_ original: Original) {
         if let animation = animation {
             withAnimation(animation) {
                 objectThrottled.send(original)
@@ -282,7 +275,6 @@ public class ObservableDerivedThrottledState<Original: Hashable, Derived: Hashab
 
 extension Store where State == RowndState {
 
-    // BACKWARD COMPATIBLE: Removed @MainActor requirement to restore API compatibility
     public func subscribe<T>(
         select selector: @escaping (RowndState) -> (T), animation: SwiftUI.Animation? = nil
     ) -> ObservableState<T> {
