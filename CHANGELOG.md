@@ -1,5 +1,9 @@
 
 
+## <small>3.14.9 (2026-02-27)</small>
+
+* fix: restore backward compatibility in state subscription API (#123) ([0a3c97f](https://github.com/rownd/ios/commit/0a3c97f)), closes [#123](https://github.com/rownd/ios/issues/123)
+
 ## <small>3.14.8 (2026-02-20)</small>
 
 * fix(state): stale pointer access could cause app crashes (#121) ([7fe6b4a](https://github.com/rownd/ios/commit/7fe6b4a))
