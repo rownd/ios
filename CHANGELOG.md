@@ -1,5 +1,10 @@
 
 
+## <small>3.14.10 (2026-03-18)</small>
+
+* chore: add .claude config and update Package.resolved ([d53df6d](https://github.com/rownd/ios/commit/d53df6d))
+* fix(instant): retain InstantUsers to prevent premature subscription cancellation ([d39d7b4](https://github.com/rownd/ios/commit/d39d7b4))
+
 ## <small>3.14.9 (2026-02-27)</small>
 
 * fix: restore backward compatibility in state subscription API (#123) ([0a3c97f](https://github.com/rownd/ios/commit/0a3c97f)), closes [#123](https://github.com/rownd/ios/issues/123)
