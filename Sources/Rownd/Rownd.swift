@@ -33,6 +33,7 @@ public class Rownd: NSObject {
     internal static let automationsCoordinator = AutomationsCoordinator()
     internal static var connectionAction = ConnectionAction()
     internal static var customerWebViews = CustomerWebViewManager()
+    @MainActor private static var instantUsers: InstantUsers?
 
     // Run processAutomations() every second to support time-based automations
     internal var automationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -96,8 +97,8 @@ public class Rownd: NSObject {
                 store.dispatch(PasskeyData.fetchPasskeyRegistration())
             }
 
-            InstantUsers(context: Context.currentContext)
-                .tmpForceInstantUserConversionIfRequested()
+            instantUsers = InstantUsers(context: Context.currentContext)
+            instantUsers?.tmpForceInstantUserConversionIfRequested()
         }
 
         return state
