@@ -48,6 +48,8 @@ public class Rownd: NSObject {
             config.appKey = _appKey
         }
 
+        registerSuperTokensSyncEventHandler()
+        
         let state = await inst.inflateStoreCache()
 
         // Skip the rest within app extensions

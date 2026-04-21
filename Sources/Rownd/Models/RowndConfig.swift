@@ -7,6 +7,27 @@
 
 import Foundation
 
+
+public struct SuperTokensAppInfo: Encodable {
+    public var appName: String
+    public var apiDomain: String
+    public var apiBasePath: String
+
+    public init(appName: String, apiDomain: String, apiBasePath: String = "/auth") {
+        self.appName = appName
+        self.apiDomain = apiDomain
+        self.apiBasePath = apiBasePath
+    }
+}
+
+public struct SuperTokensConfig: Encodable {
+    public var appInfo: SuperTokensAppInfo
+
+    public init(appInfo: SuperTokensAppInfo) {
+        self.appInfo = appInfo
+    }
+}
+
 public struct RowndConfig: Encodable {
     internal init() {}
 
@@ -21,6 +42,7 @@ public struct RowndConfig: Encodable {
     public var customizations: RowndCustomizations = RowndCustomizations()
 
     // These will not be encoded
+    public var supertokens: SuperTokensConfig? = nil
     public var appGroupPrefix: String?
     public var enableSmartLinkPasteBehavior: Bool = true
     public var signInLinkPattern: String = ".*\\.rownd\\.link$"
