@@ -31,10 +31,6 @@ private final class SuperTokensSyncEventHandler: RowndEventHandlerDelegate {
 private let superTokensSyncEventHandler = SuperTokensSyncEventHandler()
 
 func registerSuperTokensSyncEventHandler() {
-    guard Rownd.config.supertokens?.appInfo != nil else {
-        return
-    }
-
     let alreadyRegistered = Context.currentContext.eventListeners.contains { listener in
         listener === superTokensSyncEventHandler
     }
@@ -48,10 +44,15 @@ func syncUserToSuperTokens(
     accessToken: String,
     appInfo: SuperTokensAppInfo
 ) async {
-    let base = "\(appInfo.apiDomain)\(appInfo.apiBasePath)"
+    guard let url = appInfo.migrationURL else {
+        log.error(
+            "[Rownd->ST] invalid migration URL constructed from apiDomain=\(appInfo.apiDomain) apiBasePath=\(appInfo.apiBasePath)"
+        )
+        return
+    }
 
     do {
-        var request = URLRequest(url: URL(string: "\(base)/plugin/rownd/migrate")!)
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.httpShouldHandleCookies = true
