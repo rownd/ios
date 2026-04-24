@@ -1,5 +1,9 @@
 
 
+## 4.0.0 (2026-04-24)
+
+* Add the SuperTokens lazy user migration flow (#124) ([221d6bc](https://github.com/rownd/ios/commit/221d6bc)), closes [#124](https://github.com/rownd/ios/issues/124)
+
 ## <small>3.14.10 (2026-03-18)</small>
 
 * chore: add .claude config and update Package.resolved ([d53df6d](https://github.com/rownd/ios/commit/d53df6d))
