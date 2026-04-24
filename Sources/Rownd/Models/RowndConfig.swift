@@ -7,6 +7,64 @@
 
 import Foundation
 
+
+public struct SuperTokensAppInfo: Encodable {
+    public var appName: String
+    public var apiDomain: String
+    public var apiBasePath: String
+
+    internal var normalizedApiDomain: String? {
+        let domain = apiDomain.trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+
+        guard let url = URL(string: domain),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              url.host != nil
+        else {
+            return nil
+        }
+
+        return url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
+
+    internal var normalizedApiBasePath: String {
+        let segments = apiBasePath
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: "/")
+            .map(String.init)
+
+        return segments.isEmpty ? "" : "/" + segments.joined(separator: "/")
+    }
+
+    internal var migrationURL: URL? {
+        guard let normalizedApiDomain else {
+            return nil
+        }
+
+        guard var components = URLComponents(string: normalizedApiDomain) else {
+            return nil
+        }
+
+        components.path = normalizedApiBasePath + "/plugin/rownd/migrate"
+        return components.url
+    }
+
+    public init(appName: String, apiDomain: String, apiBasePath: String = "/auth") {
+        self.appName = appName
+        self.apiDomain = apiDomain
+        self.apiBasePath = apiBasePath
+    }
+}
+
+public struct SuperTokensConfig: Encodable {
+    public var appInfo: SuperTokensAppInfo
+
+    public init(appInfo: SuperTokensAppInfo) {
+        self.appInfo = appInfo
+    }
+}
+
 public struct RowndConfig: Encodable {
     internal init() {}
 
@@ -21,6 +79,7 @@ public struct RowndConfig: Encodable {
     public var customizations: RowndCustomizations = RowndCustomizations()
 
     // These will not be encoded
+    public var supertokens: SuperTokensConfig? = nil
     public var appGroupPrefix: String?
     public var enableSmartLinkPasteBehavior: Bool = true
     public var signInLinkPattern: String = ".*\\.rownd\\.link$"
