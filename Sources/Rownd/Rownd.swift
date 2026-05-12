@@ -181,6 +181,28 @@ public class Rownd: NSObject {
     }
 
     @MainActor
+    internal static func requestSignInForcedConversion(_ signInOptions: RowndSignInOptions?) {
+        inst.bottomSheetController.isUserDismissalDisabled = true
+        requestSignIn(signInOptions)
+    }
+
+    @MainActor
+    internal static func releaseForcedConversionLock() {
+        let wasLocked = inst.bottomSheetController.isUserDismissalDisabled
+        inst.bottomSheetController.isUserDismissalDisabled = false
+        guard wasLocked else { return }
+        // The post-auth auto-close may have fired and been blocked while the lock was held
+        // (Hub schedules hide() 1.5s after `.authentication` but `authLevel` propagates from a
+        // separate UserData.fetch — the timer can lose the race). Retry the close now.
+        (inst.bottomSheetController.controller as? HubViewProtocol)?.hide()
+    }
+
+    @MainActor
+    internal static var _bottomSheetIsLocked: Bool {
+        inst.bottomSheetController.isUserDismissalDisabled
+    }
+
+    @MainActor
     public static func connectAuthenticator(
         with: RowndConnectSignInHint, completion: (() -> Void)? = nil
     ) {

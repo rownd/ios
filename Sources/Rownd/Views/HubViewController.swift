@@ -182,11 +182,16 @@ public class HubViewController: UIViewController, HubViewProtocol, BottomSheetHo
             self.dismiss(animated: true)
             return
         }
-        
+
+        if bottomSheetController.isUserDismissalDisabled {
+            logger.debug("Ignoring HubViewController.hide(): forced-conversion lock is active")
+            return
+        }
+
         if (isBottomSheetDismissing) {
             return
         }
-        
+
         isBottomSheetDismissing = true
         bottomSheetController.hideBottomSheet({
             self.dismiss(animated: true)
