@@ -1,5 +1,9 @@
 
 
+## <small>4.0.1 (2026-05-12)</small>
+
+* fix(instant): make forced conversion sheet non-dismissible (#125) ([8731aac](https://github.com/rownd/ios/commit/8731aac)), closes [#125](https://github.com/rownd/ios/issues/125) [#125](https://github.com/rownd/ios/issues/125) [#1](https://github.com/rownd/ios/issues/1) [#2](https://github.com/rownd/ios/issues/2)
+
 ## 4.0.0 (2026-04-24)
 
 * Add the SuperTokens lazy user migration flow (#124) ([221d6bc](https://github.com/rownd/ios/commit/221d6bc)), closes [#124](https://github.com/rownd/ios/issues/124)
