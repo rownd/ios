@@ -24,6 +24,8 @@ class InstantUsersTests: XCTestCase {
 
     override func tearDown() {
         Rownd.config = originalConfig
+        // Reset the singleton lock so it does not leak between tests.
+        Rownd.releaseForcedConversionLock()
         super.tearDown()
     }
 
@@ -196,5 +198,126 @@ class InstantUsersTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 2.0)
 
         _ = instantUsers
+    }
+
+    /// Verifies that the forced-conversion lock is engaged on the singleton bottom
+    /// sheet when the conversion subscription fires for an instant user.
+    func testLockIsEngagedWhenConversionTriggers() async throws {
+        let store = createStore()
+        _ = Context(store)
+
+        Rownd.config.forceInstantUserConversion = true
+        XCTAssertFalse(Rownd._bottomSheetIsLocked, "Pre-condition: lock should start cleared")
+
+        let instantUsers = InstantUsers(context: Context.currentContext)
+        instantUsers.tmpForceInstantUserConversionIfRequested()
+
+        try await Task.sleep(nanoseconds: 50_000_000)
+
+        store.dispatch(SetAuthState(payload: AuthState(
+            accessToken: generateJwt(expires: Date(timeIntervalSinceNow: 3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date(timeIntervalSinceNow: 36000).timeIntervalSince1970)
+        )))
+        store.dispatch(SetClockSync(clockSyncState: .synced))
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_instant_user"],
+            authLevel: .instant
+        )))
+
+        try await waitUntil(timeout: 2.0) { Rownd._bottomSheetIsLocked }
+        XCTAssertTrue(Rownd._bottomSheetIsLocked, "Lock should engage when authLevel transitions to .instant")
+
+        _ = instantUsers
+    }
+
+    /// Verifies that the lock releases once the user transitions from `.instant`
+    /// to a non-instant identifier auth level (e.g. `.verified`).
+    func testLockReleasesAfterVerifiedConversion() async throws {
+        let store = createStore()
+        _ = Context(store)
+
+        Rownd.config.forceInstantUserConversion = true
+
+        let instantUsers = InstantUsers(context: Context.currentContext)
+        instantUsers.tmpForceInstantUserConversionIfRequested()
+
+        try await Task.sleep(nanoseconds: 50_000_000)
+
+        store.dispatch(SetAuthState(payload: AuthState(
+            accessToken: generateJwt(expires: Date(timeIntervalSinceNow: 3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date(timeIntervalSinceNow: 36000).timeIntervalSince1970)
+        )))
+        store.dispatch(SetClockSync(clockSyncState: .synced))
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_instant_user"],
+            authLevel: .instant
+        )))
+
+        try await waitUntil(timeout: 2.0) { Rownd._bottomSheetIsLocked }
+
+        // Simulate successful conversion: user-data fetch returns with verified level.
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_verified_user", "email": "user@example.com"],
+            authLevel: .verified
+        )))
+
+        try await waitUntil(timeout: 2.0) { !Rownd._bottomSheetIsLocked }
+        XCTAssertFalse(Rownd._bottomSheetIsLocked, "Lock should release once authLevel becomes .verified")
+
+        _ = instantUsers
+    }
+
+    /// Verifies that the `hasTriggeredConversion` gate prevents the conversion
+    /// flow from re-triggering after a successful conversion + lock release.
+    /// (The customer-confirmed behavior is once-per-session.)
+    func testConversionDoesNotRetriggerAfterRelease() async throws {
+        let store = createStore()
+        _ = Context(store)
+
+        Rownd.config.forceInstantUserConversion = true
+
+        let instantUsers = InstantUsers(context: Context.currentContext)
+        instantUsers.tmpForceInstantUserConversionIfRequested()
+
+        try await Task.sleep(nanoseconds: 50_000_000)
+
+        // First .instant → lock should engage.
+        store.dispatch(SetAuthState(payload: AuthState(
+            accessToken: generateJwt(expires: Date(timeIntervalSinceNow: 3600).timeIntervalSince1970),
+            refreshToken: generateJwt(expires: Date(timeIntervalSinceNow: 36000).timeIntervalSince1970)
+        )))
+        store.dispatch(SetClockSync(clockSyncState: .synced))
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_instant_user"],
+            authLevel: .instant
+        )))
+        try await waitUntil(timeout: 2.0) { Rownd._bottomSheetIsLocked }
+
+        // Convert and release.
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_user", "email": "user@example.com"],
+            authLevel: .verified
+        )))
+        try await waitUntil(timeout: 2.0) { !Rownd._bottomSheetIsLocked }
+
+        // Drop back to .instant — should NOT re-engage the lock (once-per-session).
+        store.dispatch(SetUserState(payload: UserState(
+            data: ["user_id": "test_user"],
+            authLevel: .instant
+        )))
+        try await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertFalse(Rownd._bottomSheetIsLocked, "Conversion must not re-trigger after a successful release")
+
+        _ = instantUsers
+    }
+
+    // MARK: - helpers
+
+    private func waitUntil(timeout: TimeInterval, condition: @escaping () -> Bool) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 25_000_000)
+        }
     }
 }

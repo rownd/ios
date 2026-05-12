@@ -11,6 +11,7 @@ import Combine
 class InstantUsers {
     private let context: Context
     private var cancellables = Set<AnyCancellable>()
+    private var hasTriggeredConversion: Bool = false
 
     init(
         context: Context
@@ -36,24 +37,26 @@ class InstantUsers {
             .removeDuplicates(
                 by: ==
             )
-            .first {
-                isAuthenticated,
-                authLevel in
-                isAuthenticated && authLevel == .instant
-            }
-            .sink {
-                isAuthenticated,
-                authLevel in
+            .sink { [weak self] isAuthenticated, authLevel in
+                guard let self = self, isAuthenticated else { return }
 
-                var signInOptions = RowndSignInOptions()
-                signInOptions.title = "Add a sign-in method"
-                signInOptions.subtitle = "To make sure you can always access your account, please add a sign-in method."
-                signInOptions.intent = .signUp
-                Rownd
-                    .requestSignIn(signInOptions)
+                if !self.hasTriggeredConversion && authLevel == .instant {
+                    self.hasTriggeredConversion = true
 
-                subscriber
-                    .unsubscribe()
+                    var signInOptions = RowndSignInOptions()
+                    signInOptions.title = "Add a sign-in method"
+                    signInOptions.subtitle = "To make sure you can always access your account, please add a sign-in method."
+                    signInOptions.intent = .signUp
+                    Rownd.requestSignInForcedConversion(signInOptions)
+                    return
+                }
+
+                // User has converted to a non-instant auth level (verified, unverified, guest).
+                // Release the lock so the Hub's post-success auto-close can proceed.
+                if self.hasTriggeredConversion && authLevel != .instant && authLevel != .unknown {
+                    Rownd.releaseForcedConversionLock()
+                    subscriber.unsubscribe()
+                }
             }.store(
                 in: &self.cancellables
             )
