@@ -1,5 +1,9 @@
 
 
+## <small>3.14.11 (2026-05-12)</small>
+
+* fix(instant): make forced conversion sheet non-dismissible (#125) (#126) ([537f3a0](https://github.com/rownd/ios/commit/537f3a0)), closes [#125](https://github.com/rownd/ios/issues/125) [#126](https://github.com/rownd/ios/issues/126) [#125](https://github.com/rownd/ios/issues/125) [#1](https://github.com/rownd/ios/issues/1) [#2](https://github.com/rownd/ios/issues/2)
+
 ## <small>3.14.10 (2026-03-18)</small>
 
 * chore: add .claude config and update Package.resolved ([d53df6d](https://github.com/rownd/ios/commit/d53df6d))
