@@ -24,6 +24,11 @@ class BottomSheetViewController: UIViewController {
     var latestTargetHeight: CGFloat = 0.9
     var isKeyboardOpen = false
 
+    // When true, swipe-to-dismiss and tap-outside-to-dismiss are disabled for this presentation,
+    // and the Hub's `can_touch_background_to_dismiss` message cannot re-enable them. Programmatic
+    // dismissal (e.g. after a successful sign-in) is unaffected. Reset on viewDidDisappear.
+    var isUserDismissalDisabled: Bool = false
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let controller = controller else {
@@ -54,6 +59,9 @@ class BottomSheetViewController: UIViewController {
 
         sheetController = presentAsBottomSheet(controller, theme: theme, behavior: behavior)
 
+        if isUserDismissalDisabled {
+            sheetController?.setCanTouchDimmingBackgroundToDismiss(false)
+        }
     }
 
     override func viewDidLoad() {
@@ -69,6 +77,7 @@ class BottomSheetViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.controller = nil
+        self.isUserDismissalDisabled = false
     }
 
     func updateBottomSheetHeight(_ number: CGFloat) {
@@ -77,6 +86,10 @@ class BottomSheetViewController: UIViewController {
     }
 
     public func hideBottomSheet(_ completion: (() -> Void)? = nil) {
+        if isUserDismissalDisabled {
+            logger.debug("Ignoring hideBottomSheet: forced-conversion lock is active")
+            return
+        }
         sheetController?.dismiss(completion)
     }
 
@@ -99,6 +112,9 @@ class BottomSheetViewController: UIViewController {
     }
 
     func canTouchDimmingBackgroundToDismiss(_ enable: Bool) {
+        if isUserDismissalDisabled && enable {
+            return
+        }
         if let sheetController = sheetController {
             sheetController.setCanTouchDimmingBackgroundToDismiss(enable)
         }

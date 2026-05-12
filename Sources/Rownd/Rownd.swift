@@ -181,6 +181,17 @@ public class Rownd: NSObject {
     }
 
     @MainActor
+    internal static func requestSignInForcedConversion(_ signInOptions: RowndSignInOptions?) {
+        inst.bottomSheetController.isUserDismissalDisabled = true
+        requestSignIn(signInOptions)
+    }
+
+    @MainActor
+    internal static func releaseForcedConversionLock() {
+        inst.bottomSheetController.isUserDismissalDisabled = false
+    }
+
+    @MainActor
     public static func connectAuthenticator(
         with: RowndConnectSignInHint, completion: (() -> Void)? = nil
     ) {
